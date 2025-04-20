@@ -1,0 +1,4 @@
+fastapi[all]
+gspread
+oauth2client
+pandas
