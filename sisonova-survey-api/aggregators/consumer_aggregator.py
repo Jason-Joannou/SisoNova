@@ -15,10 +15,11 @@ from utils.gs_client import load_gs_client
 
 def get_gender_demographic_statistics(df: pd.DataFrame, gender: Optional[str] = None):
     """
-    Gets the statistics of all the male survey participants
+    Gets the statistics of all the survey participants
 
     Args:
         df (pd.DataFrame): A dataframe containing the demographic information.
+        gender (Optional[str]): A string of the type of gender to filter the dataframe by
 
     Returns:
         dict: Male statistics
