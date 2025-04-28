@@ -232,6 +232,9 @@ def rename_all_survey_columns(df: pd.DataFrame) -> pd.DataFrame:
     renamed_df = df.copy()
     all_mappings = {}
 
+    # strip any whitespace coming from survey
+    renamed_df.columns = df.columns.str.strip()
+
     mapping_dicts = [
         DEMOGRAPHIC_COLUMNS,
         PERSONAL_AND_HOUSEHOLD_INCOME_COLUMNS,
