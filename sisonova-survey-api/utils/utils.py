@@ -35,11 +35,14 @@ def format_number_columns(number_columns: List[str]) -> float:
     formatted_list = []
 
     for number in number_columns:
-        if len(number) > 1:
-            formatted_number = int(number[0])
-            formatted_list.append(formatted_number)
+        if isinstance(number, str):
+            if len(number) > 1:
+                formatted_number = int(number[0])
+                formatted_list.append(formatted_number)
+            else:
+                formatted_list.append(int(number))
         else:
-            formatted_list.append(int(number))
+            formatted_list.append(number)
 
     avg = np.mean(formatted_list)
 
