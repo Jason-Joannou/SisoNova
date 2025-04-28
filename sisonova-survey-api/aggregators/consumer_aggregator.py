@@ -2,8 +2,8 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-
 from utils.gs_client import load_gs_client
+from utils.utils import format_checkbox_columns
 
 # The idea is to build a story line for each of the sections in the survey
 # So whats the storyline
@@ -66,3 +66,14 @@ def get_gender_demographic_statistics(df: pd.DataFrame, gender: Optional[str] = 
             formatted_earn_income_in_household.append(int(number))
 
     average_income_in_household = np.mean(formatted_earn_income_in_household)
+
+    # Income Management
+
+    most_frequent_spending_plan = new_df["PLAN_SPENDING"].mode()[0]
+    most_frequent_spending_plan_period = new_df["WHEN_PLAN_SPENDING"].mode()[0]
+    most_frequent_budget_description = new_df["BUDGET_DESCRIPTION"].mode()[0]
+    most_frequent_tracking_method = new_df["TRACK_MONEY"].mode()[0]
+    most_frequent_manage_method = format_checkbox_columns(
+        new_df["MANAGE_SPENDING"].to_list()
+    )
+    most_frequent_control_method = new_df["MONEY_CONTROL"].mode()[0]
