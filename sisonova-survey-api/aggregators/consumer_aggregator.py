@@ -1,8 +1,9 @@
-from typing import Optional
+from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
 
+from utils.consumer_survey_mappings import rename_all_survey_columns
 from utils.gs_client import load_gs_client
 from utils.utils import format_checkbox_columns, format_number_columns
 
@@ -329,3 +330,33 @@ def get_gender_demographic_statistics(df: pd.DataFrame, gender: Optional[str] = 
     )
 
     return stats
+
+
+def build_consumer_storyline(gender: Optional[str] = None) -> Dict:
+    """
+    This methods pulls the answers from the google form, formats them, gets the statistics, and returns the results.
+
+    Args:
+        gender (Optional[str]): The gender we want to get statistics for - if None we get all.
+
+    Returns:
+        Dict: The statistics object
+    """
+
+    client = load_gs_client()
+    sheet = client.open("SisoNova Consumer Survey (Responses)").sheet1
+    data = sheet.get_all_records()
+    df = pd.DataFrame(data)
+    df = rename_all_survey_columns(df=df)
+
+    print(df.head())
+
+    stats = get_gender_demographic_statistics(df=df, gender=gender)
+
+    return stats
+
+
+if __name__ == "__main__":
+
+    stats = build_consumer_storyline(gender="Male")
+    print(stats)
