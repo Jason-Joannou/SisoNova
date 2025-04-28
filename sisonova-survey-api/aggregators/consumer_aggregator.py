@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from utils.gs_client import load_gs_client
-from utils.utils import format_checkbox_columns
+from utils.utils import format_checkbox_columns, format_number_columns
 
 # The idea is to build a story line for each of the sections in the survey
 # So whats the storyline
@@ -72,29 +72,13 @@ def get_gender_demographic_statistics(df: pd.DataFrame, gender: Optional[str] = 
         else "No data"
     )
 
-    people_in_household_list = new_df["HOUSEHOLD_SIZE"].to_list()
-    formatted_people_in_household_list = []
+    stats["average_household_size"] = format_number_columns(
+        new_df["HOUSEHOLD_SIZE"].to_list()
+    )
 
-    for number in people_in_household_list:
-        if len(number) > 1:
-            formatted_number = int(number[0])
-            formatted_people_in_household_list.append(formatted_number)
-        else:
-            formatted_people_in_household_list.append(int(number))
-
-    stats["average_household_size"] = np.mean(formatted_people_in_household_list)
-
-    earn_income_in_household = new_df["INCOME_EARNERS_COUNT"].to_list()
-    formatted_earn_income_in_household = []
-
-    for number in earn_income_in_household:
-        if len(number) > 1:
-            formatted_number = int(number)
-            formatted_earn_income_in_household.append(formatted_number)
-        else:
-            formatted_earn_income_in_household.append(int(number))
-
-    stats["average_income_earners"] = np.mean(formatted_earn_income_in_household)
+    stats["average_income_earners"] = format_number_columns(
+        new_df["INCOME_EARNERS_COUNT"].to_list()
+    )
 
     # Income Management
 
@@ -226,10 +210,8 @@ def get_gender_demographic_statistics(df: pd.DataFrame, gender: Optional[str] = 
     stats["most_frequent_financial_service_concern"] = format_checkbox_columns(
         new_df["FINANCIAL_SERVICE_CONCERNS"].to_list()
     )
-    stats["most_frequent_financial_confidence"] = (
-        new_df["FINANCIAL_CONFIDENCE"].mode()[0]
-        if not new_df["FINANCIAL_CONFIDENCE"].empty
-        else "No data"
+    stats["most_frequent_financial_confidence"] = format_number_columns(
+        new_df["FINANCIAL_CONFIDENCE"].to_list()
     )
     stats["most_frequent_financial_confusion_response"] = (
         new_df["FINANCIAL_CONFUSION_RESPONSE"].mode()[0]
@@ -259,10 +241,8 @@ def get_gender_demographic_statistics(df: pd.DataFrame, gender: Optional[str] = 
 
     # Psychological Barriers
 
-    stats["most_frequent_financial_risk_tolerance"] = (
-        new_df["FINANCIAL_RISK_TOLERANCE"].mode()[0]
-        if not new_df["FINANCIAL_RISK_TOLERANCE"].empty
-        else "No data"
+    stats["most_frequent_financial_risk_tolerance"] = format_number_columns(
+        new_df["FINANCIAL_RISK_TOLERANCE"].to_list()
     )
     stats["most_frequent_debt_attitude"] = (
         new_df["DEBT_ATTITUDE"].mode()[0]
@@ -336,10 +316,8 @@ def get_gender_demographic_statistics(df: pd.DataFrame, gender: Optional[str] = 
     stats["most_frequent_fintech_adoption_motivator"] = format_checkbox_columns(
         new_df["FINTECH_ADOPTION_MOTIVATORS"].to_list()
     )
-    stats["most_frequent_digital_security_trust"] = (
-        new_df["DIGITAL_SECURITY_TRUST"].mode()[0]
-        if not new_df["DIGITAL_SECURITY_TRUST"].empty
-        else "No data"
+    stats["most_frequent_digital_security_trust"] = format_number_columns(
+        new_df["DIGITAL_SECURITY_TRUST"].to_list()
     )
     stats["most_frequent_digital_error_anxiety"] = (
         new_df["DIGITAL_ERROR_ANXIETY"].mode()[0]
