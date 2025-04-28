@@ -1,5 +1,7 @@
 from typing import List
 
+import pandas as pd
+
 from utils.config import (
     DEMOGRAPHIC_COLUMNS,
     FINANCIAL_ACCESS_COLUMNS,
@@ -223,3 +225,31 @@ def map_phsycological_barriers_to_standard(columns_to_map: List[str]):
     new_columns = [PSYCHOLOGICAL_BARRIERS_COLUMNS[value] for value in columns_to_keep]
 
     return new_columns
+
+
+def rename_all_survey_columns(df: pd.DataFrame) -> pd.DataFrame:
+
+    renamed_df = df.copy()
+    all_mappings = {}
+
+    mapping_dicts = [
+        DEMOGRAPHIC_COLUMNS,
+        PERSONAL_AND_HOUSEHOLD_INCOME_COLUMNS,
+        INCOME_MANAGEMENT_COLUMNS,
+        FINANCIAL_ACCESS_COLUMNS,
+        FINANCIAL_BARRIERS_COLUMNS,
+        PSYCHOLOGICAL_BARRIERS_COLUMNS,
+        TECHNOLOGY_UNDERSTANDING_COLUMNS,
+    ]
+
+    for mapping_dict in mapping_dicts:
+        all_mappings.update(mapping_dict)
+
+    columns_to_rename = {}
+    for old_col, new_col in all_mappings.items():
+        if old_col in renamed_df.columns:
+            columns_to_rename[old_col] = new_col
+
+    renamed_df.rename(columns=columns_to_rename, inplace=True)
+
+    return renamed_df
