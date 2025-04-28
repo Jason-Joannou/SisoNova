@@ -3,11 +3,16 @@ from typing import List, Optional
 
 import gspread
 from dotenv import load_dotenv
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
 load_dotenv()
 
-SCOPE: List[str] = os.getenv("GOOGLE_API_SCOPE")
+SCOPE: List[str] = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CREDENTIALS_PATH = os.path.join(BASE_DIR, "sisonova-api-credentials.json")
 
 
 def load_gs_client(scope: Optional[List[str]] = None) -> gspread.Client:
@@ -32,8 +37,8 @@ def load_gs_client(scope: Optional[List[str]] = None) -> gspread.Client:
         if scope is None:
             scope = SCOPE
 
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            filename="../sisonova-api-credentials.json", scopes=scope
+        credentials = Credentials.from_service_account_file(
+            filename=CREDENTIALS_PATH, scopes=scope
         )
         client = gspread.authorize(credentials)
         return client
