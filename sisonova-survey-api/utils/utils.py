@@ -1,8 +1,8 @@
 from collections import Counter
-from typing import List
+from typing import List, Optional
 
 
-def format_checkbox_columns(checkbox_column: List[str]) -> str:
+def format_checkbox_columns(checkbox_column: List[str]) -> Optional[str]:
     """
     This formats and returns the most common string in a column
 
@@ -18,6 +18,9 @@ def format_checkbox_columns(checkbox_column: List[str]) -> str:
     for long_string in checkbox_column:
         seperated_strings = long_string.split(",")
         formatted_strings.extend(seperated_strings)
+
+    if not formatted_strings:
+        return None
 
     counter = Counter(formatted_strings)
     most_common_string, _ = counter.most_common(1)[0]
