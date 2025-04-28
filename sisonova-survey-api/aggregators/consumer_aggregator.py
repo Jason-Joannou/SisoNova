@@ -347,9 +347,8 @@ def build_consumer_storyline(gender: Optional[str] = None) -> Dict:
     sheet = client.open("SisoNova Consumer Survey (Responses)").sheet1
     data = sheet.get_all_records()
     df = pd.DataFrame(data)
-    df = rename_all_survey_columns(df=df)
 
-    print(df.head())
+    df = rename_all_survey_columns(df=df)
 
     stats = get_gender_demographic_statistics(df=df, gender=gender)
 
