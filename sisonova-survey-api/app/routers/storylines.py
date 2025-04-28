@@ -6,14 +6,16 @@ from fastapi.responses import JSONResponse
 from aggregators.consumer_aggregator import build_consumer_storyline
 
 router = APIRouter(
-    prefix="api/storyline",
+    prefix="/api/storyline",
     tags=["storyline"],
     responses={404: {"description": "Not Found"}},
 )
 
 
-@router.get("/")
-async def get_storyline(gender: Optional[str] = None) -> Union[HTTPException, Response]:
+@router.get("/", response_model=None)  # Will define response model later
+async def get_storyline(
+    gender: Optional[str] = None,
+):
     """
     Get the financial storyline statistics based on gender.
 
