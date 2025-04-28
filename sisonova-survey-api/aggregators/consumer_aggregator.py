@@ -28,22 +28,50 @@ def get_gender_demographic_statistics(df: pd.DataFrame, gender: Optional[str] = 
     if gender:
         new_df = df[df["GENDER"] == gender].copy()
 
+    stats = {}
+
     number_of_participants = len(new_df)
     # Demographics
 
-    most_frequent_age_group = new_df["AGE_GROUP"].mode()[0]
-    most_frequent_province = new_df["PROVINCE"].mode()[0]
-    most_frequent_living_location = new_df["LOCATION"].mode()[0]
-    most_frequent_employment_status = new_df["EMPLOYMENT_STATUS"].mode()[0]
-    most_frequent_education_level = new_df["EDUCATION_COMPLETED"].mode()[0]
+    stats["most_frequent_age_group"] = (
+        new_df["AGE_GROUP"].mode()[0] if not new_df["AGE_GROUP"].empty else "No data"
+    )
+    stats["most_frequent_province"] = (
+        new_df["PROVINCE"].mode()[0] if not new_df["PROVINCE"].empty else "No data"
+    )
+    stats["most_frequent_living_location"] = (
+        new_df["AREA_TYPE"].mode()[0] if not new_df["AREA_TYPE"].empty else "No data"
+    )
+    stats["most_frequent_employment_status"] = (
+        new_df["EMPLOYMENT_STATUS"].mode()[0]
+        if not new_df["EMPLOYMENT_STATUS"].empty
+        else "No data"
+    )
+    stats["most_frequent_education_level"] = (
+        new_df["EDUCATION_LEVEL"].mode()[0]
+        if not new_df["EDUCATION_LEVEL"].empty
+        else "No data"
+    )
 
     # Personal and household income
 
-    most_frequent_personal_income = new_df["PERSONAL_INCOME"].mode()[0]
-    most_frequent_household_income = new_df["HOUSEHOLD_INCOME"].mode()[0]
-    most_frequent_source_of_income = new_df["SOURCE_OF_INCOME"].mode()[0]
+    stats["most_frequent_personal_income"] = (
+        new_df["MONTHLY_PERSONAL_INCOME"].mode()[0]
+        if not new_df["MONTHLY_PERSONAL_INCOME"].empty
+        else "No data"
+    )
+    stats["most_frequent_household_income"] = (
+        new_df["MONTHLY_HOUSEHOLD_INCOME"].mode()[0]
+        if not new_df["MONTHLY_HOUSEHOLD_INCOME"].empty
+        else "No data"
+    )
+    stats["most_frequent_source_of_income"] = (
+        new_df["INCOME_SOURCE"].mode()[0]
+        if not new_df["INCOME_SOURCE"].empty
+        else "No data"
+    )
 
-    people_in_household_list = new_df["PEOPLE_IN_HOUSEHOLD"].to_list()
+    people_in_household_list = new_df["HOUSEHOLD_SIZE"].to_list()
     formatted_people_in_household_list = []
 
     for number in people_in_household_list:
@@ -53,9 +81,9 @@ def get_gender_demographic_statistics(df: pd.DataFrame, gender: Optional[str] = 
         else:
             formatted_people_in_household_list.append(int(number))
 
-    average_people_in_household = np.mean(formatted_people_in_household_list)
+    stats["average_household_size"] = np.mean(formatted_people_in_household_list)
 
-    earn_income_in_household = new_df["EARN_INCOME_IN_HOUSEHOLD"].to_list()
+    earn_income_in_household = new_df["INCOME_EARNERS_COUNT"].to_list()
     formatted_earn_income_in_household = []
 
     for number in earn_income_in_household:
@@ -65,15 +93,73 @@ def get_gender_demographic_statistics(df: pd.DataFrame, gender: Optional[str] = 
         else:
             formatted_earn_income_in_household.append(int(number))
 
-    average_income_in_household = np.mean(formatted_earn_income_in_household)
+    stats["average_income_earners"] = np.mean(formatted_earn_income_in_household)
 
     # Income Management
 
-    most_frequent_spending_plan = new_df["PLAN_SPENDING"].mode()[0]
-    most_frequent_spending_plan_period = new_df["WHEN_PLAN_SPENDING"].mode()[0]
-    most_frequent_budget_description = new_df["BUDGET_DESCRIPTION"].mode()[0]
-    most_frequent_tracking_method = new_df["TRACK_MONEY"].mode()[0]
-    most_frequent_manage_method = format_checkbox_columns(
-        new_df["MANAGE_SPENDING"].to_list()
+    stats["most_frequent_spending_plan_frequency"] = (
+        new_df["SPENDING_PLAN_FREQUENCY"].mode()[0]
+        if not new_df["SPENDING_PLAN_FREQUENCY"].empty
+        else "No data"
     )
-    most_frequent_control_method = new_df["MONEY_CONTROL"].mode()[0]
+    stats["most_frequent_spending_plan_timing"] = (
+        new_df["SPENDING_PLAN_TIMING"].mode()[0]
+        if not new_df["SPENDING_PLAN_TIMING"].empty
+        else "No data"
+    )
+    stats["most_frequent_budgeting_style"] = (
+        new_df["BUDGETING_STYLE"].mode()[0]
+        if not new_df["BUDGETING_STYLE"].empty
+        else "No data"
+    )
+    stats["most_frequent_expense_tracking"] = (
+        new_df["EXPENSE_TRACKING"].mode()[0]
+        if not new_df["EXPENSE_TRACKING"].empty
+        else "No data"
+    )
+    stats["most_frequent_spending_management_tool"] = format_checkbox_columns(
+        new_df["SPENDING_MANAGEMENT_TOOLS"].to_list()
+    )
+    stats["most_frequent_financial_control"] = (
+        new_df["FINANCIAL_CONTROL_FREQUENCY"].mode()[0]
+        if not new_df["FINANCIAL_CONTROL_FREQUENCY"].empty
+        else "No data"
+    )
+    stats["most_frequent_money_emotion"] = (
+        new_df["MONEY_EMOTION"].mode()[0]
+        if not new_df["MONEY_EMOTION"].empty
+        else "No data"
+    )
+    stats["most_frequent_income_adequacy"] = (
+        new_df["INCOME_ADEQUACY"].mode()[0]
+        if not new_df["INCOME_ADEQUACY"].empty
+        else "No data"
+    )
+    stats["most_frequent_cash_shortage_strategy"] = format_checkbox_columns(
+        new_df["CASH_SHORTAGE_STRATEGIES"].to_list()
+    )
+    stats["most_frequent_payment_delay"] = (
+        new_df["PAYMENT_DELAY_FREQUENCY"].mode()[0]
+        if not new_df["PAYMENT_DELAY_FREQUENCY"].empty
+        else "No data"
+    )
+    stats["most_frequent_monthly_surplus"] = (
+        new_df["MONTHLY_SURPLUS"].mode()[0]
+        if not new_df["MONTHLY_SURPLUS"].empty
+        else "No data"
+    )
+    stats["most_frequent_spending_priority"] = (
+        new_df["SPENDING_PRIORITY_METHOD"].mode()[0]
+        if not new_df["SPENDING_PRIORITY_METHOD"].empty
+        else "No data"
+    )
+    stats["most_frequent_financial_decision_factor"] = (
+        new_df["FINANCIAL_DECISION_FACTORS"].mode()[0]
+        if not new_df["FINANCIAL_DECISION_FACTORS"].empty
+        else "No data"
+    )
+    stats["most_frequent_purchase_regret"] = (
+        new_df["PURCHASE_REGRET_FREQUENCY"].mode()[0]
+        if not new_df["PURCHASE_REGRET_FREQUENCY"].empty
+        else "No data"
+    )
