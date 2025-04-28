@@ -46,39 +46,39 @@ FINANCIAL_ACCESS_COLUMNS = {
 }
 
 FINANCIAL_BARRIERS_COLUMNS = {
-    "Have you ever avoided getting a bank account, insurance, or loan because the paperwork was too confusing?": "PAPERWORK_AVOIDANCE",  # Changed from AVOIDED_FINANCIAL_SERVICES
-    "Is it easy for you to understand the papers and rules from banks and other money businesses?": "FINANCIAL_LITERACY_LEVEL",  # Changed from UNDERSTANDING_OF_FINANCIAL_SERVICES
-    "Have you ever been asked to give documents (like your ID, proof of where you live, or payslip) and couldn't?": "DOCUMENTATION_BARRIERS",  # Changed from FINANCIAL_DOCUMENTATION_REQUIRED
-    "When you think about using something new from the bank (like a loan or insurance), what worries you the most? (Select all that apply)": "FINANCIAL_SERVICE_CONCERNS",  # Changed from WORRY_FOR_NEW_FINANCIAL_SERVICE
-    "How sure are you that you can manage your money well?": "FINANCIAL_CONFIDENCE",  # Changed from CAN_MANAGE_MONEY_WELL
-    "If you don't understand something about a bank or money service, what do you usually do?": "FINANCIAL_CONFUSION_RESPONSE",  # Changed from ACTION_FOR_NOT_UNDERSTANDING_FINANCIAL_SERVICE
-    "Do you trust banks and other money services to treat you fairly and honestly?": "FINANCIAL_INSTITUTION_TRUST",  # Changed from FAIRLY_TREATED
-    "Have you ever had a bad experience with a bank or money service that made you not want to use them again?": "NEGATIVE_FINANCIAL_EXPERIENCES",  # Changed from FINANCIAL_SERVICES_BAD_EXPERIENCE
-    "Do you ever feel like banks or money services are not made for people in your situation or community?": "FINANCIAL_EXCLUSION_FEELING",  # Changed from FINANCIAL_SERVICES_MADE_FOR_YOU
-    "If banks and money services were explained more clearly and simply, would you be more likely to use them?": "CLARITY_IMPACT_ON_USAGE",  # Changed from FINANCIAL_SERVICES_ACCEPTANCE_IF_UNDERSTANABLE
+    "Have you ever avoided getting a bank account, insurance, or loan because the paperwork was too confusing?": "PAPERWORK_AVOIDANCE",
+    "Is it easy for you to understand the papers and rules from banks and other money businesses?": "FINANCIAL_LITERACY_LEVEL",
+    "Have you ever been asked to give documents (like your ID, proof of where you live, or payslip) and couldn’t?": "DOCUMENTATION_BARRIERS",
+    "When you think about using something new from the bank (like a loan or insurance), what worries you the most? (Select all that apply)": "FINANCIAL_SERVICE_CONCERNS",
+    "How sure are you that you can manage your money well?": "FINANCIAL_CONFIDENCE",
+    "If you don’t understand something about a bank or money service, what do you usually do?": "FINANCIAL_CONFUSION_RESPONSE",
+    "Do you trust banks and other money services to treat you fairly and honestly?": "FINANCIAL_INSTITUTION_TRUST",
+    "Have you ever had a bad experience with a bank or money service that made you not want to use them again?": "NEGATIVE_FINANCIAL_EXPERIENCES",
+    "Do you ever feel like banks or money services are not made for people in your situation or community?": "FINANCIAL_EXCLUSION_FEELING",
+    "If banks and money services were explained more clearly and simply, would you be more likely to use them?": "CLARITY_IMPACT_ON_USAGE",
 }
 
-PSYCHOLOGICAL_BARRIERS_COLUMNS = {  # Fixed spelling from PHSYCOLOGICAL to PSYCHOLOGICAL
-    "How comfortable are you with taking risks with your money (for example, investing in something that could make you more money, but also could lose money)?": "FINANCIAL_RISK_TOLERANCE",  # Changed from RISK_COMFORT
-    "Do you think taking on debt (like a loan) can be a good idea if you can manage it well?": "DEBT_ATTITUDE",  # Changed from TAKE_ON_DEBT_GOOD
-    "What is your first thought when you hear the word 'debt'?": "DEBT_PERCEPTION",  # Changed from DEBT_EMOTION
-    "If you needed money quickly, how would you feel about borrowing it (from a bank, family, or friends)?": "BORROWING_COMFORT",  # Changed from MONEY_BORROWING_FEELING
-    "What does saving money mean to you? (Select all that apply)": "SAVING_PERCEPTION",  # Changed from SAVING_MEANING
-    "Do you think it's possible to save money even if you don't have a lot of money or your income changes often?": "SAVING_POSSIBILITY_BELIEF",  # Changed from POSSIBLE_TO_SAVE
-    "When you get extra income (like a bonus, gift, or side job), what do you usually do first?": "WINDFALL_USAGE",  # Changed from EXTRA_INCOME_DECISION
-    "Do you think saving money pays off in the long run?": "SAVING_BENEFIT_BELIEF",  # Changed from DOES_SAVING_PAYOFF
-    "How do you decide if something is worth buying?": "PURCHASE_DECISION_CRITERIA",  # Changed from WORTH_BUYING_RATIONAL
+PSYCHOLOGICAL_BARRIERS_COLUMNS = {
+    "How comfortable are you with taking risks with your money (for example, investing in something that could make you more money, but also could lose money)?": "FINANCIAL_RISK_TOLERANCE",
+    "Do you think taking on debt (like a loan) can be a good idea if you can manage it well?": "DEBT_ATTITUDE",
+    "What is your first thought when you hear the word “debt”?": "DEBT_PERCEPTION",
+    "If you needed money quickly, how would you feel about borrowing it (from a bank, family, or friends)?": "BORROWING_COMFORT",
+    "What does saving money mean to you? (Select all that apply)": "SAVING_PERCEPTION",
+    "Do you think it’s possible to save money even if you don’t have a lot of money or your income changes often?": "SAVING_POSSIBILITY_BELIEF",
+    "When you get extra income (like a bonus, gift, or side job), what do you usually do first?": "WINDFALL_USAGE",
+    "Do you think saving money pays off in the long run?": "SAVING_BENEFIT_BELIEF",
+    "How do you decide if something is worth buying?": "PURCHASE_DECISION_CRITERIA",
 }
 
 TECHNOLOGY_UNDERSTANDING_COLUMNS = {
-    "How comfortable are you with using technology for money tasks (like sending money, checking your balance, or signing up for services)?": "FINTECH_COMFORT_LEVEL",  # Changed from COMFORTABLE_USING_FINANCIAL_APPS
-    "Which of these devices do you use to manage your money? (Select all that apply)": "FINANCIAL_MANAGEMENT_DEVICES",  # Changed from DEVICE_MANAGEMENT_FOR_MONEY
-    "How often do you access the internet (on any device)?": "INTERNET_USAGE_FREQUENCY",  # Changed from INTERNET_ACCESS_FREQUENCY
-    "What's the biggest problem you face when using digital tools for managing money (like apps, websites, or mobile money)?": "DIGITAL_FINANCE_CHALLENGES",  # Changed from BIGGEST_DIGITAL_TOOL_PROBLEM
-    "Have you ever stopped using a financial app or service because it was hard to understand or use?": "APP_ABANDONMENT_EXPERIENCE",  # Changed from ACTION_FOR_NOT_UNDERSTANDING_FINANCIAL_SERVICE
-    "If you needed to learn how to use a new financial app, how would you like to learn?": "FINTECH_LEARNING_PREFERENCE",  # Changed from PREFERRED_LEARNING_METHOD_FOR_NEW_FINANCIAL_SERVICE
-    "What would encourage you to try a new financial app or tool? (Select all that apply)": "FINTECH_ADOPTION_MOTIVATORS",  # Changed from ENCOURAGEMENT_FOR_NEW_FINANCIAL_SERVICE
-    "How much do you trust online platforms to keep your personal and financial information secure?": "DIGITAL_SECURITY_TRUST",  # Changed from ONLINE_FINANCIAL_SERVICES_TRUST_LEVELS
-    "Do you ever avoid using digital tools for money because you're worried you might make a mistake (like sending money to the wrong person)?": "DIGITAL_ERROR_ANXIETY",  # Changed from AVOID_DIGITAL_TOOLS
-    "Which digital tools or apps do you use to manage your money? (Select all that apply)": "FINANCIAL_APPS_USED",  # Changed from FINANCIAL_SERVICES_APPS
+    "How comfortable are you with using technology for money tasks (like sending money, checking your balance, or signing up for services)?": "FINTECH_COMFORT_LEVEL",
+    "Which of these devices do you use to manage your money? (Select all that apply)": "FINANCIAL_MANAGEMENT_DEVICES",
+    "How often do you access the internet (on any device)?": "INTERNET_USAGE_FREQUENCY",
+    "What’s the biggest problem you face when using digital tools for managing money (like apps, websites, or mobile money)?": "DIGITAL_FINANCE_CHALLENGES",
+    "Have you ever stopped using a financial app or service because it was hard to understand or use?": "APP_ABANDONMENT_EXPERIENCE",
+    "If you needed to learn how to use a new financial app, how would you like to learn?": "FINTECH_LEARNING_PREFERENCE",
+    "What would encourage you to try a new financial app or tool? (Select all that apply)": "FINTECH_ADOPTION_MOTIVATORS",
+    "How much do you trust online platforms to keep your personal and financial information secure?": "DIGITAL_SECURITY_TRUST",
+    "Do you ever avoid using digital tools for money because you're worried you might make a mistake (like sending money to the wrong person)?": "DIGITAL_ERROR_ANXIETY",
+    "Which digital tools or apps do you use to manage your money? (Select all that apply)": "FINANCIAL_APPS_USED",
 }
