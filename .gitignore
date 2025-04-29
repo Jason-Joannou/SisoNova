@@ -173,5 +173,49 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
+# node related ignores
+
+# Node related ignores
+
+# dependencies
+sisonova-survey-frontend/node_modules
+sisonova-survey-frontend/.pnp
+sisonova-survey-frontend/.pnp.*
+sisonova-survey-frontend/.yarn/*
+!sisonova-survey-frontend/.yarn/patches
+!sisonova-survey-frontend/.yarn/plugins
+!sisonova-survey-frontend/.yarn/releases
+!sisonova-survey-frontend/.yarn/versions
+
+# testing
+sisonova-survey-frontend/coverage
+
+# next.js
+sisonova-survey-frontend/.next/
+sisonova-survey-frontend/out/
+
+# production
+sisonova-survey-frontend/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+sisonova-survey-frontend/npm-debug.log*
+sisonova-survey-frontend/yarn-debug.log*
+sisonova-survey-frontend/yarn-error.log*
+sisonova-survey-frontend/.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+sisonova-survey-frontend/.env*
+
+# vercel
+sisonova-survey-frontend/.vercel
+
+# typescript
+sisonova-survey-frontend/*.tsbuildinfo
+sisonova-survey-frontend/next-env.d.ts
+
 # Misc
 sisonova-survey-api/sisonova-api-credentials.json
