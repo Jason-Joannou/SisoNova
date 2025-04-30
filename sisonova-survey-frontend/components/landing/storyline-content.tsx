@@ -6,6 +6,7 @@ import { useStoryLine } from "@/lib/hooks/use-storyline";
 import { Card, CardContent } from "../ui/card";
 import { StorylineContentProps } from "@/lib/types/component";
 import LoadingState from "../shared/loading-state";
+import { UbuntuHeading } from "../ui/ubuntu-heading";
 
 export default function StoryLineContent({gender}: StorylineContentProps) {
     const { data, loading, error } = useStoryLine(gender);
@@ -71,14 +72,14 @@ const sectionVariants = {
         animate={isInView ? "visible" : "hidden"}
         className="max-w-3xl mx-auto"
       >
-        <motion.h2 variants={itemVariants} className="text-3xl font-bold mb-6 text-center">
-          Demographics
-        </motion.h2>
+        <motion.div variants={itemVariants}>
+            <UbuntuHeading>Demographics</UbuntuHeading>
+        </motion.div>
         
-        <Card>
+        <Card className="ubuntu-card">
           <CardContent className="pt-6">
             <motion.p variants={itemVariants} className="text-lg mb-4">
-              Our average respondent is in the <strong>{data?.most_frequent_age_group || 'N/A'}</strong> age group, 
+                Our average respondent is in the <strong>{data?.most_frequent_age_group || 'N/A'}</strong> age group, 
               living in <strong>{data?.most_frequent_province || 'N/A'}</strong>, typically in a 
               <strong> {data?.most_frequent_living_location?.toLowerCase() || 'N/A'}</strong> area.
             </motion.p>
@@ -106,11 +107,11 @@ const sectionVariants = {
         animate={isInView ? "visible" : "hidden"}
         className="max-w-3xl mx-auto"
       >
-        <motion.h2 variants={itemVariants} className="text-3xl font-bold mb-6 text-center">
-          Income & Household
+        <motion.h2 variants={itemVariants}>
+          <UbuntuHeading>Income & Household</UbuntuHeading>
         </motion.h2>
         
-        <Card>
+        <Card className="ubuntu-card">
           <CardContent className="pt-6">
             <motion.p variants={itemVariants} className="text-lg mb-4">
               Their personal monthly income typically falls in the 
@@ -146,11 +147,11 @@ const sectionVariants = {
         animate={isInView ? "visible" : "hidden"}
         className="max-w-3xl mx-auto"
       >
-        <motion.h2 variants={itemVariants} className="text-3xl font-bold mb-6 text-center">
-          Financial Management
+        <motion.h2 variants={itemVariants}>
+          <UbuntuHeading>Financial Management</UbuntuHeading>
         </motion.h2>
         
-        <Card>
+        <Card className="ubuntu-card">
           <CardContent className="pt-6">
             <motion.p variants={itemVariants} className="text-lg mb-4">
               When it comes to managing money, they typically create a spending plan 
@@ -192,11 +193,11 @@ const sectionVariants = {
         animate={isInView ? "visible" : "hidden"}
         className="max-w-3xl mx-auto"
       >
-        <motion.h2 variants={itemVariants} className="text-3xl font-bold mb-6 text-center">
-          Financial Access
+        <motion.h2 variants={itemVariants}>
+          <UbuntuHeading>Financial Access</UbuntuHeading>
         </motion.h2>
         
-        <Card>
+        <Card className="ubuntu-card">
           <CardContent className="pt-6">
             <motion.p variants={itemVariants} className="text-lg mb-4">
               They typically have <strong>{data?.most_frequent_account_type || 'N/A'}</strong> accounts, 
@@ -237,10 +238,10 @@ const sectionVariants = {
         className="max-w-3xl mx-auto"
       >
         <motion.h2 variants={itemVariants} className="text-3xl font-bold mb-6 text-center">
-          Financial Barriers
+          <UbuntuHeading>Financial Barriers</UbuntuHeading>
         </motion.h2>
         
-        <Card>
+        <Card className="ubuntu-card">
           <CardContent className="pt-6">
             <motion.p variants={itemVariants} className="text-lg mb-4">
               When it comes to paperwork, they 
@@ -283,10 +284,10 @@ const sectionVariants = {
         className="max-w-3xl mx-auto"
       >
         <motion.h2 variants={itemVariants} className="text-3xl font-bold mb-6 text-center">
-          Technology Usage
+          <UbuntuHeading>Technology Usage</UbuntuHeading>
         </motion.h2>
         
-        <Card>
+        <Card className="ubuntu-card">
           <CardContent className="pt-6">
             <motion.p variants={itemVariants} className="text-lg mb-4">
               Their comfort level with financial technology is 
