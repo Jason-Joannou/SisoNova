@@ -10,7 +10,8 @@ export default function Home() {
 
   return (
 
-    <main className="container mx-auto px-4 py-12 max-w-4xl">
+    <div className="min-h-screen py-12">
+      <div className="container mx-auto px-4 max-w-4xl bg-white/80 rounded-xl shadow-lg py-8">
       <motion.h1 
         className="text-5xl md:text-7xl font-so text-center mb-6"
         initial={{ opacity: 0, y: -20 }}
@@ -54,6 +55,7 @@ export default function Home() {
       </motion.div>
 
       <StoryLineContent gender={selectedGender} />
-    </main>
+      </div>
+    </div>
   );
 }
