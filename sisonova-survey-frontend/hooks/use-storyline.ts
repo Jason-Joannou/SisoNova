@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { fetchStoryline } from "@/services/storyline-service";
-import { StorylineResponse } from "@/types/api";
+import { fetchStoryline } from "../services/storyline-service";
+import { StorylineResponse } from "../types/api";
 
 export function useStoryLine(gender?: string) {
     const [data, setData] = useState<StorylineResponse>({ stats: {}, messaged: "" });

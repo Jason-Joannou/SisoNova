@@ -1,5 +1,5 @@
 import api from "./api";
-import { StorylineResponse } from "@/types/api";
+import { StorylineResponse } from "../types/api";
 
 export const fetchStoryline = async (gender?: string): Promise<StorylineResponse> => {
     try{
