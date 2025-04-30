@@ -116,6 +116,10 @@
   font-family: var(--font-geist-so);
 }
 
+.font-grape-nuts {
+  font-family: var(--font-grape-nuts);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

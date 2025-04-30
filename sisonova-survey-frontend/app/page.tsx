@@ -20,7 +20,7 @@ export default function Home() {
       </motion.h1>
       
       <motion.p 
-        className="text-xl md:text-2xl text-center text-muted-foreground mb-16 font-so"
+        className="text-xl md:text-2xl text-center text-muted-foreground mb-16 font-grape-nuts"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
@@ -34,7 +34,7 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <p className="text-2xl font-medium mb-6">
+        <p className="text-2xl mb-6 font-grape-nuts">
           Let's go through the average 
           <span className="inline-block mx-2 min-w-[150px]">
             <Select onValueChange={(value) => setSelectedGender(value === 'all' ? undefined : value)}>
