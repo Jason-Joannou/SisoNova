@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchStoryline } from "../services/storyline-service";
+import { fetchStoryline } from "../../services/storyline-service";
 import { StorylineResponse } from "../types/api";
 
 export function useStoryLine(gender?: string) {
