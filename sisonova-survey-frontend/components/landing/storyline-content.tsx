@@ -32,6 +32,7 @@ export default function StoryLineContent({gender}: StorylineContentProps) {
           <FinancialManagementSection data={data?.stats} />
           <FinancialAccessSection data={data?.stats} />
           <BarriersSection data={data?.stats} />
+          <PsychologicalBarriersSection data={data?.stats} />
           <TechnologySection data={data?.stats} />
         </div>
       );
@@ -138,9 +139,6 @@ const sectionVariants = {
   function FinancialManagementSection({ data }: { data: any }) {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, amount: 0.3 });
-
-    console.log("Spending tool:", data?.most_frequent_spending_management_tool);
-    console.log(data);
     
     return (
       <motion.section
@@ -179,9 +177,32 @@ const sectionVariants = {
               <strong> "{data?.most_frequent_spending_management_tool || 'N/A'}"</strong>.
             </motion.p>
             
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              They feel in control of their money 
+              <strong> {data?.most_frequent_financial_control?.toLowerCase() || 'N/A'}</strong>, 
+              and their income <strong>{data?.most_frequent_income_adequacy?.toLowerCase() || 'N/A'}</strong> covers their needs.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              If they run short on cash, they typically 
+              <strong> {data?.most_frequent_cash_shortage_strategy || 'N/A'}</strong>, 
+              and they <strong>{data?.most_frequent_payment_delay?.toLowerCase() || 'N/A'}</strong> have to delay important payments.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              At month-end, they <strong>{data?.most_frequent_monthly_surplus?.toLowerCase() || 'N/A'}</strong>, 
+              and they prioritize spending on <strong>{data?.most_frequent_spending_priority?.toLowerCase() || 'N/A'}</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              When making financial decisions, what matters most is 
+              <strong> {data?.most_frequent_financial_decision_factor?.toLowerCase() || 'N/A'}</strong>.
+            </motion.p>
+            
             <motion.p variants={itemVariants} className="text-lg">
               When thinking about money, they most often feel 
-              <strong> {data?.most_frequent_money_emotion?.toLowerCase().replace(/^i\b/, "they") || 'N/A'}</strong>.
+              <strong> {data?.most_frequent_money_emotion?.toLowerCase().replace(/^i\b/, "they") || 'N/A'}</strong>, 
+              and they <strong>{data?.most_frequent_purchase_regret?.toLowerCase() || 'N/A'}</strong> regret purchases.
             </motion.p>
           </CardContent>
         </Card>
@@ -223,14 +244,38 @@ const sectionVariants = {
               <strong> {data?.most_frequent_account_usage_purpose || 'N/A'}</strong>.
             </motion.p>
             
-            <motion.p variants={itemVariants} className="text-lg">
+            <motion.p variants={itemVariants} className="text-lg mb-4">
               The financial services they trust most are 
               <strong>
                 {" "}
                 {data?.most_frequent_trusted_financial_service?.includes("Major")
-                  ? "Major banks (FNB', ' Standard Bank', ' etc.)"
+                  ? "Major banks (FNB, Standard Bank, etc.)"
                   : data?.most_frequent_trusted_financial_service || "N/A"}
               </strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              They <strong>{
+                data?.most_frequent_provider_switching?.includes("Yes") 
+                  ? "have switched financial providers" 
+                  : "have not switched financial providers"
+              }</strong>, 
+              and they most frequently use <strong>{data?.most_frequent_financial_service || 'N/A'}</strong> services.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              Common issues they've faced include 
+              <strong> {data?.most_frequent_financial_service_issue || 'N/A'}</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              They use digital banking 
+              <strong> {data?.most_frequent_digital_banking_usage?.toLowerCase() || 'N/A'}</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg">
+              When asked if financial services are designed for people like them, they respond 
+              <strong> {data?.most_frequent_financial_inclusion_perception?.toLowerCase() || 'N/A'}</strong>.
             </motion.p>
           </CardContent>
         </Card>
@@ -251,7 +296,7 @@ const sectionVariants = {
         animate={isInView ? "visible" : "hidden"}
         className="max-w-3xl mx-auto"
       >
-        <motion.h2 variants={itemVariants} className="text-3xl font-bold mb-6 text-center">
+        <motion.h2 variants={itemVariants}>
           <UbuntuHeading>Financial Barriers</UbuntuHeading>
         </motion.h2>
         
@@ -270,13 +315,116 @@ const sectionVariants = {
             </motion.p>
             
             <motion.p variants={itemVariants} className="text-lg mb-4">
+              Regarding documentation, they <strong>{
+                data?.most_frequent_documentation_barrier?.includes("Yes") 
+                  ? "have experienced barriers with required documents" 
+                  : "haven't faced major documentation barriers"
+              }</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
               The main concerns they have about financial services are 
               <strong> {data?.most_frequent_financial_service_concern || 'N/A'}</strong>.
             </motion.p>
             
-            <motion.p variants={itemVariants} className="text-lg">
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              When confused about financial matters, they typically 
+              <strong> {data?.most_frequent_financial_confusion_response?.toLowerCase() || 'N/A'}</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
               Their trust in financial institutions is 
               <strong> {data?.most_frequent_financial_institution_trust?.toLowerCase() || 'N/A'}</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              Regarding negative experiences, they <strong>{
+                data?.most_frequent_negative_financial_experience?.includes("Yes") 
+                  ? "have had bad experiences that affected their trust" 
+                  : "haven't had significant negative experiences"
+              }</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              They <strong>{
+                data?.most_frequent_financial_exclusion_feeling?.includes("Yes") 
+                  ? "sometimes feel excluded by financial services" 
+                  : "generally feel included by financial services"
+              }</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg">
+              Clearer explanations would <strong>{data?.most_frequent_clarity_impact?.toLowerCase() || 'N/A'}</strong> 
+              impact their likelihood of using financial services.
+            </motion.p>
+          </CardContent>
+        </Card>
+      </motion.section>
+    );
+  }
+
+  function PsychologicalBarriersSection({ data }: { data: any }) {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, amount: 0.3 });
+    
+    return (
+      <motion.section
+        ref={ref}
+        variants={sectionVariants}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+        className="max-w-3xl mx-auto"
+      >
+        <motion.h2 variants={itemVariants}>
+          <UbuntuHeading>Money Mindset</UbuntuHeading>
+        </motion.h2>
+        
+        <Card className="ubuntu-card">
+          <CardContent className="pt-6">
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              When it comes to financial risk, they score 
+              <strong> {data?.most_frequent_financial_risk_tolerance || 'N/A'}</strong> out of 10 
+              on comfort level.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              Their attitude toward debt is that it's 
+              <strong> {data?.most_frequent_debt_attitude?.toLowerCase() || 'N/A'}</strong>, 
+              and when they hear the word "debt," they think of 
+              <strong> {data?.most_frequent_debt_perception?.toLowerCase() || 'N/A'}</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              If they needed to borrow money quickly, they would feel 
+              <strong> {data?.most_frequent_borrowing_comfort?.toLowerCase() || 'N/A'}</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              To them, saving money represents <strong>{data?.most_frequent_saving_perception || 'N/A'}</strong>, 
+              and they <strong>{
+                data?.most_frequent_saving_possibility_belief?.includes("Yes") 
+                  ? "believe it's possible to save even with limited income, though difficult" 
+                  : data?.most_frequent_saving_possibility_belief?.includes("No") 
+                    ? "don't believe it's realistic to save with limited income" 
+                    : data?.most_frequent_saving_possibility_belief || 'N/A'
+              }</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              When they receive unexpected money, they typically 
+              <strong> {data?.most_frequent_windfall_usage?.toLowerCase() || 'N/A'}</strong>, 
+              and they <strong>{
+                data?.most_frequent_saving_benefit_belief?.includes("Yes") 
+                  ? "definitely believe saving pays off in the long run" 
+                  : data?.most_frequent_saving_benefit_belief?.includes("No") 
+                    ? "don't believe saving pays off in the long run" 
+                    : data?.most_frequent_saving_benefit_belief || 'N/A'
+              }</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg">
+              When deciding if something is worth buying, they typically 
+              <strong> {data?.most_frequent_purchase_decision_criteria?.toLowerCase() || 'N/A'}</strong>.
             </motion.p>
           </CardContent>
         </Card>
@@ -297,7 +445,7 @@ const sectionVariants = {
         animate={isInView ? "visible" : "hidden"}
         className="max-w-3xl mx-auto"
       >
-        <motion.h2 variants={itemVariants} className="text-3xl font-bold mb-6 text-center">
+        <motion.h2 variants={itemVariants}>
           <UbuntuHeading>Technology Usage</UbuntuHeading>
         </motion.h2>
         
@@ -324,9 +472,42 @@ const sectionVariants = {
               <strong> {data?.most_frequent_digital_finance_challenge || 'N/A'}</strong>.
             </motion.p>
             
-            <motion.p variants={itemVariants} className="text-lg">
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              They <strong>{
+                data?.most_frequent_app_abandonment?.includes("Yes") 
+                  ? "have abandoned financial apps due to usability issues" 
+                  : "haven't abandoned financial apps due to usability"
+              }</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              When learning new financial technology, they prefer 
+              <strong> {data?.most_frequent_fintech_learning_preference?.toLowerCase() || 'N/A'}</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              What would motivate them to try new financial technology: 
+              <strong> {data?.most_frequent_fintech_adoption_motivator || 'N/A'}</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
               Their trust in digital security scores 
               <strong> {data?.most_frequent_digital_security_trust || 'N/A'}</strong> out of 10.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              They <strong>{
+                data?.most_frequent_digital_error_anxiety?.includes("Yes") 
+                  ? "often worry about making mistakes with digital tools" 
+                  : data?.most_frequent_digital_error_anxiety?.includes("Sometimes")
+                    ? "sometimes worry about making mistakes with digital tools"
+                    : "rarely worry about making mistakes with digital tools"
+              }</strong>.
+            </motion.p>
+            
+            <motion.p variants={itemVariants} className="text-lg">
+              The financial apps they use most frequently include 
+              <strong> {data?.most_frequent_financial_app_used || 'N/A'}</strong>.
             </motion.p>
           </CardContent>
         </Card>
