@@ -46,4 +46,4 @@ def format_number_columns(number_columns: List[str]) -> float:
 
     avg = np.mean(formatted_list)
 
-    return avg
+    return round(avg, 2)
