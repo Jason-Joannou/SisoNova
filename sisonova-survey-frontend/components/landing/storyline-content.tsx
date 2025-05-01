@@ -155,13 +155,19 @@ const sectionVariants = {
           <CardContent className="pt-6">
             <motion.p variants={itemVariants} className="text-lg mb-4">
               When it comes to managing money, they typically create a spending plan 
-              <strong> {data?.most_frequent_spending_plan_frequency?.toLowerCase() || 'N/A'}</strong>, 
-              usually <strong>{data?.most_frequent_spending_plan_timing?.toLowerCase() || 'N/A'}</strong>.
+              <strong> {data?.most_frequent_spending_plan_frequency?.toLowerCase() || ' N/A'}</strong>, 
+              usually {
+                data?.most_frequent_spending_plan_timing?.includes("Before") || data?.most_frequent_spending_plan_timing?.includes("After")
+                  ? <>
+                      plan their spending <strong>{data?.most_frequent_spending_plan_timing?.toLowerCase() || 'N/A'}</strong>.
+                    </>
+                  : " don't plan their spending."
+              }
             </motion.p>
             
             <motion.p variants={itemVariants} className="text-lg mb-4">
-              Their budgeting style can be described as 
-              <strong> {data?.most_frequent_budgeting_style?.toLowerCase() || 'N/A'}</strong>, 
+              In terms of budgeting  
+              <strong> {data?.most_frequent_budgeting_style?.toLowerCase().replace(/^i\b/, "they") || 'N/A'}</strong>, 
               and they track expenses <strong>{data?.most_frequent_expense_tracking?.toLowerCase() || 'N/A'}</strong>.
             </motion.p>
             
