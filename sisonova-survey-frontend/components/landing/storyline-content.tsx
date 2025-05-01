@@ -171,17 +171,17 @@ const sectionVariants = {
             <motion.p variants={itemVariants} className="text-lg mb-4">
               In terms of budgeting  
               <strong> {data?.most_frequent_budgeting_style?.toLowerCase().replace(/^i\b/, "they") || 'N/A'}</strong>, 
-              and in terms of expenses: "<strong>{data?.most_frequent_expense_tracking || 'N/A'}</strong>".
+              and when asked how they watch their expenses: "<strong>{data?.most_frequent_expense_tracking || 'N/A'}</strong>".
             </motion.p>
             
             <motion.p variants={itemVariants} className="text-lg mb-4">
               The most common tools used for managing spending are 
-              <strong> {data?.most_frequent_spending_management_tool || 'N/A'}</strong>.
+              <strong> "{data?.most_frequent_spending_management_tool || 'N/A'}"</strong>.
             </motion.p>
             
             <motion.p variants={itemVariants} className="text-lg">
               When thinking about money, they most often feel 
-              <strong> {data?.most_frequent_money_emotion?.toLowerCase() || 'N/A'}</strong>.
+              <strong> {data?.most_frequent_money_emotion?.toLowerCase().replace(/^i\b/, "they") || 'N/A'}</strong>.
             </motion.p>
           </CardContent>
         </Card>
