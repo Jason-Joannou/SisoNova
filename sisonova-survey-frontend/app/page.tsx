@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import StoryLineContent from "@/components/landing/storyline-content";
+import FooterContent from "@/components/landing/footer-content";
 
 export default function Home() {
   const [selectedGender, setSelectedGender] = useState<string | undefined>(undefined);
@@ -56,6 +57,7 @@ export default function Home() {
       </motion.div>
 
       <StoryLineContent gender={selectedGender} />
+      <FooterContent gender={selectedGender} />
       </div>
     </div>
   );
