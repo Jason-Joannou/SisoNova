@@ -138,6 +138,9 @@ const sectionVariants = {
   function FinancialManagementSection({ data }: { data: any }) {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, amount: 0.3 });
+
+    console.log("Spending tool:", data?.most_frequent_spending_management_tool);
+    console.log(data);
     
     return (
       <motion.section
@@ -161,14 +164,14 @@ const sectionVariants = {
                   ? <>
                       plan their spending <strong>{data?.most_frequent_spending_plan_timing?.toLowerCase() || 'N/A'}</strong>.
                     </>
-                  : " don't plan their spending."
+                  : <strong>don't plan their spending.</strong>
               }
             </motion.p>
             
             <motion.p variants={itemVariants} className="text-lg mb-4">
               In terms of budgeting  
               <strong> {data?.most_frequent_budgeting_style?.toLowerCase().replace(/^i\b/, "they") || 'N/A'}</strong>, 
-              and they track expenses <strong>{data?.most_frequent_expense_tracking?.toLowerCase() || 'N/A'}</strong>.
+              and in terms of expenses: "<strong>{data?.most_frequent_expense_tracking || 'N/A'}</strong>".
             </motion.p>
             
             <motion.p variants={itemVariants} className="text-lg mb-4">
@@ -222,7 +225,12 @@ const sectionVariants = {
             
             <motion.p variants={itemVariants} className="text-lg">
               The financial services they trust most are 
-              <strong> {data?.most_frequent_trusted_financial_service || 'N/A'}</strong>.
+              <strong>
+                {" "}
+                {data?.most_frequent_trusted_financial_service?.includes("Major")
+                  ? "Major banks (FNB', ' Standard Bank', ' etc.)"
+                  : data?.most_frequent_trusted_financial_service || "N/A"}
+              </strong>.
             </motion.p>
           </CardContent>
         </Card>
