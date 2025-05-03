@@ -261,7 +261,8 @@ function FinancialManagementSection({ data }: { data: any }) {
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
-            At month-end, they{" "}
+            When asked if they have extra money at month-end, the most common
+            response was{" "}
             <strong>
               {data?.most_frequent_monthly_surplus?.toLowerCase() || "N/A"}
             </strong>
@@ -276,20 +277,31 @@ function FinancialManagementSection({ data }: { data: any }) {
             When making financial decisions, what matters most is
             <strong>
               {" "}
-              {data?.most_frequent_financial_decision_factor?.toLowerCase() ||
-                "N/A"}
+              {data?.most_frequent_financial_decision_factor
+                ?.toLowerCase()
+                .replace(/^i\b/, "they") || "N/A"}
             </strong>
             .
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg">
-            When thinking about money, they most often feel
-            <strong>
-              {" "}
-              {data?.most_frequent_money_emotion
-                ?.toLowerCase()
-                .replace(/^i\b/, "they") || "N/A"}
-            </strong>
+            When thinking about money,{" "}
+            {data?.most_frequent_money_emotion ==
+            "I try not to think about it" ? (
+              <>
+                <strong>They usually try not think about it</strong>,
+              </>
+            ) : (
+              <>
+                they most often feel
+                <strong>
+                  {" "}
+                  {data?.most_frequent_money_emotion
+                    ?.toLowerCase()
+                    .replace(/^i\b/, "they") || "N/A"}
+                </strong>
+              </>
+            )}
             , and they{" "}
             <strong>
               {data?.most_frequent_purchase_regret?.toLowerCase() || "N/A"}
