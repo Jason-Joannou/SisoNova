@@ -387,7 +387,7 @@ function FinancialAccessSection({ data }: { data: any }) {
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
-            Common issues they've faced include
+            The most common issues they've faced is
             <strong>
               {" "}
               {data?.most_frequent_financial_service_issue || "N/A"}
