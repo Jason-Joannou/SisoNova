@@ -334,23 +334,25 @@ function FinancialAccessSection({ data }: { data: any }) {
       <Card className="ubuntu-card">
         <CardContent className="pt-6">
           <motion.p variants={itemVariants} className="text-lg mb-4">
-            They typically have{" "}
+            They typically have a{" "}
             <strong>{data?.most_frequent_account_type || "N/A"}</strong>{" "}
-            accounts, with{" "}
+            account, with{" "}
             <strong>
               {data?.most_frequent_active_accounts_count || "N/A"}
             </strong>{" "}
-            active accounts.
+            active account(s).
           </motion.p>
 
-          <motion.p variants={itemVariants} className="text-lg mb-4">
-            The main reasons for having multiple accounts include
-            <strong>
-              {" "}
-              {data?.most_frequent_multiple_accounts_reason || "N/A"}
-            </strong>
-            .
-          </motion.p>
+          {data?.most_frequent_active_accounts_count !== "Just one" && (
+            <motion.p variants={itemVariants} className="text-lg mb-4">
+              The main reasons for having multiple accounts include
+              <strong>
+                {" "}
+                {data?.most_frequent_multiple_accounts_reason || "N/A"}
+              </strong>
+              .
+            </motion.p>
+          )}
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
             They primarily use their accounts for
