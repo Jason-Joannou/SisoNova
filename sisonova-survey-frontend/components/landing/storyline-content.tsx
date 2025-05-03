@@ -243,10 +243,21 @@ function FinancialManagementSection({ data }: { data: any }) {
               {data?.most_frequent_cash_shortage_strategy || "N/A"}
             </strong>
             , and they{" "}
-            <strong>
-              {data?.most_frequent_payment_delay?.toLowerCase() || "N/A"}
-            </strong>{" "}
-            have to delay important payments.
+            {data?.most_frequent_payment_delay === "Every Month" ? (
+              <>
+                delay payments{" "}
+                <strong>
+                  {data?.most_frequent_payment_delay?.toLowerCase() || "N/A"}
+                </strong>
+              </>
+            ) : (
+              <>
+                <strong>
+                  {data?.most_frequent_payment_delay?.toLowerCase() || "N/A"}
+                </strong>{" "}
+                have to delay important payments.
+              </>
+            )}{" "}
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
