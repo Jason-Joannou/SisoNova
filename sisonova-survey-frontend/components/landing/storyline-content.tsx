@@ -667,7 +667,7 @@ function TechnologySection({ data }: { data: any }) {
             They primarily use
             <strong>
               {" "}
-              {data?.most_frequent_financial_management_device || "N/A"}
+              {data?.most_frequent_financial_management_device || "N/A"}{" "}
             </strong>
             for managing their finances.
           </motion.p>
@@ -682,7 +682,8 @@ function TechnologySection({ data }: { data: any }) {
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
-            The main challenges they face with digital finance are
+            When asked about the main challenges they face with digital finance
+            tools are, the most common response was
             <strong>
               {" "}
               {data?.most_frequent_digital_finance_challenge || "N/A"}
@@ -711,7 +712,8 @@ function TechnologySection({ data }: { data: any }) {
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
-            What would motivate them to try new financial technology:
+            When asked about what would motivate them to try new financial
+            technology, the most common response was
             <strong>
               {" "}
               {data?.most_frequent_fintech_adoption_motivator || "N/A"}
@@ -725,7 +727,7 @@ function TechnologySection({ data }: { data: any }) {
               {" "}
               {data?.most_frequent_digital_security_trust || "N/A"}
             </strong>{" "}
-            out of 10.
+            out of 5.
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
