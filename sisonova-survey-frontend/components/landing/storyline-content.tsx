@@ -441,36 +441,33 @@ function BarriersSection({ data }: { data: any }) {
       <Card className="ubuntu-card">
         <CardContent className="pt-6">
           <motion.p variants={itemVariants} className="text-lg mb-4">
-            When it comes to paperwork, they
+            When asked if paperwork was a detergent from accessing financial
+            services, the most common response was
             <strong>
               {" "}
               {data?.most_frequent_paperwork_avoidance?.toLowerCase() || "N/A"}
             </strong>{" "}
-            avoid it.
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
-            Their financial literacy level is
+            When asking about their understanding of the paperwork needed for
+            financial services, the most common response was
             <strong>
               {" "}
               {data?.most_frequent_financial_literacy?.toLowerCase() || "N/A"}
             </strong>
-            , and their confidence in financial matters scores
+            , and their average financial confidence in themselves is
             <strong>
               {" "}
               {data?.most_frequent_financial_confidence || "N/A"}
             </strong>{" "}
-            out of 10.
+            out of 5.
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
-            Regarding documentation, they{" "}
-            <strong>
-              {data?.most_frequent_documentation_barrier?.includes("Yes")
-                ? "have experienced barriers with required documents"
-                : "haven't faced major documentation barriers"}
-            </strong>
-            .
+            Regarding documentation, when asked if they have ever experienced
+            any issues with their documentation, the most common response was{" "}
+            <strong>{data?.most_frequent_documentation_barrier}</strong>.
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
@@ -493,7 +490,8 @@ function BarriersSection({ data }: { data: any }) {
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
-            Their trust in financial institutions is
+            When asked about their trust in financial institutions, the most
+            common response was
             <strong>
               {" "}
               {data?.most_frequent_financial_institution_trust?.toLowerCase() ||
@@ -528,7 +526,7 @@ function BarriersSection({ data }: { data: any }) {
             Clearer explanations would{" "}
             <strong>
               {data?.most_frequent_clarity_impact?.toLowerCase() || "N/A"}
-            </strong>
+            </strong>{" "}
             impact their likelihood of using financial services.
           </motion.p>
         </CardContent>
@@ -561,7 +559,7 @@ function PsychologicalBarriersSection({ data }: { data: any }) {
               {" "}
               {data?.most_frequent_financial_risk_tolerance || "N/A"}
             </strong>{" "}
-            out of 10 on comfort level.
+            out of 5 on comfort level.
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
