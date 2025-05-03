@@ -14,12 +14,9 @@ export default function AboutPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center space-y-4"
+        className="text-center space-y-4 font-so"
       >
         <UbuntuHeading>About SisoNova</UbuntuHeading>
-        <p className="text-muted-foreground text-lg">
-          Understanding financial inclusion in South Africa
-        </p>
       </motion.div>
 
       <motion.div
