@@ -52,7 +52,7 @@
   --card-foreground: oklch(0.2 0.04 80);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.2 0.04 80);
-  
+
   /* South African flag-inspired colors */
   --primary: oklch(0.55 0.28 130); /* Green from SA flag */
   --primary-foreground: oklch(0.98 0.02 80);
@@ -62,7 +62,7 @@
   --muted-foreground: oklch(0.4 0.05 80);
   --accent: oklch(0.5 0.2 240); /* Blue from SA flag */
   --accent-foreground: oklch(0.98 0.02 80);
-  
+
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.85 0.03 80);
   --input: oklch(0.85 0.03 80);
@@ -76,7 +76,7 @@
   --card-foreground: oklch(0.95 0.02 80);
   --popover: oklch(0.25 0.05 80);
   --popover-foreground: oklch(0.95 0.02 80);
-  
+
   /* South African flag-inspired colors with more saturation for dark mode */
   --primary: oklch(0.6 0.3 130); /* Brighter green */
   --primary-foreground: oklch(0.2 0.04 80);
@@ -86,7 +86,7 @@
   --muted-foreground: oklch(0.75 0.03 80);
   --accent: oklch(0.55 0.25 240); /* Brighter blue */
   --accent-foreground: oklch(0.95 0.02 80);
-  
+
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(0.35 0.05 80);
   --input: oklch(0.35 0.05 80);
@@ -96,11 +96,11 @@
 /* Add these custom colors for specific elements */
 :root {
   --sisonova-dark-brown: #291009;
-  --sisonova-medium-brown: #47332A;
-  --sisonova-light-brown: #6C5A4E;
-  --sisonova-light-green: #8BC181;
-  --sisonova-medium-green: #4A9051;
-  --sisonova-dark-green: #24713F;
+  --sisonova-medium-brown: #47332a;
+  --sisonova-light-brown: #6c5a4e;
+  --sisonova-light-green: #8bc181;
+  --sisonova-medium-green: #4a9051;
+  --sisonova-dark-green: #24713f;
 }
 
 body {
@@ -109,7 +109,7 @@ body {
 }
 
 body::before {
-  content: '';
+  content: "";
   position: fixed;
   top: 0;
   left: 0;
@@ -135,7 +135,7 @@ body::before {
 }
 
 .ubuntu-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -144,7 +144,7 @@ body::before {
 }
 
 .ubuntu-card::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
@@ -152,8 +152,14 @@ body::before {
   height: 1px;
 }
 
+.dashboard-theme {
+  --background: #f5f5f5;
+  --card: #ffffff;
+  --border: #e0e0e0;
+}
+
 strong {
-  color: #007A4D; /* Green from SA flag */
+  color: #007a4d; /* Green from SA flag */
   font-weight: 700;
 }
 
