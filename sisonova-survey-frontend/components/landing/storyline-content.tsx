@@ -563,7 +563,8 @@ function PsychologicalBarriersSection({ data }: { data: any }) {
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
-            Their attitude toward debt is that it's
+            When asked if taking on debt could ever be a good thing, the most
+            common response was
             <strong>
               {" "}
               {data?.most_frequent_debt_attitude?.toLowerCase() || "N/A"}
@@ -577,7 +578,8 @@ function PsychologicalBarriersSection({ data }: { data: any }) {
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg mb-4">
-            If they needed to borrow money quickly, they would feel
+            When asked about how they would feel if they needed to borrow money
+            quickly, the most common response was
             <strong>
               {" "}
               {data?.most_frequent_borrowing_comfort?.toLowerCase() || "N/A"}
@@ -617,7 +619,8 @@ function PsychologicalBarriersSection({ data }: { data: any }) {
           </motion.p>
 
           <motion.p variants={itemVariants} className="text-lg">
-            When deciding if something is worth buying, they typically
+            When asked about deciding if something is worth buying, the most
+            common response was
             <strong>
               {" "}
               {data?.most_frequent_purchase_decision_criteria?.toLowerCase() ||
