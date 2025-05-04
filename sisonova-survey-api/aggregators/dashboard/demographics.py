@@ -32,3 +32,19 @@ def process_age_group_distributions(df: pd.DataFrame):
         return []
     age_counts = get_column_value_counts(column="AGE_GROUP", df=df)
     return age_counts
+
+
+def process_geographic_distribution(df: pd.DataFrame):
+    """
+    This method returns the geographic counts in the dataframe
+
+    Args:
+        df (pd.DataFrame): Dataframe of survey data
+    Returns:
+        list: A list of dictionaires counting the counts
+    """
+
+    if df.empty:
+        return []
+    age_counts = get_column_value_counts(column="PROVINCE", df=df)
+    return age_counts
