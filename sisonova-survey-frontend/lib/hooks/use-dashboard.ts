@@ -3,7 +3,10 @@ import { fetchDashboardData } from "@/services/dashboard-services";
 import { DashboardFilters } from "../types/api";
 import { DashboardResponse } from "../types/responses";
 
-export function useDashboard(dashboardFilters: DashboardFilters) {
+export function useDashboard(
+  dashboardFilters: DashboardFilters,
+  apiUrlPrefix: string,
+) {
   const [data, setData] = useState<DashboardResponse>({
     dashboard_response: {},
     message: "",
@@ -17,7 +20,10 @@ export function useDashboard(dashboardFilters: DashboardFilters) {
       setError(null);
 
       try {
-        const response = await fetchDashboardData(dashboardFilters);
+        const response = await fetchDashboardData(
+          dashboardFilters,
+          apiUrlPrefix,
+        );
         setData(response);
       } catch (error) {
         setError("Error fetching storyline");
