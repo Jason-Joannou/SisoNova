@@ -2,6 +2,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
 import { useStoryLine } from "@/lib/hooks/use-storyline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,6 +23,8 @@ import {
   BarChart3Icon,
   PieChartIcon,
   TableIcon,
+  HomeIcon,
+  InfoIcon,
 } from "lucide-react";
 import DemographicsCharts from "@/components/dashboard/demographic-charts";
 import PersonalIncomeCharts from "@/components/dashboard/personal-income-charts";
@@ -93,6 +97,37 @@ export default function DashboardPage() {
   return (
     <div className="bg-gray-100 min-h-screen w-full relative">
       <div className="container mx-auto py-8 px-4">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex justify-end mb-6"
+        >
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+              asChild
+            >
+              <Link href="/">
+                <HomeIcon className="h-4 w-4 mr-1" />
+                Home
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+              asChild
+            >
+              <Link href="/about">
+                <InfoIcon className="h-4 w-4 mr-1" />
+                About
+              </Link>
+            </Button>
+          </div>
+        </motion.div>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <UbuntuHeading>Survey Data Dashboard</UbuntuHeading>
