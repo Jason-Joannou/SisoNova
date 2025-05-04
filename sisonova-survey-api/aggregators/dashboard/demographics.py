@@ -5,6 +5,7 @@ from utils.config import (
     FINANCIAL_BARRIERS_COLUMNS,
     INCOME_MANAGEMENT_COLUMNS,
     PERSONAL_AND_HOUSEHOLD_INCOME_COLUMNS,
+    PSYCHOLOGICAL_BARRIERS_COLUMNS,
 )
 from utils.utils import format_number_columns, get_column_value_counts
 
@@ -106,6 +107,30 @@ def process_financial_barriers_columns(df: pd.DataFrame):
             )
         )
         for _, value in FINANCIAL_BARRIERS_COLUMNS.items()
+    }
+
+    return results
+
+
+def process_psychological_barriers_columns(df: pd.DataFrame):
+    """
+    Creates counts for each income management-related checkbox/multi-select column.
+    """
+    checkbox_columns = [
+        "SAVING_PERCEPTION",
+    ]
+
+    avg_columns = ["FINANCIAL_RISK_TOLERANCE"]
+
+    results = {
+        value: (
+            {"avg": format_number_columns(df[value].to_list())}
+            if value in avg_columns
+            else get_column_value_counts(
+                column=value, df=df, is_checkbox=value in checkbox_columns
+            )
+        )
+        for _, value in PSYCHOLOGICAL_BARRIERS_COLUMNS.items()
     }
 
     return results
