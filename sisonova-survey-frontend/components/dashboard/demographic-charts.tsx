@@ -133,12 +133,28 @@ export default function DemographicsCharts({
         <CardContent>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ageData}>
-                <XAxis dataKey="name" />
-                <YAxis />
+              <PieChart>
+                <Pie
+                  data={ageData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  label={({ name, percent }) =>
+                    `${name}: ${(percent * 100).toFixed(0)}%`
+                  }
+                >
+                  {ageData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
                 <Tooltip />
-                <Bar dataKey="value" fill="#8884d8" />
-              </BarChart>
+              </PieChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
@@ -180,17 +196,33 @@ export default function DemographicsCharts({
 
       <Card>
         <CardHeader>
-          <CardTitle>Employment status</CardTitle>
+          <CardTitle>Employment Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={employmentData}>
-                <XAxis dataKey="name" />
-                <YAxis />
+              <PieChart>
+                <Pie
+                  data={employmentData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  label={({ name, percent }) =>
+                    `${name}: ${(percent * 100).toFixed(0)}%`
+                  }
+                >
+                  {employmentData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
                 <Tooltip />
-                <Bar dataKey="value" fill="#a4de6c" />
-              </BarChart>
+              </PieChart>
             </ResponsiveContainer>
           </div>
         </CardContent>

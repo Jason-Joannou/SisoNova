@@ -30,8 +30,6 @@ export default function PersonalIncomeCharts({
   const monthlyHouseholdIncome =
     data.dashboard_response?.MONTHLY_HOUSEHOLD_INCOME;
 
-  console.log(data);
-
   if (loading) {
     return <LoadingState />;
   }
@@ -62,7 +60,7 @@ export default function PersonalIncomeCharts({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Personal Average Monthly Income</CardTitle>
+          <CardTitle>Average Monthly Income Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -96,7 +94,7 @@ export default function PersonalIncomeCharts({
 
       <Card>
         <CardHeader>
-          <CardTitle>Main Income Sources</CardTitle>
+          <CardTitle>Income Source Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -130,7 +128,7 @@ export default function PersonalIncomeCharts({
 
       <Card>
         <CardHeader>
-          <CardTitle>Average Monthly Household Income</CardTitle>
+          <CardTitle>Average Monthly Household Income Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">

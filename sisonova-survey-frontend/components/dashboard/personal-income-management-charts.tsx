@@ -77,7 +77,7 @@ export default function IncomeManagementCharts({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Spending Plan Frequency</CardTitle>
+          <CardTitle>Spending Plan Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -105,6 +105,9 @@ export default function IncomeManagementCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents how often respondents plan their spending.
           </div>
         </CardContent>
       </Card>
@@ -140,12 +143,16 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether a respondent plans their spending before or
+            after they get paid.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Budgeting Style</CardTitle>
+          <CardTitle>Budgeting Style Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -174,12 +181,15 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the budgeting style of the respondent.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Expense Tracking</CardTitle>
+          <CardTitle>Expense Tracking Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -208,12 +218,16 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents how respondents keep an eye on where their money
+            goes.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Spending Management Tools</CardTitle>
+          <CardTitle>Spending Management Tools Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -242,12 +256,16 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the tools the respondent uses to help them keep
+            track of their money.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Financial Control Frequency</CardTitle>
+          <CardTitle>Financial Control Frequency Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -276,12 +294,16 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents how often respondents feel that they are in control
+            of their money.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Money Emotion</CardTitle>
+          <CardTitle>Money Emotion Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -310,12 +332,16 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents how the respondents feel when they think about
+            money.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Income Adequacy</CardTitle>
+          <CardTitle>Income Adequacy Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -344,12 +370,16 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether the income the respondents earn cover their
+            needs.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Cash Shortage Strategies</CardTitle>
+          <CardTitle>Cash Shortage Strategies Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -378,12 +408,16 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the actions the respondents take when they are short
+            on cash.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Payment Delay Frequency</CardTitle>
+          <CardTitle>Payment Delay Frequency Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -412,12 +446,16 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether respondents are late on payments if they are
+            short on cash.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Monthyl Surplus</CardTitle>
+          <CardTitle>Monthly Surplus Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -446,12 +484,16 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether the respondents have extra money at the end
+            of the month.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Spending Priority</CardTitle>
+          <CardTitle>Spending Priority Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -480,12 +522,16 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the respondents priority when it comes to paying
+            expenses
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Financial Decision Factors</CardTitle>
+          <CardTitle>Financial Decision Factors Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -514,12 +560,16 @@ export default function IncomeManagementCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents what matters the most to a respondent when making a
+            financial decision.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Purchase Regret Frequency</CardTitle>
+          <CardTitle>Purchase Regret Frequency Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -547,6 +597,10 @@ export default function IncomeManagementCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents how often a respondent feels guilty after making a
+            purchase.
           </div>
         </CardContent>
       </Card>
