@@ -23,6 +23,7 @@ import {
   TableIcon,
 } from "lucide-react";
 import DemographicsCharts from "@/components/dashboard/demographic-charts";
+import { useDashboard } from "@/lib/hooks/use-dashboard";
 // import IncomeCharts from "@/components/dashboard/income-charts";
 // import FinancialCharts from "@/components/dashboard/financial-charts";
 // import TechnologyCharts from "@/components/dashboard/technology-charts";
@@ -135,7 +136,6 @@ export default function DashboardPage() {
                     <SelectItem value={undefined}>All Genders</SelectItem>
                     <SelectItem value="Male">Male</SelectItem>
                     <SelectItem value="Female">Female</SelectItem>
-                    <SelectItem value="Non-binary">Non-binary</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -150,12 +150,12 @@ export default function DashboardPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={undefined}>All Age Groups</SelectItem>
-                    <SelectItem value="18-24 years">18-24 years</SelectItem>
-                    <SelectItem value="25-34 years">25-34 years</SelectItem>
-                    <SelectItem value="35-44 years">35-44 years</SelectItem>
-                    <SelectItem value="45-54 years">45-54 years</SelectItem>
-                    <SelectItem value="55-64 years">55-64 years</SelectItem>
-                    <SelectItem value="65 years or older">65+ years</SelectItem>
+                    <SelectItem value="Under 18">Under 18 years</SelectItem>
+                    <SelectItem value="18-24">18-24 years</SelectItem>
+                    <SelectItem value="25-34">25-34 years</SelectItem>
+                    <SelectItem value="35-44">35-44 years</SelectItem>
+                    <SelectItem value="45-54">45-54 years</SelectItem>
+                    <SelectItem value="55 and above">55 and above</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
