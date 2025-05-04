@@ -68,7 +68,13 @@ def process_financial_access_columns(df: pd.DataFrame):
     """
     Creates counts for each income management-related checkbox/multi-select column.
     """
-    checkbox_columns = ["CASH_SHORTAGE_STRATEGIES", "SPENDING_MANAGEMENT_TOOLS"]
+    checkbox_columns = [
+        "ACCOUNT_USAGE_PURPOSES",
+        "MULTIPLE_ACCOUNTS_REASONS",
+        "MOST_USED_FINANCIAL_SERVICES",
+        "ACCOUNT_TYPES",
+        "FINANCIAL_SERVICE_ISSUES",
+    ]
 
     results = {
         value: get_column_value_counts(
