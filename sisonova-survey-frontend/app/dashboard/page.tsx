@@ -28,6 +28,7 @@ import PersonalIncomeCharts from "@/components/dashboard/personal-income-charts"
 import IncomeManagementCharts from "@/components/dashboard/personal-income-management-charts";
 import FinancialAccessCharts from "@/components/dashboard/financial-access-charts";
 import FinancialBarriersCharts from "@/components/dashboard/financial-barriers-charts";
+import PsychologicalBarriersCharts from "@/components/dashboard/psychological-barriers-charts";
 // import IncomeCharts from "@/components/dashboard/income-charts";
 // import FinancialCharts from "@/components/dashboard/financial-charts";
 // import TechnologyCharts from "@/components/dashboard/technology-charts";
@@ -294,10 +295,12 @@ export default function DashboardPage() {
               />
             </TabsContent>
 
-            <TabsContent
-              value="psych-barriers"
-              className="space-y-4"
-            ></TabsContent>
+            <TabsContent value="psych-barriers" className="space-y-4">
+              <PsychologicalBarriersCharts
+                filters={dashboardFilters}
+                apiUrlSuffix="psychological_barriers"
+              />
+            </TabsContent>
 
             <TabsContent value="technology" className="space-y-4"></TabsContent>
           </Tabs>
