@@ -8,6 +8,16 @@ from utils.gs_client import load_gs_client
 
 
 def get_column_value_counts(column: str, df: pd.DataFrame):
+    """
+    This method calculates the number of occurances in a column of its
+    items and returns a list of dictionaries with the counts as key, value pairs.
+
+    Args:
+        column (str): The name of the column
+        df (pd.DataFrame): Pandas dataframe holding the data
+    Returns:
+        list: A list of dictionaries with the item and its occurance as key, value pairs
+    """
 
     counts = df[column].value_counts()
     formatted_counts = list(counts.items())
@@ -18,6 +28,13 @@ def get_column_value_counts(column: str, df: pd.DataFrame):
 
 
 def get_survey_results_into_df():
+    """
+    This method retrieves the survey data from the google client,
+    formats the columns, and returns a pandas dataframe equivelant.
+
+    Returns:
+        pd.DataFrame: DataFrame holding the survey data
+    """
 
     client = load_gs_client()
     sheet = client.open("SisoNova Consumer Survey (Responses)").sheet1
