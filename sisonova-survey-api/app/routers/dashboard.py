@@ -1,6 +1,9 @@
 from typing import Dict, Optional, Union
 
-from aggregators.dashboard.demographics import process_demographic_columns
+from aggregators.dashboard.demographics import (
+    process_demographic_columns,
+    process_income_columns,
+)
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from utils.utils import filter_survey_dataframe, get_survey_results_into_df
@@ -24,7 +27,7 @@ async def get_user_demographics(
             df=df, gender=gender, age_group=age_group, province=province
         )
 
-        results = process_demographic_columns(df=df)
+        results = process_income_columns(df=df)
 
         response_data = {
             "dashboard_response": results,
