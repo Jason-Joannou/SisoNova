@@ -4,7 +4,10 @@ import { DashboardFilters } from "../types/api";
 import { DashboardResponse } from "../types/responses";
 
 export function useDashboard(dashboardFilters: DashboardFilters) {
-  const [data, setData] = useState<DashboardResponse>([{ name: "", count: 0 }]);
+  const [data, setData] = useState<DashboardResponse>({
+    dashboard_response: {},
+    message: "",
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +30,7 @@ export function useDashboard(dashboardFilters: DashboardFilters) {
     loadData();
   }, [
     dashboardFilters.gender,
-    dashboardFilters.age_group,
+    dashboardFilters.ageGroup,
     dashboardFilters.province,
   ]);
 

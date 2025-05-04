@@ -5,7 +5,7 @@ export interface StorylineResponse {
 
 export interface DashboardFilters {
   gender?: string;
-  age_group?: string;
+  ageGroup?: string;
   province?: string;
 }
 
