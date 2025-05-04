@@ -49,15 +49,14 @@ def process_income_columns(df: pd.DataFrame):
 
 def process_income_management_columns(df: pd.DataFrame):
     """
-    This method creates counts for each column in the
-    income management question in the survey and returns a dictionary as the result.
-
-    Args:
-        df (pd.DataFrame): DataFrame holding the survey data
+    Creates counts for each income management-related checkbox/multi-select column.
     """
+    checkbox_columns = ["CASH_SHORTAGE_STRATEGIES", "SPENDING_MANAGEMENT_TOOLS"]
 
     results = {
-        value: get_column_value_counts(column=value, df=df)
+        value: get_column_value_counts(
+            column=value, df=df, is_checkbox=value in checkbox_columns
+        )
         for _, value in INCOME_MANAGEMENT_COLUMNS.items()
     }
 

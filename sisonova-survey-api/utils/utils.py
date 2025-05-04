@@ -1,3 +1,4 @@
+import re
 from collections import Counter
 from typing import List, Optional
 
@@ -36,7 +37,7 @@ def filter_survey_dataframe(
     return df_new
 
 
-def get_column_value_counts(column: str, df: pd.DataFrame):
+def get_column_value_counts(column: str, df: pd.DataFrame, is_checkbox: bool = False):
     """
     This method calculates the number of occurances in a column of its
     items and returns a list of dictionaries with the counts as key, value pairs.
@@ -48,12 +49,14 @@ def get_column_value_counts(column: str, df: pd.DataFrame):
         list: A list of dictionaries with the item and its occurance as key, value pairs
     """
 
-    counts = df[column].value_counts()
-    formatted_counts = list(counts.items())
+    if is_checkbox:
+        # Flatten and format all strings in column
+        all_items = format_checkbox_columns_for_dashboard(df[column].dropna().tolist())
+        counts = pd.Series(all_items).value_counts()
+    else:
+        counts = df[column].value_counts()
 
-    results = [{"name": k, "value": v} for k, v in formatted_counts]
-
-    return results
+    return [{"name": k, "value": v} for k, v in counts.items()]
 
 
 def get_survey_results_into_df():
@@ -76,6 +79,33 @@ def get_survey_results_into_df():
     except Exception as e:
         print(f"Something went wrong with retrieving the survey data: {e}")
         return pd.DataFrame()
+
+
+def format_checkbox_columns_for_dashboard(
+    checkbox_column: List[str],
+) -> Optional[List[str]]:
+    """
+    Formats checkbox-style strings, preserving options with commas inside parentheses.
+
+    Args:
+        checkbox_column (List[str]): List of strings where each string contains options separated by commas.
+
+    Returns:
+        List[str]: List of individual checkbox options, properly split.
+    """
+    formatted_strings = []
+
+    # Pattern: split on commas not inside parentheses
+    pattern = r",\s*(?![^()]*\))"
+
+    for long_string in checkbox_column:
+        separated_strings = re.split(pattern, long_string)
+        formatted_strings.extend(separated_strings)
+
+    if not formatted_strings:
+        return []
+
+    return formatted_strings
 
 
 def format_checkbox_columns(checkbox_column: List[str]) -> Optional[str]:
