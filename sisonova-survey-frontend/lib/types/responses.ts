@@ -22,6 +22,6 @@ export interface DashboardIncomeInfomration {
 }
 
 export interface DashboardResponse {
-  dashboard_response: DashboardDemographics;
+  dashboard_response: DashboardDemographics | DashboardIncomeInfomration;
   message: string;
 }

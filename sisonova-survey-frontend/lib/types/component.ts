@@ -6,5 +6,6 @@ export interface StorylineContentProps {
 
 export interface DemographicsChartsProps {
   filters: DashboardFilters;
+  apiUrlSuffix: string;
 }
 
