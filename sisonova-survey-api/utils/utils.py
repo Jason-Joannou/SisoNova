@@ -3,6 +3,7 @@ from typing import List, Optional
 
 import numpy as np
 import pandas as pd
+
 from utils.consumer_survey_mappings import rename_all_survey_columns
 from utils.gs_client import load_gs_client
 
@@ -35,15 +36,18 @@ def get_survey_results_into_df():
     Returns:
         pd.DataFrame: DataFrame holding the survey data
     """
+    try:
+        client = load_gs_client()
+        sheet = client.open("SisoNova Consumer Survey (Responses)").sheet1
+        data = sheet.get_all_records()
+        df = pd.DataFrame(data)
 
-    client = load_gs_client()
-    sheet = client.open("SisoNova Consumer Survey (Responses)").sheet1
-    data = sheet.get_all_records()
-    df = pd.DataFrame(data)
+        df = rename_all_survey_columns(df=df)
+        return df
 
-    df = rename_all_survey_columns(df=df)
-
-    return df
+    except Exception as e:
+        print(f"Something went wrong with retrieving the survey data: {e}")
+        return pd.DataFrame()
 
 
 def format_checkbox_columns(checkbox_column: List[str]) -> Optional[str]:
