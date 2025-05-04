@@ -221,43 +221,43 @@ export default function DashboardPage() {
                 value="demographics"
                 className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
               >
-                Demographics
+                User Demographics
               </TabsTrigger>
               <TabsTrigger
                 value="income"
                 className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
               >
-                Income
+                User Income Information
               </TabsTrigger>
               <TabsTrigger
                 value="financial"
                 className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
               >
-                Financial Management
+                User Financial Management
               </TabsTrigger>
               <TabsTrigger
                 value="access"
                 className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
               >
-                Financial Access
+                User Financial Access
               </TabsTrigger>
               <TabsTrigger
                 value="barriers"
                 className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
               >
-                Barriers
+                User Financial Barriers
               </TabsTrigger>
               <TabsTrigger
                 value="psych-barriers"
                 className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
               >
-                Psychological Barriers
+                User Psychological Barriers
               </TabsTrigger>
               <TabsTrigger
                 value="technology"
                 className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
               >
-                Technology
+                User Technology Barriers
               </TabsTrigger>
             </TabsList>
 
