@@ -26,6 +26,7 @@ import DemographicsCharts from "@/components/dashboard/demographic-charts";
 import { useDashboard } from "@/lib/hooks/use-dashboard";
 import PersonalIncomeCharts from "@/components/dashboard/personal-income-charts";
 import IncomeManagementCharts from "@/components/dashboard/personal-income-management-charts";
+import FinancialAccessCharts from "@/components/dashboard/financial-access-charts";
 // import IncomeCharts from "@/components/dashboard/income-charts";
 // import FinancialCharts from "@/components/dashboard/financial-charts";
 // import TechnologyCharts from "@/components/dashboard/technology-charts";
@@ -232,7 +233,7 @@ export default function DashboardPage() {
                 Financial Management
               </TabsTrigger>
               <TabsTrigger
-                value="acccess"
+                value="access"
                 className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
               >
                 Financial Access
@@ -272,7 +273,12 @@ export default function DashboardPage() {
               />
             </TabsContent>
 
-            <TabsContent value="access" className="space-y-4"></TabsContent>
+            <TabsContent value="access" className="space-y-4">
+              <FinancialAccessCharts
+                filters={dashboardFilters}
+                apiUrlSuffix="financial_access"
+              />
+            </TabsContent>
 
             <TabsContent value="barriers" className="space-y-4"></TabsContent>
 
