@@ -1,6 +1,6 @@
 import pandas as pd
 from utils.config import DEMOGRAPHIC_COLUMNS
-from utils.utils import get_column_value_counts, get_survey_results_into_df
+from utils.utils import get_column_value_counts
 
 
 def process_demographic_columns(df: pd.DataFrame):
