@@ -2,6 +2,7 @@ import pandas as pd
 from utils.config import (
     DEMOGRAPHIC_COLUMNS,
     FINANCIAL_ACCESS_COLUMNS,
+    FINANCIAL_BARRIERS_COLUMNS,
     INCOME_MANAGEMENT_COLUMNS,
     PERSONAL_AND_HOUSEHOLD_INCOME_COLUMNS,
 )
@@ -104,7 +105,7 @@ def process_financial_barriers_columns(df: pd.DataFrame):
                 column=value, df=df, is_checkbox=value in checkbox_columns
             )
         )
-        for _, value in PERSONAL_AND_HOUSEHOLD_INCOME_COLUMNS.items()
+        for _, value in FINANCIAL_BARRIERS_COLUMNS.items()
     }
 
     return results
