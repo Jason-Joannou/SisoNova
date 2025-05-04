@@ -212,7 +212,7 @@ export default function DashboardPage() {
             onValueChange={setActiveTab}
             className="space-y-4"
           >
-            <TabsList className="bg-white rounded-2xl grid grid-cols-2 md:grid-cols-5 w-full gap-2">
+            <TabsList className="bg-gray-100 rounded-2xl flex flex-nowrap overflow-x-auto gap-x-2 w-full px-2">
               <TabsTrigger
                 value="demographics"
                 className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
@@ -230,6 +230,12 @@ export default function DashboardPage() {
                 className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
               >
                 Financial Management
+              </TabsTrigger>
+              <TabsTrigger
+                value="acccess"
+                className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
+              >
+                Financial Access
               </TabsTrigger>
               <TabsTrigger
                 value="barriers"
@@ -265,6 +271,8 @@ export default function DashboardPage() {
                 apiUrlSuffix="income_management"
               />
             </TabsContent>
+
+            <TabsContent value="access" className="space-y-4"></TabsContent>
 
             <TabsContent value="barriers" className="space-y-4"></TabsContent>
 
