@@ -37,7 +37,7 @@ def process_income_columns(df: pd.DataFrame):
             if value in avg_columns
             else get_column_value_counts(column=value, df=df)
         )
-        for _, value in DEMOGRAPHIC_COLUMNS.items()
+        for _, value in PERSONAL_AND_HOUSEHOLD_INCOME_COLUMNS.items()
     }
 
     return results
