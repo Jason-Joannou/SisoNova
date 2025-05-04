@@ -1,8 +1,7 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-
 from utils.consumer_survey_mappings import rename_all_survey_columns
 from utils.gs_client import load_gs_client
 from utils.utils import format_checkbox_columns, format_number_columns
@@ -332,7 +331,7 @@ def get_gender_demographic_statistics(df: pd.DataFrame, gender: Optional[str] = 
     return stats
 
 
-def build_consumer_storyline(gender: Optional[str] = None) -> Dict:
+def build_consumer_storyline(gender: Optional[str] = None) -> Tuple:
     """
     This methods pulls the answers from the google form, formats them, gets the statistics, and returns the results.
 
@@ -352,7 +351,16 @@ def build_consumer_storyline(gender: Optional[str] = None) -> Dict:
 
     stats = get_gender_demographic_statistics(df=df, gender=gender)
 
-    return stats
+    return (
+        stats,
+        df.drop(
+            columns=[
+                """If someone invited you to do this survey, please enter their referral code here:
+(This helps them get extra entries into the airtime & data draw!)""",
+                "Column 30",
+            ]
+        ).copy(),
+    )
 
 
 if __name__ == "__main__":

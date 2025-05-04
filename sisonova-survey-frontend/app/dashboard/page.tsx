@@ -23,7 +23,6 @@ import {
   TableIcon,
 } from "lucide-react";
 import DemographicsCharts from "@/components/dashboard/demographic-charts";
-import { useDashboard } from "@/lib/hooks/use-dashboard";
 import PersonalIncomeCharts from "@/components/dashboard/personal-income-charts";
 import IncomeManagementCharts from "@/components/dashboard/personal-income-management-charts";
 import FinancialAccessCharts from "@/components/dashboard/financial-access-charts";
@@ -31,11 +30,6 @@ import FinancialBarriersCharts from "@/components/dashboard/financial-barriers-c
 import PsychologicalBarriersCharts from "@/components/dashboard/psychological-barriers-charts";
 import TechnologicalUnderstandingCharts from "@/components/dashboard/technological-barriers-charts";
 import DataTable from "@/components/dashboard/data-table";
-// import IncomeCharts from "@/components/dashboard/income-charts";
-// import FinancialCharts from "@/components/dashboard/financial-charts";
-// import TechnologyCharts from "@/components/dashboard/technology-charts";
-// import BarriersCharts from "@/components/dashboard/barriers-charts";
-// import DataTable from "@/components/dashboard/data-table";
 
 export default function DashboardPage() {
   const [gender, setGender] = useState<string | undefined>(undefined);
@@ -59,20 +53,23 @@ export default function DashboardPage() {
     province,
   };
 
-  // Download data as CSV
+  // Download CSV
   const downloadData = () => {
-    if (!data) return;
+    if (!data || !data.raw_data) return;
 
-    // Convert data to CSV format
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      Object.keys(data.stats).join(",") +
-      "\n" +
-      Object.values(data.stats).join(",");
+    const rows = data.raw_data;
+    const header = Object.keys(rows[0]);
+    const csv = [
+      header.join(","), // header row
+      ...rows.map((row) =>
+        header.map((field) => JSON.stringify(row[field] ?? "")).join(","),
+      ),
+    ].join("\n");
 
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
+    link.setAttribute("href", url);
     link.setAttribute("download", "sisonova_survey_data.csv");
     document.body.appendChild(link);
     link.click();

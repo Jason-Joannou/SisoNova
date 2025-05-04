@@ -1,9 +1,8 @@
 from typing import Dict, Optional, Union
 
+from aggregators.consumer_aggregator import build_consumer_storyline
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
-
-from aggregators.consumer_aggregator import build_consumer_storyline
 
 router = APIRouter(
     prefix="/api/storyline",
@@ -27,10 +26,11 @@ async def get_storyline(
     """
 
     try:
-        stats = build_consumer_storyline(gender=gender)
+        stats, df = build_consumer_storyline(gender=gender)
 
         response_data = {
             "stats": stats,
+            "raw_data": df.to_dict(orient="records"),
             "message": f"Successfully retrieved storyline statistics for {gender if gender else 'all'} respondents",
         }
 
