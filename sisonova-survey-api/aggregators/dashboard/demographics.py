@@ -84,3 +84,27 @@ def process_financial_access_columns(df: pd.DataFrame):
     }
 
     return results
+
+
+def process_financial_barriers_columns(df: pd.DataFrame):
+    """
+    Creates counts for each income management-related checkbox/multi-select column.
+    """
+    checkbox_columns = [
+        "FINANCIAL_SERVICE_CONCERNS",
+    ]
+
+    avg_columns = ["FINANCIAL_CONFIDENCE"]
+
+    results = {
+        value: (
+            {"avg": format_number_columns(df[value].to_list())}
+            if value in avg_columns
+            else get_column_value_counts(
+                column=value, df=df, is_checkbox=value in checkbox_columns
+            )
+        )
+        for _, value in PERSONAL_AND_HOUSEHOLD_INCOME_COLUMNS.items()
+    }
+
+    return results
