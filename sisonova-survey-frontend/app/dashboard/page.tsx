@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import DemographicsCharts from "@/components/dashboard/demographic-charts";
 import { useDashboard } from "@/lib/hooks/use-dashboard";
+import PersonalIncomeCharts from "@/components/dashboard/personal-income-charts";
 // import IncomeCharts from "@/components/dashboard/income-charts";
 // import FinancialCharts from "@/components/dashboard/financial-charts";
 // import TechnologyCharts from "@/components/dashboard/technology-charts";
@@ -244,10 +245,18 @@ export default function DashboardPage() {
             </TabsList>
 
             <TabsContent value="demographics" className="space-y-4">
-              <DemographicsCharts filters={dashboardFilters} />
+              <DemographicsCharts
+                filters={dashboardFilters}
+                apiUrlSuffix="demographics"
+              />
             </TabsContent>
 
-            <TabsContent value="income" className="space-y-4"></TabsContent>
+            <TabsContent value="income" className="space-y-4">
+              <PersonalIncomeCharts
+                filters={dashboardFilters}
+                apiUrlSuffix="income"
+              />
+            </TabsContent>
 
             <TabsContent value="financial" className="space-y-4"></TabsContent>
 
