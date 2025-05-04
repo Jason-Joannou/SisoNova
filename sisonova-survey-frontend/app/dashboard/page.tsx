@@ -246,6 +246,12 @@ export default function DashboardPage() {
                 Barriers
               </TabsTrigger>
               <TabsTrigger
+                value="psych-barriers"
+                className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
+              >
+                Psychological Barriers
+              </TabsTrigger>
+              <TabsTrigger
                 value="technology"
                 className="data-[state=active]:bg-black data-[state=active]:text-white border border-black rounded-xl px-4 py-2"
               >
@@ -287,6 +293,11 @@ export default function DashboardPage() {
                 apiUrlSuffix="financial_barriers"
               />
             </TabsContent>
+
+            <TabsContent
+              value="psych-barriers"
+              className="space-y-4"
+            ></TabsContent>
 
             <TabsContent value="technology" className="space-y-4"></TabsContent>
           </Tabs>
