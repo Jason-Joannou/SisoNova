@@ -124,10 +124,10 @@ export default function AboutPage() {
         <p className="mt-2">
           For inquiries, contact us at{" "}
           <a
-            href="mailto:info@sisonova.com"
+            href="mailto:contact.sisonova@gmail.com"
             className="underline hover:text-primary"
           >
-            info@sisonova.com
+            contact.sisonova@gmail.com
           </a>
         </p>
       </motion.div>
