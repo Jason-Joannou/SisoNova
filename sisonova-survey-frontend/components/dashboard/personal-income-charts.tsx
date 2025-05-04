@@ -25,8 +25,8 @@ export default function PersonalIncomeCharts({
 
   const personalIncome = data.dashboard_response?.MONTHLY_PERSONAL_INCOME;
   const incomeSource = data.dashboard_response?.INCOME_SOURCE;
-  const householdSize = data.dashboard_response?.HOUSEHOLD_SIZE;
-  const incomeEarnersCount = data.dashboard_response?.INCOME_EARNERS_COUNT;
+  const householdSize = data.dashboard_response?.HOUSEHOLD_SIZE?.avg;
+  const incomeEarnersCount = data.dashboard_response?.INCOME_EARNERS_COUNT?.avg;
   const monthlyHouseholdIncome =
     data.dashboard_response?.MONTHLY_HOUSEHOLD_INCOME;
 
@@ -142,6 +142,40 @@ export default function PersonalIncomeCharts({
                 <Bar dataKey="value" fill="#8884d8" />
               </BarChart>
             </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Average Number of People in a Household</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center h-[300px] space-y-4">
+            <div className="text-6xl font-bold text-primary">
+              {householdSize}
+            </div>
+            <div className="text-muted-foreground text-sm text-center px-4">
+              This represents the average household size based on the selected
+              filters.
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Average Number of Earners in a Household</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center h-[300px] space-y-4">
+            <div className="text-6xl font-bold text-primary">
+              {incomeEarnersCount}
+            </div>
+            <div className="text-muted-foreground text-sm text-center px-4">
+              This represents the average number of earners in a household based
+              on the selected filters.
+            </div>
           </div>
         </CardContent>
       </Card>
