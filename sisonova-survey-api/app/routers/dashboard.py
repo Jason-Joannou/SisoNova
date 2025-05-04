@@ -26,7 +26,12 @@ async def get_storyline(
 
         results = process_demographic_columns(df=df)
 
-        return JSONResponse(status_code=200, content=results)
+        response_data = {
+            "dashboard_demographics": results,
+            "message": f"Successfully retreieved demographic distributions for filters: gender: {gender}, age_group: {age_group}, province: {province}",
+        }
+
+        return JSONResponse(status_code=200, content=response_data)
 
     except Exception as e:
         return HTTPException(
