@@ -31,6 +31,7 @@ export default function DemographicsCharts({
   const ageData = data.dashboard_response?.AGE_GROUP;
   const provinceData = data.dashboard_response?.PROVINCE;
   const educationData = data.dashboard_response?.EDUCATION_LEVEL;
+  const employmentData = data.dashboard_response?.EMPLOYMENT_STATUS;
 
   if (loading) {
     return <LoadingState />;
@@ -142,6 +143,24 @@ export default function DemographicsCharts({
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="value" fill="#ffc658" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Employment status</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={employmentData}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#a4de6c" />
               </BarChart>
             </ResponsiveContainer>
           </div>
