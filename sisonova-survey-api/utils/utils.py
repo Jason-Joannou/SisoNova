@@ -3,9 +3,37 @@ from typing import List, Optional
 
 import numpy as np
 import pandas as pd
-
 from utils.consumer_survey_mappings import rename_all_survey_columns
 from utils.gs_client import load_gs_client
+
+
+def filter_survey_dataframe(
+    df: pd.DataFrame,
+    gender: Optional[str] = None,
+    age_group: Optional[str] = None,
+    province: Optional[str] = None,
+):
+    """
+    This method returns a filtered list based on the suppplied parameters
+
+    Args:
+        df (pd.DataFrame): The dataframe holding the survey information
+        gender (Optional[str]): Optional string parameter representing gender
+        age_group (Optional[str]): Optional string parameter representing the age group
+        province (Optional[str]): Optional string parameter representing the province
+
+    Return:
+        df_new: The filtered dataframe
+    """
+    df_new = df.copy()
+    if gender:
+        df_new = df_new[df_new["GENDER"] == gender]
+    if age_group:
+        df_new = df_new[df_new["AGE_GROUP"] == age_group]
+    if province:
+        df_new = df_new[df_new["PROVINCE"] == province]
+
+    return df_new
 
 
 def get_column_value_counts(column: str, df: pd.DataFrame):

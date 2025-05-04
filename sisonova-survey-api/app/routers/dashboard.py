@@ -2,6 +2,7 @@ from typing import Dict, Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
+from utils.utils import filter_survey_dataframe, get_survey_results_into_df
 
 router = APIRouter(
     prefix="/api/dashboard",
@@ -16,4 +17,13 @@ async def get_storyline(
     age_group: Optional[str] = None,
     province: Optional[str] = None,
 ):
-    pass
+    try:
+        df = get_survey_results_into_df()
+        df = filter_survey_dataframe(
+            df=df, gender=gender, age_group=age_group, province=province
+        )
+
+    except Exception as e:
+        return HTTPException(
+            status_code=500, detail=f"Error getting demographic information: {str(e)}"
+        )
