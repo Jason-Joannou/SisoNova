@@ -1,6 +1,7 @@
 import pandas as pd
 from utils.config import (
     DEMOGRAPHIC_COLUMNS,
+    FINANCIAL_ACCESS_COLUMNS,
     INCOME_MANAGEMENT_COLUMNS,
     PERSONAL_AND_HOUSEHOLD_INCOME_COLUMNS,
 )
@@ -58,6 +59,22 @@ def process_income_management_columns(df: pd.DataFrame):
             column=value, df=df, is_checkbox=value in checkbox_columns
         )
         for _, value in INCOME_MANAGEMENT_COLUMNS.items()
+    }
+
+    return results
+
+
+def process_financial_access_columns(df: pd.DataFrame):
+    """
+    Creates counts for each income management-related checkbox/multi-select column.
+    """
+    checkbox_columns = ["CASH_SHORTAGE_STRATEGIES", "SPENDING_MANAGEMENT_TOOLS"]
+
+    results = {
+        value: get_column_value_counts(
+            column=value, df=df, is_checkbox=value in checkbox_columns
+        )
+        for _, value in FINANCIAL_ACCESS_COLUMNS.items()
     }
 
     return results
