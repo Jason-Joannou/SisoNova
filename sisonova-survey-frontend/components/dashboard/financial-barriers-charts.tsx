@@ -72,7 +72,7 @@ export default function FinancialBarriersCharts({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Paper Work Avoidance</CardTitle>
+          <CardTitle>Paper Work Avoidance Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -101,12 +101,16 @@ export default function FinancialBarriersCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents how often a respondent has avoided a financial
+            service due to paperwork issues.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Financial Literacy Level</CardTitle>
+          <CardTitle>Financial Literacy Level Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -135,12 +139,16 @@ export default function FinancialBarriersCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the ease of understanding paperwork that the
+            respondents recieve from financial institutions.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Documentation Barriers</CardTitle>
+          <CardTitle>Documentation Barriers Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -169,12 +177,16 @@ export default function FinancialBarriersCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether respondents have been asked for
+            documentation but could deliver.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Financial Service Concerns</CardTitle>
+          <CardTitle>Financial Service Concerns Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -203,12 +215,16 @@ export default function FinancialBarriersCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the worries that a respondents faces when using
+            financial services.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Financial Confusion Response</CardTitle>
+          <CardTitle>Financial Confusion Response Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -237,12 +253,16 @@ export default function FinancialBarriersCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the action the respondent takes when they do not
+            understand a financial service.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Negative Financial Experience</CardTitle>
+          <CardTitle>Negative Financial Experience Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -271,12 +291,16 @@ export default function FinancialBarriersCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether the respondent had any bad experiences when
+            using a financial service.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Financial Institution Trust</CardTitle>
+          <CardTitle>Financial Institution Trust Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -305,12 +329,16 @@ export default function FinancialBarriersCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the trust respondents have in financial
+            institutions.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Financial Exclusion Feelings</CardTitle>
+          <CardTitle>Financial Exclusion Feelings Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -339,12 +367,16 @@ export default function FinancialBarriersCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether a respondent feels included in the current
+            financial landscape.
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Clarity Impact on Usage</CardTitle>
+          <CardTitle>Clarity Impact on Usage Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
@@ -372,6 +404,10 @@ export default function FinancialBarriersCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether or not respondents would use more financial
+            services if they were explained clearer.
           </div>
         </CardContent>
       </Card>
