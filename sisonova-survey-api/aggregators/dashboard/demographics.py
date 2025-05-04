@@ -33,7 +33,7 @@ def process_income_columns(df: pd.DataFrame):
 
     results = {
         value: (
-            format_number_columns(df[value].to_list())
+            {"avg": format_number_columns(df[value].to_list())}
             if value in avg_columns
             else get_column_value_counts(column=value, df=df)
         )
