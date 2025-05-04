@@ -9,8 +9,7 @@ export const fetchDashboardData = async (
     let url = "/api/dashboard/demographics";
     if (dashboardProps.gender) url += `?gender=${dashboardProps.gender}`;
     if (dashboardProps.province) url += `?province=${dashboardProps.province}`;
-    if (dashboardProps.age_group)
-      url += `?age_group${dashboardProps.age_group}`;
+    if (dashboardProps.ageGroup) url += `?age_group=${dashboardProps.ageGroup}`;
     const response = await api.get(url);
     return response.data;
   } catch (error) {
