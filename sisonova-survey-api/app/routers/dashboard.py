@@ -1,10 +1,6 @@
 from typing import Dict, Optional, Union
 
-from aggregators.dashboard.demographics import (
-    process_age_group_distributions,
-    process_gender_distribution,
-    process_geographic_distribution,
-)
+from aggregators.dashboard.demographics import process_demographic_columns
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from utils.utils import filter_survey_dataframe, get_survey_results_into_df
@@ -28,9 +24,9 @@ async def get_storyline(
             df=df, gender=gender, age_group=age_group, province=province
         )
 
-        gender_counts = process_gender_distribution(df=df)
-        age_counts = process_age_group_distributions(df=df)
-        province_counts = process_geographic_distribution(df=df)
+        results = process_demographic_columns(df=df)
+
+        return JSONResponse(status_code=200, content=results)
 
     except Exception as e:
         return HTTPException(
