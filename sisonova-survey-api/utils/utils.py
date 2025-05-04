@@ -2,6 +2,31 @@ from collections import Counter
 from typing import List, Optional
 
 import numpy as np
+import pandas as pd
+from utils.consumer_survey_mappings import rename_all_survey_columns
+from utils.gs_client import load_gs_client
+
+
+def get_column_value_counts(column: str, df: pd.DataFrame):
+
+    counts = df[column].value_counts()
+    formatted_counts = list(counts.items())
+
+    results = [{k: v} for k, v in formatted_counts]
+
+    return results
+
+
+def get_survey_results_into_df():
+
+    client = load_gs_client()
+    sheet = client.open("SisoNova Consumer Survey (Responses)").sheet1
+    data = sheet.get_all_records()
+    df = pd.DataFrame(data)
+
+    df = rename_all_survey_columns(df=df)
+
+    return df
 
 
 def format_checkbox_columns(checkbox_column: List[str]) -> Optional[str]:
