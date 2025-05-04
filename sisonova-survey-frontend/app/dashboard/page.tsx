@@ -27,6 +27,7 @@ import { useDashboard } from "@/lib/hooks/use-dashboard";
 import PersonalIncomeCharts from "@/components/dashboard/personal-income-charts";
 import IncomeManagementCharts from "@/components/dashboard/personal-income-management-charts";
 import FinancialAccessCharts from "@/components/dashboard/financial-access-charts";
+import FinancialBarriersCharts from "@/components/dashboard/financial-barriers-charts";
 // import IncomeCharts from "@/components/dashboard/income-charts";
 // import FinancialCharts from "@/components/dashboard/financial-charts";
 // import TechnologyCharts from "@/components/dashboard/technology-charts";
@@ -280,7 +281,12 @@ export default function DashboardPage() {
               />
             </TabsContent>
 
-            <TabsContent value="barriers" className="space-y-4"></TabsContent>
+            <TabsContent value="barriers" className="space-y-4">
+              <FinancialBarriersCharts
+                filters={dashboardFilters}
+                apiUrlSuffix="financial_barriers"
+              />
+            </TabsContent>
 
             <TabsContent value="technology" className="space-y-4"></TabsContent>
           </Tabs>
