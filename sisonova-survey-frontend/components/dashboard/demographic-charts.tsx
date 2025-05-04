@@ -154,12 +154,28 @@ export default function DemographicsCharts({
         <CardContent>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={educationData}>
-                <XAxis dataKey="name" />
-                <YAxis />
+              <PieChart>
+                <Pie
+                  data={educationData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  label={({ name, percent }) =>
+                    `${name}: ${(percent * 100).toFixed(0)}%`
+                  }
+                >
+                  {educationData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
                 <Tooltip />
-                <Bar dataKey="value" fill="#ffc658" />
-              </BarChart>
+              </PieChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
