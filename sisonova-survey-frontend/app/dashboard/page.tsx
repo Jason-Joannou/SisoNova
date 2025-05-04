@@ -30,6 +30,7 @@ import FinancialAccessCharts from "@/components/dashboard/financial-access-chart
 import FinancialBarriersCharts from "@/components/dashboard/financial-barriers-charts";
 import PsychologicalBarriersCharts from "@/components/dashboard/psychological-barriers-charts";
 import TechnologicalUnderstandingCharts from "@/components/dashboard/technological-barriers-charts";
+import DataTable from "@/components/dashboard/data-table";
 // import IncomeCharts from "@/components/dashboard/income-charts";
 // import FinancialCharts from "@/components/dashboard/financial-charts";
 // import TechnologyCharts from "@/components/dashboard/technology-charts";
@@ -311,7 +312,7 @@ export default function DashboardPage() {
             </TabsContent>
           </Tabs>
         ) : (
-          <div>Hello</div>
+          <DataTable data={data.stats} />
         )}
       </div>
     </div>
