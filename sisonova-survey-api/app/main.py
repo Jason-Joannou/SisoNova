@@ -1,9 +1,8 @@
 import uvicorn
+from app.routers import dashboard, storylines
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
-from app.routers import storylines
 
 app = FastAPI(
     title="SisoNova Survey API",
@@ -37,6 +36,7 @@ async def root():
 
 # Include routers
 app.include_router(storylines.router)
+app.include_router(dashboard.router)
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=3001, reload=True)
