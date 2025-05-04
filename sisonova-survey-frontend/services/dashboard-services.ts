@@ -4,9 +4,11 @@ import { DashboardResponse } from "@/lib/types/responses";
 
 export const fetchDashboardData = async (
   dashboardProps: DashboardFilters,
+  apiUrlSuffix: string,
 ): Promise<DashboardResponse> => {
   try {
-    let url = "/api/dashboard/demographics";
+    let url = `/api/dashboard/${apiUrlSuffix}`;
+    console.log(url);
     if (dashboardProps.gender) url += `?gender=${dashboardProps.gender}`;
     if (dashboardProps.province) url += `?province=${dashboardProps.province}`;
     if (dashboardProps.ageGroup) url += `?age_group=${dashboardProps.ageGroup}`;
