@@ -51,7 +51,7 @@ def get_column_value_counts(column: str, df: pd.DataFrame):
     counts = df[column].value_counts()
     formatted_counts = list(counts.items())
 
-    results = [{k: v} for k, v in formatted_counts]
+    results = [{"name": k, "value": v} for k, v in formatted_counts]
 
     return results
 

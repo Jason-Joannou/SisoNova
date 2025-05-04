@@ -27,7 +27,7 @@ async def get_storyline(
         results = process_demographic_columns(df=df)
 
         response_data = {
-            "dashboard_demographics": results,
+            "dashboard_response": results,
             "message": f"Successfully retreieved demographic distributions for filters: gender: {gender}, age_group: {age_group}, province: {province}",
         }
 
