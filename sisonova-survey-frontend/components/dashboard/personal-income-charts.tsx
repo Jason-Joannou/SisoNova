@@ -89,6 +89,9 @@ export default function PersonalIncomeCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the average monthly income of a respondent.
+          </div>
         </CardContent>
       </Card>
 
@@ -123,6 +126,9 @@ export default function PersonalIncomeCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the main source of income for a respondent.
+          </div>
         </CardContent>
       </Card>
 
@@ -156,6 +162,10 @@ export default function PersonalIncomeCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the average monthly household income for a
+            respondent.
           </div>
         </CardContent>
       </Card>
