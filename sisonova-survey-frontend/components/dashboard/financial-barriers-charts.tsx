@@ -24,9 +24,6 @@ export default function FinancialBarriersCharts({
 }: DemographicsChartsProps) {
   const { data, loading, error } = useDashboard(filters, apiUrlSuffix);
 
-  console.log("DATA");
-  console.log(data);
-
   const paperworkAvoidance = data.dashboard_response?.PAPERWORK_AVOIDANCE;
   const financialLiteracyLevel =
     data.dashboard_response?.FINANCIAL_LITERACY_LEVEL;
