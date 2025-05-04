@@ -45,6 +45,12 @@ export default function DashboardPage() {
     setProvince(undefined);
   };
 
+  const dashboardFilters = {
+    gender,
+    ageGroup,
+    province,
+  };
+
   // Download data as CSV
   const downloadData = () => {
     if (!data) return;
@@ -238,7 +244,7 @@ export default function DashboardPage() {
             </TabsList>
 
             <TabsContent value="demographics" className="space-y-4">
-              <DemographicsCharts data={data?.stats} />
+              <DemographicsCharts filters={dashboardFilters} />
             </TabsContent>
 
             <TabsContent value="income" className="space-y-4"></TabsContent>
