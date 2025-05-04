@@ -14,51 +14,37 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import LoadingState from "../shared/loading-state";
+import { useDashboard } from "@/lib/hooks/use-dashboard";
+import { DemographicsChartsProps } from "@/lib/types/component";
 
-interface DemographicsChartsProps {
-  data: any;
-}
+export default function DemographicsCharts({
+  filters,
+}: DemographicsChartsProps) {
+  const { data, loading, error } = useDashboard(filters);
 
-export default function DemographicsCharts({ data }: DemographicsChartsProps) {
-  if (!data) return null;
+  console.log(data);
+  console.log(loading);
+  console.log(error);
 
-  // Sample data - in a real implementation, you would process your actual data
-  const genderData = [
-    { name: "Male", value: 48 },
-    { name: "Female", value: 48 },
-    { name: "Non-binary", value: 2 },
-    { name: "Prefer not to say", value: 2 },
-  ];
+  const genderData = data.dashboard_response?.GENDER;
+  const ageData = data.dashboard_response?.AGE_GROUP;
+  const provinceData = data.dashboard_response?.PROVINCE;
+  const educationData = data.dashboard_response?.EDUCATION_LEVEL;
 
-  const ageData = [
-    { name: "18-24", value: 15 },
-    { name: "25-34", value: 25 },
-    { name: "35-44", value: 25 },
-    { name: "45-54", value: 15 },
-    { name: "55-64", value: 10 },
-    { name: "65+", value: 10 },
-  ];
+  if (loading) {
+    return <LoadingState />;
+  }
 
-  const provinceData = [
-    { name: "Gauteng", value: 30 },
-    { name: "Western Cape", value: 20 },
-    { name: "KwaZulu-Natal", value: 15 },
-    { name: "Eastern Cape", value: 10 },
-    { name: "Free State", value: 8 },
-    { name: "Mpumalanga", value: 7 },
-    { name: "North West", value: 5 },
-    { name: "Limpopo", value: 3 },
-    { name: "Northern Cape", value: 2 },
-  ];
-
-  const educationData = [
-    { name: "Less than high school", value: 10 },
-    { name: "High school", value: 30 },
-    { name: "Some college", value: 25 },
-    { name: "Bachelor's degree", value: 20 },
-    { name: "Master's degree", value: 10 },
-    { name: "Doctorate", value: 5 },
-  ];
+  if (error) {
+    return (
+      <Card className="border-destructive">
+        <CardContent className="pt-6">
+          <p className="text-destructive">{error}</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const COLORS = [
     "#0088FE",
