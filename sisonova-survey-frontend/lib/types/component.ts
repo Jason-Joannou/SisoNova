@@ -1,3 +1,10 @@
+import { DashboardFilters } from "./api";
+
 export interface StorylineContentProps {
-    gender?: string
+  gender?: string;
 }
+
+export interface DemographicsChartsProps {
+  filters: DashboardFilters;
+}
+
