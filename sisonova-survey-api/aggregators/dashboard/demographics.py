@@ -48,3 +48,19 @@ def process_geographic_distribution(df: pd.DataFrame):
         return []
     age_counts = get_column_value_counts(column="PROVINCE", df=df)
     return age_counts
+
+
+def process_education_distribution(df: pd.DataFrame):
+    """
+    This method returns the education counts in the dataframe
+
+    Args:
+        df (pd.DataFrame): Dataframe of survey data
+    Returns:
+        list: A list of dictionaires counting the counts
+    """
+
+    if df.empty:
+        return []
+    education_counts = get_column_value_counts(column="EDUCATION_LEVEL", df=df)
+    return education_counts
