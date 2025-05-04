@@ -29,6 +29,7 @@ import IncomeManagementCharts from "@/components/dashboard/personal-income-manag
 import FinancialAccessCharts from "@/components/dashboard/financial-access-charts";
 import FinancialBarriersCharts from "@/components/dashboard/financial-barriers-charts";
 import PsychologicalBarriersCharts from "@/components/dashboard/psychological-barriers-charts";
+import TechnologicalUnderstandingCharts from "@/components/dashboard/technological-barriers-charts";
 // import IncomeCharts from "@/components/dashboard/income-charts";
 // import FinancialCharts from "@/components/dashboard/financial-charts";
 // import TechnologyCharts from "@/components/dashboard/technology-charts";
@@ -302,7 +303,12 @@ export default function DashboardPage() {
               />
             </TabsContent>
 
-            <TabsContent value="technology" className="space-y-4"></TabsContent>
+            <TabsContent value="technology" className="space-y-4">
+              <TechnologicalUnderstandingCharts
+                filters={dashboardFilters}
+                apiUrlSuffix="technological_understanding"
+              />
+            </TabsContent>
           </Tabs>
         ) : (
           <div>Hello</div>
