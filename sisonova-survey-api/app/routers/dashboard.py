@@ -27,7 +27,7 @@ async def get_user_demographics(
             df=df, gender=gender, age_group=age_group, province=province
         )
 
-        results = process_income_columns(df=df)
+        results = process_demographic_columns(df=df)
 
         response_data = {
             "dashboard_response": results,
@@ -54,7 +54,7 @@ async def get_user_income(
             df=df, gender=gender, age_group=age_group, province=province
         )
 
-        results = process_demographic_columns(df=df)
+        results = process_income_columns(df=df)
 
         response_data = {
             "dashboard_response": results,
