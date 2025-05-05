@@ -101,6 +101,9 @@ export default function TechnologicalUnderstandingCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the respondents level of comfort when using digital tools.
+          </div>
         </CardContent>
       </Card>
 
@@ -134,6 +137,9 @@ export default function TechnologicalUnderstandingCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the types of devices used by respondents to access digital tools.
           </div>
         </CardContent>
       </Card>
@@ -169,6 +175,9 @@ export default function TechnologicalUnderstandingCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents how often respondents use the internet.
+          </div>
         </CardContent>
       </Card>
 
@@ -202,6 +211,9 @@ export default function TechnologicalUnderstandingCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the challenges respondents face when using digital tools.
           </div>
         </CardContent>
       </Card>
@@ -237,6 +249,9 @@ export default function TechnologicalUnderstandingCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether respondents have ever avoided using digital tools because they were worried they would make mistakes.
+          </div>
         </CardContent>
       </Card>
 
@@ -249,7 +264,7 @@ export default function TechnologicalUnderstandingCharts({
         <CardContent>
           <div className="flex flex-col items-center justify-center h-[300px] space-y-4">
             <div className="text-6xl font-bold text-primary">
-              {digitalSecurityTrust}
+              {digitalSecurityTrust}/5
             </div>
             <div className="text-muted-foreground text-sm text-center px-4">
               This represents the average digital security trust based on the
@@ -290,6 +305,9 @@ export default function TechnologicalUnderstandingCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether a respondent has ever stopped using a digital tool due to it being hard to understand or use.
+          </div>
         </CardContent>
       </Card>
 
@@ -323,6 +341,9 @@ export default function TechnologicalUnderstandingCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the learning preference respondents have when learning about a new digital tool or service.
           </div>
         </CardContent>
       </Card>
@@ -358,6 +379,9 @@ export default function TechnologicalUnderstandingCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the motivators respondents have when learning about a new digital tool or service.
+          </div>
         </CardContent>
       </Card>
 
@@ -391,6 +415,9 @@ export default function TechnologicalUnderstandingCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the financial services respondents have used.
           </div>
         </CardContent>
       </Card>
