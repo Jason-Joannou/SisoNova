@@ -98,5 +98,6 @@ export interface DashboardResponse {
     | DashboardFinancialBarriers
     | DashboardPsychologicalBarriers
     | DashboardTechnologyUnderstanding;
+  data_found: boolean;
   message: string;
 }
