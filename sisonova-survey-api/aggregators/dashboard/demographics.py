@@ -76,6 +76,7 @@ def process_financial_access_columns(df: pd.DataFrame):
         "MULTIPLE_ACCOUNTS_REASONS",
         "MOST_USED_FINANCIAL_SERVICES",
         "ACCOUNT_TYPES",
+        "TRUSTED_FINANCIAL_SERVICES",
         "FINANCIAL_SERVICE_ISSUES",
     ]
 
