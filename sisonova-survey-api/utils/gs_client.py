@@ -52,6 +52,8 @@ def load_gs_client(scope: Optional[List[str]] = None) -> gspread.Client:
                     creds_dict, 
                     scopes=scope
                 )
+            else:
+                raise ValueError("GOOGLE_CREDENTIALS environment variable not set")
         else:
             raise Exception(f"Unknown enviroment {ENVIROMENT}")
         client = gspread.authorize(credentials)
