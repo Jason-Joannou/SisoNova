@@ -140,8 +140,7 @@ export default function FinancialBarriersCharts({
             </ResponsiveContainer>
           </div>
           <div className="text-muted-foreground text-sm text-center px-4">
-            This represents the ease of understanding paperwork that the
-            respondents recieve from financial institutions.
+            This represents the level of understanding respondents have of financial paperwork.
           </div>
         </CardContent>
       </Card>
@@ -421,7 +420,7 @@ export default function FinancialBarriersCharts({
         <CardContent>
           <div className="flex flex-col items-center justify-center h-[300px] space-y-4">
             <div className="text-6xl font-bold text-primary">
-              {financialConfidence}
+              {financialConfidence}/5
             </div>
             <div className="text-muted-foreground text-sm text-center px-4">
               This represents the average financial confidence based on the
