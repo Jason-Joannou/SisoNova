@@ -103,6 +103,9 @@ export default function FinancialAccessCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the types of accounts a respondent has.
+          </div>
         </CardContent>
       </Card>
 
@@ -136,6 +139,9 @@ export default function FinancialAccessCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the number of active accounts a respondent has.
           </div>
         </CardContent>
       </Card>
@@ -171,6 +177,9 @@ export default function FinancialAccessCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the reasons why a respondent has multiple accounts.
+          </div>
         </CardContent>
       </Card>
 
@@ -204,6 +213,9 @@ export default function FinancialAccessCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the purposes a respondent uses their different accounts for.
           </div>
         </CardContent>
       </Card>
@@ -239,6 +251,9 @@ export default function FinancialAccessCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents the financial services a respondent trusts.
+          </div>
         </CardContent>
       </Card>
 
@@ -272,6 +287,9 @@ export default function FinancialAccessCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether a respondent has switched providers before.
           </div>
         </CardContent>
       </Card>
@@ -307,6 +325,9 @@ export default function FinancialAccessCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents which services a respondent uses the most from their financial services provider.
+          </div>
         </CardContent>
       </Card>
 
@@ -340,6 +361,9 @@ export default function FinancialAccessCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether the respondents have had any issues with their financial services provider.
           </div>
         </CardContent>
       </Card>
@@ -375,6 +399,9 @@ export default function FinancialAccessCharts({
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents how often a respondent uses digital banking or financial apps.
+          </div>
         </CardContent>
       </Card>
 
@@ -408,6 +435,9 @@ export default function FinancialAccessCharts({
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="text-muted-foreground text-sm text-center px-4">
+            This represents whether the respondent feels that financial service providers meet their needs.
           </div>
         </CardContent>
       </Card>
