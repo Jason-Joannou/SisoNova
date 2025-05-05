@@ -1,3 +1,4 @@
+import os
 import uvicorn
 from app.routers import dashboard, storylines
 from fastapi import FastAPI
@@ -28,6 +29,7 @@ async def root():
         "documentation": "/docs",
         "available_endpoints": [
             "/api/storyline",
+            "/api/dashboard",
         ],
     }
 
@@ -38,5 +40,7 @@ async def root():
 app.include_router(storylines.router)
 app.include_router(dashboard.router)
 
+
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="0.0.0.0", port=3001, reload=True)
+    port = int(os.getenv("PORT", 3001))
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=True)
