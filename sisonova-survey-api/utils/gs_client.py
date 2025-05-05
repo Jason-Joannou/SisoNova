@@ -1,9 +1,11 @@
 import os
+import json
 from typing import List, Optional
 
 import gspread
 from dotenv import load_dotenv
 from google.oauth2.service_account import Credentials
+from google.oauth2 import service_account
 
 load_dotenv()
 
@@ -13,6 +15,7 @@ SCOPE: List[str] = [
 ]
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CREDENTIALS_PATH = os.path.join(BASE_DIR, "sisonova-api-credentials.json")
+ENVIROMENT = os.getenv("ENVIROMENT", "dev")
 
 
 def load_gs_client(scope: Optional[List[str]] = None) -> gspread.Client:
@@ -36,10 +39,21 @@ def load_gs_client(scope: Optional[List[str]] = None) -> gspread.Client:
     try:
         if scope is None:
             scope = SCOPE
-
-        credentials = Credentials.from_service_account_file(
-            filename=CREDENTIALS_PATH, scopes=scope
-        )
+        
+        if ENVIROMENT == "dev":
+            credentials = Credentials.from_service_account_file(
+                filename=CREDENTIALS_PATH, scopes=scope
+            )
+        elif ENVIROMENT == "prod":
+            creds_json = os.getenv("GOOGLE_CREDENTIALS")
+            if creds_json:
+                creds_dict = json.loads(creds_json)
+                credentials = service_account.Credentials.from_service_account_info(
+                    creds_dict, 
+                    scopes=scope
+                )
+        else:
+            raise Exception(f"Unknown enviroment {ENVIROMENT}")
         client = gspread.authorize(credentials)
         return client
 
