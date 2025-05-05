@@ -56,6 +56,9 @@ def get_column_value_counts(column: str, df: pd.DataFrame, is_checkbox: bool = F
     else:
         counts = df[column].value_counts()
 
+    if counts.empty:
+        return []
+
     return [{"name": k, "value": v} for k, v in counts.items()]
 
 
@@ -151,6 +154,9 @@ def format_number_columns(number_columns: List[str]) -> float:
                 formatted_list.append(int(number))
         else:
             formatted_list.append(number)
+
+    if not formatted_list:
+        return 0.0
 
     avg = np.mean(formatted_list)
 

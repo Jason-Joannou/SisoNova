@@ -32,17 +32,24 @@ async def get_user_demographics(
             df=df, gender=gender, age_group=age_group, province=province
         )
 
+        if df.empty:
+            return JSONResponse(
+                status_code=200,
+                content={"dashboard_response": {}, "message": "No data found", "data_found": False},
+            )
+
         results = process_demographic_columns(df=df)
 
         response_data = {
             "dashboard_response": results,
+            "data_found": True,
             "message": f"Successfully retreieved demographic distributions for filters: gender: {gender}, age_group: {age_group}, province: {province}",
         }
 
         return JSONResponse(status_code=200, content=response_data)
 
     except Exception as e:
-        return HTTPException(
+        raise HTTPException(
             status_code=500, detail=f"Error getting demographic information: {str(e)}"
         )
 
@@ -59,17 +66,24 @@ async def get_user_income(
             df=df, gender=gender, age_group=age_group, province=province
         )
 
+        if df.empty:
+            return JSONResponse(
+                status_code=200,
+                content={"dashboard_response": {}, "message": "No data found", "data_found": False},
+            )
+
         results = process_income_columns(df=df)
 
         response_data = {
             "dashboard_response": results,
+            "data_found": True,
             "message": f"Successfully retreieved demographic distributions for filters: gender: {gender}, age_group: {age_group}, province: {province}",
         }
 
         return JSONResponse(status_code=200, content=response_data)
 
     except Exception as e:
-        return HTTPException(
+        raise HTTPException(
             status_code=500, detail=f"Error getting demographic information: {str(e)}"
         )
 
@@ -88,17 +102,24 @@ async def get_user_income_management(
             df=df, gender=gender, age_group=age_group, province=province
         )
 
+        if df.empty:
+            return JSONResponse(
+                status_code=200,
+                content={"dashboard_response": {}, "message": "No data found", "data_found": False},
+            )
+
         results = process_income_management_columns(df=df)
 
         response_data = {
             "dashboard_response": results,
+            "data_found": True,
             "message": f"Successfully retreieved demographic distributions for filters: gender: {gender}, age_group: {age_group}, province: {province}",
         }
 
         return JSONResponse(status_code=200, content=response_data)
 
     except Exception as e:
-        return HTTPException(
+        raise HTTPException(
             status_code=500, detail=f"Error getting demographic information: {str(e)}"
         )
 
@@ -117,17 +138,24 @@ async def get_user_financial_access(
             df=df, gender=gender, age_group=age_group, province=province
         )
 
+        if df.empty:
+            return JSONResponse(
+                status_code=200,
+                content={"dashboard_response": {}, "message": "No data found", "data_found": False},
+            )
+
         results = process_financial_access_columns(df=df)
 
         response_data = {
             "dashboard_response": results,
+            "data_found": True,
             "message": f"Successfully retreieved demographic distributions for filters: gender: {gender}, age_group: {age_group}, province: {province}",
         }
 
         return JSONResponse(status_code=200, content=response_data)
 
     except Exception as e:
-        return HTTPException(
+        raise HTTPException(
             status_code=500, detail=f"Error getting demographic information: {str(e)}"
         )
 
@@ -146,17 +174,24 @@ async def get_user_financial_barriers(
             df=df, gender=gender, age_group=age_group, province=province
         )
 
+        if df.empty:
+            return JSONResponse(
+                status_code=200,
+                content={"dashboard_response": {}, "message": "No data found", "data_found": False},
+            )
+
         results = process_financial_barriers_columns(df=df)
 
         response_data = {
             "dashboard_response": results,
+            "data_found": True,
             "message": f"Successfully retreieved demographic distributions for filters: gender: {gender}, age_group: {age_group}, province: {province}",
         }
 
         return JSONResponse(status_code=200, content=response_data)
 
     except Exception as e:
-        return HTTPException(
+        raise HTTPException(
             status_code=500, detail=f"Error getting demographic information: {str(e)}"
         )
 
@@ -175,17 +210,24 @@ async def get_user_psychological_barriers(
             df=df, gender=gender, age_group=age_group, province=province
         )
 
+        if df.empty:
+            return JSONResponse(
+                status_code=200,
+                content={"dashboard_response": {}, "message": "No data found", "data_found": False},
+            )
+
         results = process_psychological_barriers_columns(df=df)
 
         response_data = {
             "dashboard_response": results,
+            "data_found": True,
             "message": f"Successfully retreieved demographic distributions for filters: gender: {gender}, age_group: {age_group}, province: {province}",
         }
 
         return JSONResponse(status_code=200, content=response_data)
 
     except Exception as e:
-        return HTTPException(
+        raise HTTPException(
             status_code=500, detail=f"Error getting demographic information: {str(e)}"
         )
 
@@ -204,16 +246,23 @@ async def get_user_technological_barriers(
             df=df, gender=gender, age_group=age_group, province=province
         )
 
+        if df.empty:
+            return JSONResponse(
+                status_code=200,
+                content={"dashboard_response": {}, "message": "No data found", "data_found": False},
+            )
+
         results = process_technological_understanding_columns(df=df)
 
         response_data = {
             "dashboard_response": results,
+            "data_found": True,
             "message": f"Successfully retreieved demographic distributions for filters: gender: {gender}, age_group: {age_group}, province: {province}",
         }
 
         return JSONResponse(status_code=200, content=response_data)
 
     except Exception as e:
-        return HTTPException(
+        raise HTTPException(
             status_code=500, detail=f"Error getting demographic information: {str(e)}"
         )
