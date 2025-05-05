@@ -193,7 +193,7 @@ async def get_user_psychological_barriers(
 @router.get(
     "/technological_understanding", response_model=None
 )  # Will define response model later
-async def get_user_psychological_barriers(
+async def get_user_technological_barriers(
     gender: Optional[str] = None,
     age_group: Optional[str] = None,
     province: Optional[str] = None,

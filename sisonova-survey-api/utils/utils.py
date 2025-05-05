@@ -74,6 +74,10 @@ def get_survey_results_into_df():
         df = pd.DataFrame(data)
 
         df = rename_all_survey_columns(df=df)
+
+        if "AGE_GROUP" in df.columns:
+            df["AGE_GROUP"] = df["AGE_GROUP"].str.replace('–', '-')
+    
         return df
 
     except Exception as e:
