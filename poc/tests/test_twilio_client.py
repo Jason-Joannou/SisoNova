@@ -10,6 +10,7 @@ from tests.conftest import (
     mock_incomplete_twilio_env_no_auth_token,
     mock_incomplete_twilio_env_no_number,
     mock_incomplete_twilio_env_no_sid,
+    mock_twilio_client,
 )
 
 
@@ -82,3 +83,12 @@ class TestTwilioClientInitialization:
         assert client.client is not None
         assert client.from_number is None
         assert "The specified Twilio number is not in e164 format" in caplog.text
+
+
+class TestTwilioClientMessaging:
+    """
+    Testing class that holds the methods required to test the messaging functionality of the twilio client class.
+    """
+
+    def test_send_notifcation_message(self, mock_twilio_client):
+        pass

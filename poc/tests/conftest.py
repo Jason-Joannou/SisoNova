@@ -1,5 +1,5 @@
 import os
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -82,3 +82,12 @@ def mock_incomplete_twilio_env_incorrect_number():
         },
     ):
         yield
+
+
+@pytest.fixture
+def mock_twilio_client(mock_complete_twilio_env):
+    with patch("message_clients.twilio.TwilioClient") as mock_client_class:
+        mock_client_instance = MagicMock()
+        mock_client_class.return_value = mock_client_instance
+
+        yield mock_client_class
