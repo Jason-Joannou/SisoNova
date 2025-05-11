@@ -33,12 +33,52 @@ class TestTwilioClientInitialization:
             assert client.client is not None
             assert client.from_number == "+12345678901"
 
-    def test_missing_sid(self, mock_incomplete_twilio_env_no_sid):
+    def test_missing_sid(self, mock_incomplete_twilio_env_no_sid, caplog):
+        """
+        This method tests whether the client fails initialization as an enviroment variable is missing.
+        """
+        caplog.set_level("ERROR")
+
+        client = TwilioClient()
+
+        assert client.client is None
+        assert client.from_number is None
+        assert "Missing required Twilio credentials" in caplog.text
+
+    def test_missing_auth_token(self, mock_incomplete_twilio_env_no_auth_token, caplog):
+        """
+        This method tests whether the client fails initialization as an enviroment variable is missing.
+        """
+
+        caplog.set_level("ERROR")
+
+        client = TwilioClient()
+
+        assert client.client is None
+        assert client.from_number is None
+        assert "Missing required Twilio credentials" in caplog.text
+
+    def test_missing_twilio_number(self, mock_incomplete_twilio_env_no_number):
         """
         This method tests whether the client fails initialization as an enviroment variable is missing.
         """
 
         client = TwilioClient()
 
-        assert client.client is None
+        assert client.client is not None
         assert client.from_number is None
+
+    def test_invalid_twilio_number(
+        self, mock_incomplete_twilio_env_incorrect_number, caplog
+    ):
+        """
+        This method tests whether the client fails initialization as an enviroment variable is missing.
+        """
+
+        caplog.set_level("ERROR")
+
+        client = TwilioClient()
+
+        assert client.client is not None
+        assert client.from_number is None
+        assert "The specified Twilio number is not in e164 format" in caplog.text
