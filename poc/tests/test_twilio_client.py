@@ -22,7 +22,7 @@ class TestTwilioClientInitialization:
         """
         This method tests whether the client initializes correctly with the mock enviroment variables
         """
-        with patch("message_clients.twilio.TwilioClient") as mock_client_class, patch(
+        with patch("message_clients.twilio.Client") as mock_client_class, patch(
             "utils.utils.is_e164_format", return_value=True
         ):
             mock_client_instance = MagicMock()
@@ -32,3 +32,13 @@ class TestTwilioClientInitialization:
 
             assert client.client is not None
             assert client.from_number == "+12345678901"
+
+    def test_missing_sid(self, mock_incomplete_twilio_env_no_sid):
+        """
+        This method tests whether the client fails initialization as an enviroment variable is missing.
+        """
+
+        client = TwilioClient()
+
+        assert client.client is None
+        assert client.from_number is None
