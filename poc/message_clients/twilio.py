@@ -4,6 +4,7 @@ from typing import Optional
 
 from dotenv import load_dotenv
 from twilio.rest import Client
+
 from utils.utils import is_e164_format
 
 load_dotenv()
@@ -28,11 +29,15 @@ class TwilioClient:
             RuntimeError: If raise_on_error is True and client initialization fails.
         """
         self.client = self._create_twilio_client()
+
+        self.from_number = None
+        if self.client is not None:
+            self.from_number = self._get_twilio_number()
+
         if raise_on_error and self.client is None:
             raise RuntimeError(
                 "Failed to initialize Twilio client. See logs for details."
             )
-        self.from_number = self._get_twilio_number()
 
     def _get_twilio_number(self) -> Optional[str]:
         """Retrieves the Twilio number from enviroment variables"""
