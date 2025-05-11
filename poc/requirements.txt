@@ -2,3 +2,4 @@ fastapi[all]
 dotenv
 sqlalchemy
 twilio
+pytest
