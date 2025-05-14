@@ -113,3 +113,32 @@ class TwilioClient:
     def is_client_valid(self) -> bool:
         """Check if the Twilio client is properly initialized."""
         return self.client is not None
+    
+    def is_number_valid(self) -> bool:
+        """Check if the Twilio number is properly initialized."""
+        return self.from_number is not None
+    
+    def send_mesage_notification(self, to: str, body: str) -> bool:
+        """
+        Sends an SMS message to a specified phone number.
+
+        Parameters:
+        to (str): The recipient's phone number in E.164 format.
+        body (str): The content of the SMS message.
+
+        Returns:
+        bool: True if the message is sent successfully, False otherwise.
+        """
+        try:
+
+            if self.is_client_valid():
+                self.client.messages.create(to=to, from_=self.from_number, body=body)
+                return True
+            raise ValueError(
+                "Failed to send message. Twilio client is not initialized."
+            )
+
+        except ValueError as ve:
+            print(f"Error sending message: {ve}")
+            logger.error(f"Error sending message: {ve}")
+            return False
