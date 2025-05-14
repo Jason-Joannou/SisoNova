@@ -37,7 +37,7 @@ app.add_middleware(
 # Add middleware
 app.add_middleware(
     APIMiddleware,
-    twilio_paths=["/webhook/whatsapp", "/twilio/status"],
+    twilio_paths=["/api/twilio/whatsapp", "/twilio/status"],
     admin_paths=["/admin/", "/broadcast/", "/analytics/", "/config/"]
 )
 
