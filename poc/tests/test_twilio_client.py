@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from message_clients.twilio import TwilioClient
+from api.message_clients.twilio import TwilioClient
 from tests.conftest import (
     mock_complete_twilio_env,
     mock_incomplete_twilio_env_incorrect_number,
