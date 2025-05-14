@@ -28,3 +28,8 @@ async def root():
     }
 
     return JSONResponse(status_code=200, content=content)
+
+# Health Endpoint
+@app.get("/health")
+async def health():
+    return JSONResponse(status_code=200, content={"message": "Healthy"})
