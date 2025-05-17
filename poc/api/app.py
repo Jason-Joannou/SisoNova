@@ -1,13 +1,16 @@
-from utils import logger_config
 import logging
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from middleware.middleware import APIMiddleware
 from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from middleware.middleware import APIMiddleware
+from routes import twilio
+from utils import logger_config
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -22,8 +25,7 @@ app = FastAPI(
     title="SisoNova Service",
     description="API for SisoNova core services",
     version="1.0.0",
-    lifespan=lifespan
-    
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -38,8 +40,11 @@ app.add_middleware(
 app.add_middleware(
     APIMiddleware,
     twilio_paths=["/api/twilio/whatsapp", "/twilio/status"],
-    admin_paths=["/admin/", "/broadcast/", "/analytics/", "/config/"]
+    admin_paths=["/admin/", "/broadcast/", "/analytics/", "/config/"],
 )
+
+app.include_router(twilio.router)
+
 
 # Root Endpoint
 @app.get("/")
@@ -55,6 +60,7 @@ async def root():
 
     return JSONResponse(status_code=200, content=content)
 
+
 # Health Endpoint
 @app.get("/health")
 async def health():
@@ -63,5 +69,6 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
+
     logger.info("Starting API server")
     uvicorn.run("app:app", host="127.0.0.1", port=3000, reload=True)
