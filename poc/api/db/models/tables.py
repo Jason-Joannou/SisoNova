@@ -74,3 +74,25 @@ class UnverifiedExpenses(Base):
     expense_amount = Column(Float, nullable=False)
     expense_feeling = Column(String, nullable=True)
     expense_date = Column(DateTime, nullable=False, default=datetime.utcnow())
+
+
+class UnverifiedIncomes(Base):
+
+    __tablename__ = "UnverifiedIncomes"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
+    income_type = Column(String, nullable=False)
+    income_amount = Column(Float, nullable=False)
+    income_feeling = Column(String, nullable=True)
+    income_date = Column(DateTime, nullable=False, default=datetime.utcnow())
+
+
+class FinancialFeelings(Base):
+
+    __tablename__ = "FinancialFeelings"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
+    feeling = Column(String, nullable=False)
+    feeling_date = Column(DateTime, default=datetime.utcnow())
