@@ -72,4 +72,5 @@ class UnverifiedExpenses(Base):
     user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
     expense_type = Column(String, nullable=False)
     expense_amount = Column(Float, nullable=False)
+    expense_feeling = Column(String, nullable=True)
     expense_date = Column(DateTime, nullable=False, default=datetime.utcnow())
