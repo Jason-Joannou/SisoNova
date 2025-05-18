@@ -33,7 +33,7 @@ class MessageState(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
     current_state = Column(
-        String, nullable=False, default="unregistered_number_language_selector"
+        String, nullable=False, default="unregistered_number_language_selector_template"
     )
     previous_state = Column(String, nullable=True)
     updated_at = Column(DateTime, default=datetime.utcnow)
