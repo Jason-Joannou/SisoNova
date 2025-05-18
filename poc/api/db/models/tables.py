@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -62,3 +62,14 @@ class MessageLog(Base):
     sent_at = Column(DateTime, default=datetime.utcnow)
     delivered_at = Column(DateTime, nullable=True)
     read_at = Column(DateTime, nullable=True)
+
+
+class UnverifiedExpenses(Base):
+
+    __tablename__ = "UnverifiedExpenses"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
+    expense_type = Column(String, nullable=False)
+    expense_amount = Column(Float, nullable=False)
+    expense_date = Column(DateTime, nullable=False, default=datetime.utcnow())
