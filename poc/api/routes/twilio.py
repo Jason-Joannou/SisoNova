@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse, PlainTextResponse
 from middleware.utils import validate_twilio_request
-from utils.twiml_responses import twiml_image_response
+from utils.twiml_responses import twiml_image_response, twiml_unregistered_response
 
 router = APIRouter(
     prefix="/api/twilio",
@@ -21,7 +21,7 @@ async def twilio_webhook(form_data: dict = Depends(validate_twilio_request)):
     response_message = f"You said: {message_body}"
 
     # Return TwiML response
-    twiml_response = twiml_image_response()
+    twiml_response = twiml_unregistered_response()
 
     return PlainTextResponse(content=twiml_response, media_type="application/xml")
 
