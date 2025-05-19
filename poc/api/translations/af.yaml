@@ -22,3 +22,12 @@ unregistered_number_language_selector_template:
     Engels
     Afrikaans
     Zoeloe
+unregistered_number_welcome_template:
+  template_message: |
+    Puik! Jy het jou voorkeurtaal gekies - kom ons begin jou!
+
+    Ons het opgemerk dat jy nuut is by SisoNova se finansiële bystanddiens.
+    
+    Wil jy nou registreer?
+
+    Antwoord asseblief met "yes" of "no" om voort te gaan

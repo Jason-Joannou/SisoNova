@@ -22,3 +22,12 @@ unregistered_number_language_selector_template:
     IsiNgisi
     IsiBhunu
     isiZulu
+unregistered_number_welcome_template:
+  template_message: |
+    Kuhle! Ukhethe ulimi oluncamelayo - ake sikuqalise!
+
+    Siqaphele ukuthi umusha kusevisi ye-Financial Assistance ye-SisoNova.
+    
+    Ungathanda ukubhalisa manje?
+
+    Sicela uphendule ngokuthi "yes" noma "no" ukuze uqhubeke

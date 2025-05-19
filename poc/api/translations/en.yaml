@@ -22,3 +22,13 @@ unregistered_number_language_selector_template:
     English
     Afrikaans
     Zulu
+
+unregistered_number_welcome_template:
+  template_message: |
+    Great! You've selected your preferred language - let's get you started!
+
+    We noticed you are new to SisoNova's Financial Assistance service.
+    
+    Would you like to register now?
+
+    Please reply with "yes" or "no" to continue
