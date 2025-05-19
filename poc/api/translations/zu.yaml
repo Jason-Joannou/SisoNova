@@ -1,0 +1,24 @@
+unregistered_number_language_selector_template:
+  template_error_message: |
+    Lolo akulona ulimi oluvumelekile.
+
+    Izilimi ezivumelekile yilezi:
+
+    {valid_languages}
+
+    Sicela uzame ukufaka ulimi oluncamelayo futhi.
+
+  template_message: |
+    Sawubona lapho 👋 , futhi wamukelekile enkonzweni yosizo lwezezimali yeSisoNova.
+
+    Sikholelwa ukuthi izingxoxo zezezimali zisebenza kahle kakhulu uma zenzeka ngolimi okhululekile ngalo.
+
+    Ukukusiza uzizwe uqiniseka futhi uqonda zonke izinyathelo zakho, sicela ukhethe ulimi oluncamelayo ukuze uqhubeke.
+
+    (Ungakushintsha lokhu noma nini kamuva.)
+
+    Sicela uphendule ngolimi oluncamelayo:
+
+    IsiNgisi
+    IsiBhunu
+    Zulu

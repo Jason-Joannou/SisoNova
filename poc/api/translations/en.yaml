@@ -1,0 +1,24 @@
+unregistered_number_language_selector_template:
+  template_error_message: |
+    That is not a valid language.
+
+    The valid languages are:
+
+    {valid_languages}
+
+    Please try enter your preferred language again.
+
+  template_message: |
+    Hi there 👋 , and welcome to SisoNova's financial assistance service.
+
+    We believe that financial conversations are most effective when they happen in a language you're comfortable with.
+
+    To help you feel confident and understood every step of the way, please select your preferred language to continue.
+
+    (You can change this anytime later.)
+
+    Please reply with your preferred language:
+
+    English
+    Afrikaans
+    Zulu
