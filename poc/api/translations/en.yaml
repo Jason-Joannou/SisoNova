@@ -4,7 +4,7 @@ unregistered_number_language_selector_template:
 
     The valid languages are:
 
-    {valid_languages}
+    {error_message}
 
     Please try enter your preferred language again.
 

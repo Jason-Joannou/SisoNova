@@ -4,7 +4,7 @@ unregistered_number_language_selector_template:
 
     Izilimi ezivumelekile yilezi:
 
-    {valid_languages}
+    {error_message}
 
     Sicela uzame ukufaka ulimi oluncamelayo futhi.
 

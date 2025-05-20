@@ -4,7 +4,7 @@ unregistered_number_language_selector_template:
 
     Die geldige tale is:
 
-    {valid_languages}
+    {error_message}
 
     Probeer asseblief weer jou voorkeurtaal invoer.
 
