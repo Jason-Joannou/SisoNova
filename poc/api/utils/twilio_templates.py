@@ -1,5 +1,6 @@
 from typing import Optional
 from utils.language_config import load_language_config, get_template_validation
+from utils.twiml_responses import generate_twiml_message
 
 
 class TwilioTemplateManager:
@@ -39,14 +40,23 @@ class TwilioTemplateManager:
         self.current_template_name = template_name
         self._set_message_template(template_name=template_name)
 
-    def get_template_message(self):
+    def get_template_message(self) -> str:
         
         if self._validate_user_response():
-            return self.templates["template_message"]
+            message = self.templates["template_message"]
+            twiml_build = [
+                {"body": message}
+            ]
+            twiml_message = generate_twiml_message(msgs=twiml_build)
+            return twiml_message
         
         validation_obj = get_template_validation(template_name=self.current_template_name)
         error_message = self.templates["error_message"].format(validation_obj.validation_message)
-        return error_message
+        twiml_build = [
+            {"body": error_message}
+        ]
+        twiml_message = generate_twiml_message(msgs=twiml_build)
+        return twiml_message
 
 
         
