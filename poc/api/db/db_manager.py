@@ -107,36 +107,6 @@ class DatabaseManager:
         with self.session_scope() as session:
             return session.execute(query)
     
-    def get_user_by_phone(self, phone_number):
-        """Get a user by phone number."""
-        with self.session_scope() as session:
-            return session.query(User).filter(User.phone_number == phone_number).first()
-    
-    def get_user_language_preference(self, user_id):
-        """Get a user's language preference."""
-        with self.session_scope() as session:
-            return session.query(LanguagePreference).filter(LanguagePreference.user_id == user_id).first()
-    
-    def get_user_message_state(self, user_id):
-        """Get a user's message state."""
-        with self.session_scope() as session:
-            return session.query(MessageState).filter(MessageState.user_id == user_id).first()
-    
-    def get_user_expenses(self, user_id):
-        """Get all expenses for a user."""
-        with self.session_scope() as session:
-            return session.query(UnverifiedExpenses).filter(UnverifiedExpenses.user_id == user_id).all()
-    
-    def get_user_incomes(self, user_id):
-        """Get all incomes for a user."""
-        with self.session_scope() as session:
-            return session.query(UnverifiedIncomes).filter(UnverifiedIncomes.user_id == user_id).all()
-    
-    def get_user_feelings(self, user_id):
-        """Get all financial feelings for a user."""
-        with self.session_scope() as session:
-            return session.query(FinancialFeelings).filter(FinancialFeelings.user_id == user_id).all()
-
 
 # Example usage:
 if __name__ == "__main__":
