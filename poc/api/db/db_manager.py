@@ -6,7 +6,7 @@ import logging
 
 from models.tables import Base
 
-logger = logging.getLogger("middleware")
+logger = logging.getLogger("db-manager")
 logger.setLevel(logging.INFO)
 
 class DatabaseManager:
