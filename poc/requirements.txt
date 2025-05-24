@@ -4,3 +4,6 @@ sqlalchemy
 twilio
 pytest
 pyyaml
+sqlalchemy[asyncio]
+aiosqlite 
+asyncpg
