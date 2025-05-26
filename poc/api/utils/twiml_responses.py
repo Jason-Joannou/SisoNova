@@ -9,11 +9,23 @@ from twilio.twiml.messaging_response import (
     Redirect,
 )
 
-def generate_twiml_message(msgs: List[Dict[str, str]]):
+def generate_twiml_message(msgs: List[Dict[str, str]]) -> str:
+    """
+    Generate TwiML response from a list of message dictionaries.
+    
+    Args:
+        msgs: List of dictionaries containing message content
+              Each dict can have keys: 'body', 'media_url', 'redirect'
+    
+    Returns:
+        String representation of TwiML response
+    """
     response = MessagingResponse()
-    message = Message()
-
+    
     for msg in msgs:
+        # Create a new message for each msg dict
+        message = response.message()
+        
         for msg_type, msg_content in msg.items():
             if msg_type == "body":
                 message.body(msg_content)
@@ -21,8 +33,6 @@ def generate_twiml_message(msgs: List[Dict[str, str]]):
                 message.media(msg_content)
             elif msg_type == "redirect":
                 message.redirect(msg_content)
-
-    response.message(message)
 
     return str(response)
 
