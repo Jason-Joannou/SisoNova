@@ -25,7 +25,7 @@ class DatabaseManager:
         """
         if db_url is None:
             # Default to SQLite with aiosqlite
-            db_url = 'sqlite+aiosqlite:///financial_app.db'
+            db_url = 'sqlite+aiosqlite:///test_db.db'
             
         # For PostgreSQL, you would use:
         # db_url = 'postgresql+asyncpg://username:password@localhost:5432/dbname'
@@ -71,20 +71,6 @@ class DatabaseManager:
             raise
         finally:
             await session.close()
-    
-    async def add(self, obj):
-        """Add an object to the database."""
-        async with self.session_scope() as session:
-            session.add(obj)
-            await session.flush()
-            return obj
-    
-    async def add_all(self, objects):
-        """Add multiple objects to the database."""
-        async with self.session_scope() as session:
-            session.add_all(objects)
-            await session.flush()
-            return objects
     
     async def execute_query(self, query):
         """Execute a raw SQL query."""

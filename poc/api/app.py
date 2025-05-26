@@ -4,9 +4,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from middleware.middleware import APIMiddleware
-from routes import twilio
-from utils import logger_config
+from api.middleware.middleware import APIMiddleware
+from api.routes import twilio
+from api.utils import logger_config
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -71,4 +71,4 @@ if __name__ == "__main__":
     import uvicorn
 
     logger.info("Starting API server")
-    uvicorn.run("app:app", host="127.0.0.1", port=3000, reload=True)
+    uvicorn.run("api.app:app", host="127.0.0.1", port=3000, reload=True)
