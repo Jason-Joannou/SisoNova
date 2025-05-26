@@ -22,7 +22,24 @@ unregistered_number_language_selector_template:
     Engels
     Afrikaans
     Zoeloe
+
+  next_template: unregistered_number_welcome_template
+  previous_template: NULL
+
+  error_message:
+    - Engels
+    - Afrikaans
+    - Zoeloe
+
 unregistered_number_welcome_template:
+  template_error_message: |
+    Dit is nie 'n geldige taal nie.
+
+    Die geldige tale is:
+
+    {error_message}
+
+    Probeer asseblief weer jou voorkeurtaal invoer.
   template_message: |
     Puik! Jy het jou voorkeurtaal gekies - kom ons begin jou!
 
@@ -31,3 +48,11 @@ unregistered_number_welcome_template:
     Wil jy nou registreer?
 
     Antwoord asseblief met "yes" of "no" om voort te gaan
+
+  next_template: unregistered_number_welcome_template
+  previous_template: unregistered_number_welcome_template
+
+  error_message:
+    - Engels
+    - Afrikaans
+    - Zoeloe

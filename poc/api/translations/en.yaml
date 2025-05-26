@@ -23,7 +23,23 @@ unregistered_number_language_selector_template:
     Afrikaans
     Zulu
 
+  next_template: unregistered_number_welcome_template
+  previous_template: NULL
+
+  error_message:
+    - English
+    - Afrikaans
+    - Zulu
+
 unregistered_number_welcome_template:
+  template_error_message: |
+    That is not a valid language.
+
+    The valid languages are:
+
+    {error_message}
+
+    Please try enter your preferred language again.
   template_message: |
     Great! You've selected your preferred language - let's get you started!
 
@@ -32,3 +48,11 @@ unregistered_number_welcome_template:
     Would you like to register now?
 
     Please reply with "yes" or "no" to continue
+
+  next_template: unregistered_number_welcome_template
+  previous_template: unregistered_number_welcome_template
+
+  error_message:
+    - English
+    - Afrikaans
+    - Zulu

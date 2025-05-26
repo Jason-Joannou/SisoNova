@@ -22,7 +22,24 @@ unregistered_number_language_selector_template:
     IsiNgisi
     IsiBhunu
     isiZulu
+
+  next_template: unregistered_number_welcome_template
+  previous_template: NULL
+
+  error_message:
+    - IsiNgisi
+    - IsiBhunu
+    - isiZulu
+
 unregistered_number_welcome_template:
+  template_error_message: |
+    Lolo akulona ulimi oluvumelekile.
+
+    Izilimi ezivumelekile yilezi:
+
+    {error_message}
+
+    Sicela uzame ukufaka ulimi oluncamelayo futhi.
   template_message: |
     Kuhle! Ukhethe ulimi oluncamelayo - ake sikuqalise!
 
@@ -31,3 +48,11 @@ unregistered_number_welcome_template:
     Ungathanda ukubhalisa manje?
 
     Sicela uphendule ngokuthi "yes" noma "no" ukuze uqhubeke
+
+  next_template: unregistered_number_welcome_template
+  previous_template: unregistered_number_welcome_template
+
+  error_message:
+    - IsiNgisi
+    - IsiBhunu
+    - isiZulu
