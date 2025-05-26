@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -14,6 +14,7 @@ class User(Base):
     phone_number = Column(String, nullable=False, unique=True)
     user_name = Column(String, nullable=True)
     user_surname = Column(String, nullable=True)
+    registered = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -22,7 +23,7 @@ class LanguagePreference(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
-    preferred_language = Column(String, nullable=False)
+    preferred_language = Column(String, nullable=True)
     updated_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -32,9 +33,7 @@ class MessageState(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
-    current_state = Column(
-        String, nullable=False, default="unregistered_number_language_selector_template"
-    )
+    current_state = Column(String, nullable=False)
     previous_state = Column(String, nullable=True)
     updated_at = Column(DateTime, default=datetime.utcnow)
 
