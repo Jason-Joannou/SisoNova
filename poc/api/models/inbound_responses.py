@@ -1,11 +1,44 @@
-from models.enums import Languages
+from api.models.enums import Languages
 from pydantic import BaseModel, field_validator
+from abc import ABC, abstractmethod
+from pydantic import BaseModel
+from typing import Any
 
+class BaseValidator(BaseModel, ABC):
+    @classmethod
+    @abstractmethod
+    def validate_input(cls, input_value: str) -> bool:
+        """Validate input without knowing the field structure"""
+        pass
 
-class LanguageSelector(BaseModel):
+class LanguageSelector(BaseValidator):
     language: Languages
 
     @field_validator("language", mode="before")
     @classmethod
     def normalize_input(cls, v: str) -> str:
         return v.strip().capitalize()
+    
+    @classmethod
+    def validate_input(cls, input_value: str) -> bool:
+        try:
+            cls(language=input_value)
+            return True
+        except Exception:
+            return False
+
+class YesNoValidator(BaseValidator):
+    response: str  # or whatever field name you use
+    
+    @field_validator("response", mode="before")
+    @classmethod
+    def normalize_input(cls, v: str) -> str:
+        return v.strip().lower()
+    
+    @classmethod
+    def validate_input(cls, input_value: str) -> bool:
+        try:
+            cls(response=input_value)
+            return True
+        except Exception:
+            return False

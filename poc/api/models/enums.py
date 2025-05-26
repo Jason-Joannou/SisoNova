@@ -1,6 +1,6 @@
 from enum import Enum
 
 class Languages(str, Enum):
-    enlish = "English"
+    english = "English"
     afrikaans = "Afrikaans"
     zulu = "Zulu"
