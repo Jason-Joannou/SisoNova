@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.asyncio import async_scoped_session
 from sqlalchemy.orm import sessionmaker
 
-from models.tables import Base
+from api.db.models.tables import Base
 
 logger = logging.getLogger("db-manager")
 logger.setLevel(logging.INFO)
@@ -44,13 +44,13 @@ class DatabaseManager:
         """Create all tables defined in the Base metadata."""
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-        self.logger.info("All tables created successfully")
+        logger.info("All tables created successfully")
     
     async def drop_tables(self):
         """Drop all tables defined in the Base metadata."""
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
-        self.logger.info("All tables dropped successfully")
+        logger.info("All tables dropped successfully")
     
     @asynccontextmanager
     async def session_scope(self):
@@ -67,7 +67,7 @@ class DatabaseManager:
             await session.commit()
         except Exception as e:
             await session.rollback()
-            self.logger.error(f"Session error: {str(e)}")
+            logger.error(f"Session error: {str(e)}")
             raise
         finally:
             await session.close()
@@ -99,13 +99,16 @@ if __name__ == "__main__":
     
     async def main():
         # For SQLite with aiosqlite
-        db_manager = DatabaseManager(db_url='sqlite+aiosqlite:///financial_app.db', echo=True)
+        db_manager = DatabaseManager(db_url='sqlite+aiosqlite:///test_db.db', echo=True)
         
         # For PostgreSQL with asyncpg
         # db_manager = AsyncDatabaseManager(db_url='postgresql+asyncpg://username:password@localhost:5432/dbname', echo=True)
         
         # Create all tables
         await db_manager.create_tables()
+
+        # Drop all tables
+        # await db_manager.drop_tables()
         
         # Example: Create a new user
         # new_user = User(phone_number="+1234567890", user_name="John", user_surname="Doe")
