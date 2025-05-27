@@ -19,27 +19,27 @@ unregistered_number_language_selector_template:
 
     Sicela uphendule ngolimi oluncamelayo:
 
-    IsiNgisi
-    IsiBhunu
-    isiZulu
+    English
+    Afrikaans
+    Zulu
 
   next_template: unregistered_number_welcome_template
   previous_template: NULL
 
   error_message:
-    - IsiNgisi
-    - IsiBhunu
-    - isiZulu
+    - English
+    - Afrikaans
+    - Zulu
 
 unregistered_number_welcome_template:
   template_error_message: |
-    Lolo akulona ulimi oluvumelekile.
+    Lokho akuyona inketho evumelekile.
 
-    Izilimi ezivumelekile yilezi:
+    Izinketho ezivumelekile yilezi:
 
     {error_message}
 
-    Sicela uzame ukufaka ulimi oluncamelayo futhi.
+    Sicela uzame ukufaka inketho futhi.
   template_message: |
     Kuhle! Ukhethe ulimi oluncamelayo - ake sikuqalise!
 
@@ -53,6 +53,5 @@ unregistered_number_welcome_template:
   previous_template: unregistered_number_welcome_template
 
   error_message:
-    - IsiNgisi
-    - IsiBhunu
-    - isiZulu
+    - Yes
+    - No

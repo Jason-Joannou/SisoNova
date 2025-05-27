@@ -33,13 +33,13 @@ unregistered_number_language_selector_template:
 
 unregistered_number_welcome_template:
   template_error_message: |
-    That is not a valid language.
+    That is not a valid option.
 
-    The valid languages are:
+    The valid options are:
 
     {error_message}
 
-    Please try enter your preferred language again.
+    Please try enter the option again.
   template_message: |
     Great! You've selected your preferred language - let's get you started!
 
@@ -53,6 +53,5 @@ unregistered_number_welcome_template:
   previous_template: unregistered_number_welcome_template
 
   error_message:
-    - English
-    - Afrikaans
-    - Zulu
+    - Yes
+    - No
