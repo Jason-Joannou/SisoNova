@@ -44,10 +44,19 @@ unregistered_number_welcome_template:
     Puik! Jy het jou voorkeurtaal gekies - kom ons begin jou!
 
     Ons het opgemerk dat jy nuut is by SisoNova se finansiële bystanddiens.
-    
+
     Wil jy nou registreer?
 
-    Antwoord asseblief met "yes" of "no" om voort te gaan
+    Deur te registreer:
+    
+    - Ons sal jou WhatsApp-nommer veilig stoor vir toekomstige interaksies.  
+    - 'n Digitale beursie sal vir jou op die Algorand-blokketting geskep word om jou finansiële reis te help bestuur.  
+    - Jy sal toegang hê tot gepersonaliseerde finansiële instrumente, dienste en insigte.  
+
+    Deur "yes" te antwoord, stem jy in tot ons Bepalings en Voorwaardes:  
+    https://sisonova.com/terms-and-conditions
+
+    Antwoord asseblief met "yes" of "no" om voort te gaan.
 
   next_template: unregistered_number_welcome_template
   previous_template: unregistered_number_welcome_template

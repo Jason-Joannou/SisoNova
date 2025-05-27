@@ -43,11 +43,21 @@ unregistered_number_welcome_template:
   template_message: |
     Great! You've selected your preferred language - let's get you started!
 
-    We noticed you are new to SisoNova's Financial Assistance service.
-    
+    We noticed you're new to SisoNova's Financial Assistance service.
+
     Would you like to register now?
 
-    Please reply with "yes" or "no" to continue
+    By registering:
+    
+    - We'll securely save your WhatsApp number for future interactions.  
+    - A digital wallet will be created for you on the Algorand blockchain to help manage your financial journey.  
+    - You'll be able to access personalized financial tools, services, and insights.  
+
+    By replying "yes", you agree to our Terms and Conditions:  
+    https://sisonova.com/terms-and-conditions
+
+    Please reply with "yes" or "no" to continue.
+
 
   next_template: unregistered_number_welcome_template
   previous_template: unregistered_number_welcome_template
@@ -55,3 +65,4 @@ unregistered_number_welcome_template:
   error_message:
     - Yes
     - No
+

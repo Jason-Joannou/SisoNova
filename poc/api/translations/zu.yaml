@@ -44,10 +44,19 @@ unregistered_number_welcome_template:
     Kuhle! Ukhethe ulimi oluncamelayo - ake sikuqalise!
 
     Siqaphele ukuthi umusha kusevisi ye-Financial Assistance ye-SisoNova.
-    
+
     Ungathanda ukubhalisa manje?
 
-    Sicela uphendule ngokuthi "yes" noma "no" ukuze uqhubeke
+    Ngokubhalisa:
+    
+    - Sizogcina ngokuphephile inombolo yakho ye-WhatsApp ukuze uthole ukusebenzelana okuzayo.  
+    - I-wallet yedijithali izodalelwa wena ku-Algorand blockchain ukusiza ukuphatha uhambo lwakho lwezezimali.  
+    - Uzokwazi ukufinyelela amathuluzi ezezimali omuntu siqu, amasevisi, nemininingwane.  
+
+    Ngokuphendula ngokuthi "yes", uyavumelana nemigomo nemibandela yethu:  
+    https://sisonova.com/terms-and-conditions
+
+    Sicela uphendule ngokuthi "yes" noma "no" ukuze uqhubeke.
 
   next_template: unregistered_number_welcome_template
   previous_template: unregistered_number_welcome_template
