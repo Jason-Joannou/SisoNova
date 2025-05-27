@@ -22,7 +22,7 @@ async def twilio_webhook(form_data: dict = Depends(validate_twilio_request)):
     """Handle incoming WhatsApp messages from Twilio."""
     logging.info("Received WhatsApp message from Twilio")
     # Database Manager
-    db_manager = DatabaseManager(db_url='sqlite+aiosqlite:///test_db.db') # This will need to be read from an environment variable
+    db_manager = DatabaseManager(db_url='sqlite+aiosqlite:///test_db.db')
     
     # Use async context manager properly
     async with db_manager.session_scope() as db_session:
@@ -42,14 +42,15 @@ async def twilio_webhook(form_data: dict = Depends(validate_twilio_request)):
                 user_exists=False,
                 user_response=message_body,
                 current_template=None,
-                language=None
+                language=None,
+                has_started=False  # New users haven't started
             )
 
             # Insert User to database
             new_user = User(phone_number=from_number)
             await query_manager.add(new_user)
 
-            # Update Language Preference
+            # Update Language Preference (start with None)
             language_preference = LanguagePreference(
                 user_id=new_user.id,
                 preferred_language=None
@@ -59,58 +60,54 @@ async def twilio_webhook(form_data: dict = Depends(validate_twilio_request)):
             logging.info("User not found, set template")
             logging.info("Initializing tables for new user")
 
-            # Get the template message (now returns tuple)
+            # Get the template message
             next_template, previous_template, twiml_message = template_manager.get_template_message()
             
-            # Update conversation state - you should update existing record, not create new one
+            # Create message state (will stay on language selector)
             new_message_state = MessageState(
                 user_id=new_user.id,
                 current_state=next_template,
-                previous_state=previous_template
+                previous_state=previous_template,
+                has_started=True
             )
             await query_manager.add(new_message_state)
 
             return PlainTextResponse(content=twiml_message, media_type="application/xml")
         
         logging.info("User found, set template")
-        
+
         # Get conversation state
         user_message_state = await query_manager.get_user_message_state(user_id=user.id)
-
         # Get user language preference
         language_preference = await query_manager.get_user_language_preference(user_id=user.id)
+
+        print(f"DEBUG: Current state: {user_message_state.current_state}")
+        print(f"DEBUG: Has started: {user_message_state.has_started}")
+        print(f"DEBUG: Current language: {language_preference.preferred_language}")
+        print(f"DEBUG: User message: '{message_body}'")
 
         # Create template manager to process the current response
         template_manager = TwilioTemplateManager(
             user_exists=True,
             user_response=message_body,
             current_template=user_message_state.current_state,
-            language=language_preference.preferred_language
+            language=language_preference.preferred_language,
+            has_started=user_message_state.has_started
         )
 
-        # Get the response (this will trigger validation and language detection)
+        # Get the response (this handles all the logic)
         next_template, previous_template, twiml_message = template_manager.get_template_message()
 
-        # Check if user selected a new language and update it
+        # Check if language was selected and update database
         selected_language = template_manager.get_selected_language()
-        if selected_language is not None:
-            logging.info(f"User selected new language: {selected_language}")
+        if selected_language:
+            print(f"DEBUG: Language selected: {selected_language}")
             await query_manager.update_user_language_preference(user_id=user.id, new_language=selected_language)
-            
-            # Recreate template manager with new language for the NEXT template
-            template_manager = TwilioTemplateManager(
-                user_exists=True,
-                user_response=message_body,
-                current_template=user_message_state.current_state,
-                language=selected_language
-            )
-            
-            # Regenerate the message with the new language
-            next_template, previous_template, twiml_message = template_manager.get_template_message()
 
-        # ADD THESE LINES - Update the database state
+        # Update the database state
         await query_manager.update_current_message_state(user_id=user.id, new_state=next_template)
-        await query_manager.update_previous_message_state(user_id=user.id, new_state=previous_template)
+        if previous_template:
+            await query_manager.update_previous_message_state(user_id=user.id, new_state=previous_template)
 
         logging.info("Response processed, returning TwiML")
         
