@@ -35,6 +35,7 @@ class MessageState(Base):
     user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
     current_state = Column(String, nullable=False)
     previous_state = Column(String, nullable=True)
+    has_started = Column(Boolean, default=False)
     updated_at = Column(DateTime, default=datetime.utcnow)
 
 
