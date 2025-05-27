@@ -51,6 +51,13 @@ class AsyncQueries:
     
     # Set methods
 
+    async def update_user_message_state(self, user_id: int, **kwargs) -> None:
+        """Update a user's message state."""
+        await self.session.execute(
+            update(MessageState).where(MessageState.user_id == user_id).values(**kwargs)
+        )
+        await self.session.commit()
+
     async def update_current_message_state(self, user_id: int, new_state: str) -> None:
         """Update a user's message state."""
         await self.session.execute(
