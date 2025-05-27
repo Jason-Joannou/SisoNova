@@ -1,7 +1,6 @@
 import yaml
 from pathlib import Path
-from api.models.inbound_responses import LanguageSelector, YesNoValidator
-from api.models.enums import Languages
+from api.models.inbound_responses import LanguageSelector, YesNoValidator, NumberedMenuValidator
 from api.models.responses import TemplateValidation
 
 def load_language_config(path: str = "./api/translations") -> dict:
@@ -17,7 +16,10 @@ def get_template_validation(template_name: str) -> TemplateValidation:
         },
         "unregistered_number_welcome_template": {
             "inbound_validator": YesNoValidator,
-        }
+        },
+        "registration_no_template": {
+            "inbound_validator": NumberedMenuValidator,
+        },
     }
 
     return templates[template_name]
