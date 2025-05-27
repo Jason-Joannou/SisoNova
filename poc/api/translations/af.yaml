@@ -108,14 +108,19 @@ registration_no_template:
     {error_message}
 
     Probeer asseblief weer die opsie in te voer.
+    
   template_message: |
     Geen probleem nie! As jy later van plan verander, kan jy altyd weer registreer.
 
     Om meer uit te vind oor SisoNova se dienste, besoek ons webwerf: https://sisonova.com
+    
+    Wil jy graag:
+    1. Gaan terug na registrasie
 
-  previous_template: NULL
-  current_template: unregistered_number_welcome_template
+  previous_template: unregistered_number_welcome_template
+
+  response_routing:
+    "1": "unregistered_number_welcome_template"
 
   error_message:
-    - Yes
-    - No
+    - "1"

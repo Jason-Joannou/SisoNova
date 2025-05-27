@@ -61,12 +61,12 @@ unregistered_number_welcome_template:
   previous_template: unregistered_number_welcome_template
 
   response_routing:
-    "yes": "registration_user_template"
+    "yes": "registered_user_template"
     "no": "registration_no_template"
 
   error_message:
-    - Yes
-    - No
+    - "Yes"
+    - "No"
 
 registered_user_template:
   template_error_message: |
@@ -108,14 +108,20 @@ registration_no_template:
     {error_message}
 
     Please try enter the option again.
+    
   template_message: |
     No problem! If you change your mind later, you can always register again.
 
     To find out more about SisoNova's services, visit our website: https://sisonova.com
+    
+    Would you like to:
+    1. Go back to registration
+    
 
-  previous_template: NULL
-  current_template: unregistered_number_welcome_template
+  previous_template: unregistered_number_welcome_template
+
+  response_routing:
+    "1": "unregistered_number_welcome_template"
 
   error_message:
-    - Yes
-    - No
+    - "1"

@@ -108,14 +108,20 @@ registration_no_template:
     {error_message}
 
     Sicela uzame ukufaka inketho futhi.
+    
   template_message: |
     Ayikho inkinga! Uma ushintsha umqondo wakho ngemva kwesikhathi, ungakwazi ukubhalisa futhi.
 
     Ukuze uthole okwengeziwe ngezinkonzo zeSisoNova, vakashela iwebhusayithi yethu: https://sisonova.com
+    
+    Ungathanda uku:
+    1. Buyela emuva ekubhaliseni
+    
 
-  previous_template: NULL
-  current_template: unregistered_number_welcome_template
+  previous_template: unregistered_number_welcome_template
+
+  response_routing:
+    "1": "unregistered_number_welcome_template"
 
   error_message:
-    - Yes
-    - No
+    - "1"
