@@ -58,8 +58,63 @@ unregistered_number_welcome_template:
 
     Antwoord asseblief met "yes" of "no" om voort te gaan.
 
-  next_template: unregistered_number_welcome_template
   previous_template: unregistered_number_welcome_template
+
+  response_routing:
+    "yes": "registration_yes_template"
+    "no": "registration_no_template"
+
+  error_message:
+    - Yes
+    - No
+
+registered_user_template:
+  template_error_message: |
+    Dit is nie 'n geldige opsie nie.
+
+    Die geldige opsies is:
+
+    {error_message}
+
+    Probeer asseblief weer die opsie in te voer.
+  template_message: |
+    Dankie dat jy by SisoNova se Finansiële Bystanddiens geregistreer het!
+
+    Ons het suksesvol 'n veilige digitale beursie vir jou op die Algorand-blokketting geskep om jou finansiële reis te ondersteun.
+
+    Jy het nou toegang tot gepersonaliseerde finansiële nutsgoed, dienste en insigte. Kies asseblief een van die volgende opsies om te begin:
+
+    1. SisoNova Personal - Pasgemaakte finansiële bystand en gereedskap vir individuele gebruik.
+    2. SisoNova Public - Toegang tot gedeelde hulpbronne en gemeenskapsgebaseerde finansiële ondersteuning.
+
+    Om meer uit te vind oor SisoNova se dienste, besoek ons webwerf: https://sisonova.com
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "sisonova_personal_template"
+    "2": "sisonova_public_template"
+
+  error_message:
+    - 1
+    - 2
+
+registration_no_template:
+  template_error_message: |
+    Dit is nie 'n geldige opsie nie.
+
+    Die geldige opsies is:
+
+    {error_message}
+
+    Probeer asseblief weer die opsie in te voer.
+  template_message: |
+    Geen probleem nie! As jy later van plan verander, kan jy altyd weer registreer.
+
+    Om meer uit te vind oor SisoNova se dienste, besoek ons webwerf: https://sisonova.com
+
+  previous_template: NULL
+  current_template: unregistered_number_welcome_template
 
   error_message:
     - Yes

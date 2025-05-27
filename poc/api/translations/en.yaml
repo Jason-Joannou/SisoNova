@@ -48,7 +48,7 @@ unregistered_number_welcome_template:
     Would you like to register now?
 
     By registering:
-    
+
     - We'll securely save your WhatsApp number for future interactions.  
     - A digital wallet will be created for you on the Algorand blockchain to help manage your financial journey.  
     - You'll be able to access personalized financial tools, services, and insights.  
@@ -58,11 +58,64 @@ unregistered_number_welcome_template:
 
     Please reply with "yes" or "no" to continue.
 
-
-  next_template: unregistered_number_welcome_template
   previous_template: unregistered_number_welcome_template
+
+  response_routing:
+    "yes": "registration_user_template"
+    "no": "registration_no_template"
 
   error_message:
     - Yes
     - No
 
+registered_user_template:
+  template_error_message: |
+    That is not a valid option.
+
+    The valid options are:
+
+    {error_message}
+
+    Please try enter the option again.
+  template_message: |
+    Thank you for registering with SisoNova's Financial Assistance Service!
+
+    We've successfully created a secure digital wallet for you on the Algorand blockchain to support your financial journey.
+
+    You now have access to personalized financial tools, services, and insights. Please choose one of the following options to get started:
+
+    1. SisoNova Personal - Tailored financial assistance and tools for individual use.
+    2. SisoNova Public - Access to shared resources and community-based financial support.
+
+    To find out more about SisoNova's services, visit our website: https://sisonova.com
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "sisonova_personal_template"
+    "2": "sisonova_public_template"
+
+  error_message:
+    - 1
+    - 2
+
+registration_no_template:
+  template_error_message: |
+    That is not a valid option.
+
+    The valid options are:
+
+    {error_message}
+
+    Please try enter the option again.
+  template_message: |
+    No problem! If you change your mind later, you can always register again.
+
+    To find out more about SisoNova's services, visit our website: https://sisonova.com
+
+  previous_template: NULL
+  current_template: unregistered_number_welcome_template
+
+  error_message:
+    - Yes
+    - No

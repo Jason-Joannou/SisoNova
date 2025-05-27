@@ -58,8 +58,63 @@ unregistered_number_welcome_template:
 
     Sicela uphendule ngokuthi "yes" noma "no" ukuze uqhubeke.
 
-  next_template: unregistered_number_welcome_template
   previous_template: unregistered_number_welcome_template
+
+  response_routing:
+    "yes": "registration_yes_template"
+    "no": "registration_no_template"
+
+  error_message:
+    - Yes
+    - No
+
+registered_user_template:
+  template_error_message: |
+    Lokho akuyona inketho evumelekile.
+
+    Izinketho ezivumelekile yilezi:
+
+    {error_message}
+
+    Sicela uzame ukufaka inketho futhi.
+  template_message: |
+    Siyabonga ngokubhalisa nesevisi yosizo lwezezimali ye-SisoNova!
+
+    Sikudalele ngempumelelo iwalethi yedijithali evikelekile ku-blockchain ye-Algorand ukuze sisekele uhambo lwakho lwezezimali.
+
+    Manje usungakwazi ukufinyelela amathuluzi ezezimali omuntu siqu, amasevisi, nemininingwane. Sicela ukhethe enye yezinketho ezilandelayo ukuze uqalise:
+
+    1. SisoNova Personal - Usizo lwezezimali oluhambisanayo namathuluzi okusetshenziswa komuntu ngamunye.
+    2. SisoNova Public - Ukufinyelela ezinsizeni ezabiwe kanye nokwesekwa kwezezimali okusekelwe emphakathini.
+
+    Ukuze uthole okwengeziwe ngezinkonzo zeSisoNova, vakashela iwebhusayithi yethu: https://sisonova.com
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "sisonova_personal_template"
+    "2": "sisonova_public_template"
+
+  error_message:
+    - 1
+    - 2
+
+registration_no_template:
+  template_error_message: |
+    Lokho akuyona inketho evumelekile.
+
+    Izinketho ezivumelekile yilezi:
+
+    {error_message}
+
+    Sicela uzame ukufaka inketho futhi.
+  template_message: |
+    Ayikho inkinga! Uma ushintsha umqondo wakho ngemva kwesikhathi, ungakwazi ukubhalisa futhi.
+
+    Ukuze uthole okwengeziwe ngezinkonzo zeSisoNova, vakashela iwebhusayithi yethu: https://sisonova.com
+
+  previous_template: NULL
+  current_template: unregistered_number_welcome_template
 
   error_message:
     - Yes
