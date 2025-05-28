@@ -1,6 +1,7 @@
 from api.db.models.tables import User, LanguagePreference, MessageState, UnverifiedExpenses, UnverifiedIncomes, FinancialFeelings
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
+from datetime import datetime
 
 class AsyncQueries:
 
@@ -13,6 +14,36 @@ class AsyncQueries:
             select(User).where(User.phone_number == phone_number)
         )
         return result.scalar_one_or_none()
+    
+    async def get_user_expenses_by_date_range(self, user_id: int, start_date: datetime, end_date: datetime) -> list[UnverifiedExpenses]:
+        """Get all expenses for a user within a date range."""
+        result = await self.session.execute(
+            select(UnverifiedExpenses).where(
+                UnverifiedExpenses.user_id == user_id and
+                UnverifiedExpenses.expense_date >= start_date and UnverifiedExpenses.expense_date <= end_date
+            )
+        )
+        return result.scalars().all()
+    
+    async def get_user_incomes_by_date_range(self, user_id: int, start_date: datetime, end_date: datetime) -> list[UnverifiedIncomes]:
+        """Get all incomes for a user within a date range."""
+        result = await self.session.execute(
+            select(UnverifiedIncomes).where(
+                UnverifiedIncomes.user_id == user_id and
+                UnverifiedIncomes.income_date >= start_date and UnverifiedIncomes.income_date <= end_date
+            )
+        )
+        return result.scalars().all()
+    
+    async def get_user_feelings_by_date_range(self, user_id: int, start_date: datetime, end_date: datetime) -> list[FinancialFeelings]:
+        """Get all financial feelings for a user within a date range."""
+        result = await self.session.execute(
+            select(FinancialFeelings).where(
+                FinancialFeelings.user_id == user_id and
+                FinancialFeelings.feeling_date >= start_date and FinancialFeelings.feeling_date <= end_date
+            )
+        )
+        return result.scalars().all()
     
     async def get_user_language_preference(self, user_id: int) -> LanguagePreference:
         """Get a user's language preference."""
