@@ -10,3 +10,4 @@ asyncpg
 reportlab
 google-generativeai
 google
+boto3
