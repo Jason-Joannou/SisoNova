@@ -99,6 +99,44 @@ registered_user_template:
     - 1
     - 2
 
+sisonova_personal_template:
+  template_error_message: |
+    That is not a valid option.
+
+    The valid options are:
+
+    {error_message}
+
+    Please try enter the option again.
+  template_message: |
+    Welcome to SisoNova Personal - Your Personalized Financial Assistance Service!
+
+    SisoNova Personal provides personalized financial assistance and tools for individual use.
+
+    To start managing your financial profile, please select one of the following options:
+
+    1. Expenses
+    2. Incomes
+    3. Financial Feeling
+    4. Financial Profile Reports
+    5. Back
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "user_expenses_template"
+    "2": "user_incomes_template"
+    "3": "user_financial_feeling_template"
+    "4": "user_financial_profile_reports_template"
+    "5": "registered_user_template"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+
 registration_no_template:
   template_error_message: |
     That is not a valid option.

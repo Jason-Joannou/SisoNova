@@ -124,3 +124,41 @@ registration_no_template:
 
   error_message:
     - "1"
+
+sisonova_personal_template:
+  template_error_message: |
+    Dit is nie 'n geldige opsie nie.
+
+    Die geldige opsies is:
+
+    {error_message}
+
+    Probeer asseblief weer die opsie in te voer.
+  template_message: |
+    Welkom by SisoNova Personal - Jou persoonlike finansiële bystanddiens!
+
+    SisoNova Personal verskaf persoonlike finansiële bystand en gereedskap vir individuele gebruik.
+
+    Om jou finansiële profiel te begin bestuur, kies asseblief een van die volgende opsies:
+
+    1. Uitgawes
+    2. Inkomste
+    3. Finansiële Gevoel
+    4. Finansiële profielverslae
+    5. Terug
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "user_expenses_template"
+    "2": "user_incomes_template"
+    "3": "user_financial_feeling_template"
+    "4": "user_financial_profile_reports_template"
+    "5": "registered_user_template"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5

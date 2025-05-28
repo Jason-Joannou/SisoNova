@@ -125,3 +125,42 @@ registration_no_template:
 
   error_message:
     - "1"
+
+sisonova_personal_template:
+  template_error_message: |
+    Lokho akuyona inketho evumelekile.
+
+    Izinketho ezivumelekile yilezi:
+
+    {error_message}
+
+    Sicela uzame ukufaka inketho futhi.
+  template_message: |
+    Siyakwamukela ku-SisoNova Personal - Isevisi Yakho Yokusiza Ngezezimali!
+
+    I-SisoNova Personal inikeza usizo lwezezimali lomuntu siqu namathuluzi okusetshenziswa komuntu ngamunye.
+
+    Ukuze uqale ukuphatha iphrofayela yakho yezezimali, sicela ukhethe enye yezinketho ezilandelayo:
+
+    1. Izindleko
+    2. Imali engenayo
+    3. Umuzwa Wezezimali
+    4. Imibiko Yephrofayili Yezezimali
+    5. Emuva
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "user_expenses_template"
+    "2": "user_incomes_template"
+    "3": "user_financial_feeling_template"
+    "4": "user_financial_profile_reports_template"
+    "5": "registered_user_template"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+
