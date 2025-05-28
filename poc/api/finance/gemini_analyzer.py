@@ -127,104 +127,174 @@ class PersonalizedGeminiAnalyzer:
             "emergency_status": emergency_prep.get("emergency_fund_status", "Unknown")
         }
     
+    # Updated AI prompts for WhatsApp-friendly responses
     def _create_personalized_prompt(self, data_summary: Dict[str, Any], report_type: str, user_context: str) -> str:
-        """Create a detailed, personalized prompt for Gemini analysis"""
+        """Create WhatsApp-optimized prompts for different report types"""
         
         base_prompt = f"""
-You are a financial advisor specializing in helping {user_context}. 
-You have been provided with ACTUAL financial data from a real user. 
-Analyze their SPECIFIC situation and provide personalized, actionable advice.
+    You are a financial advisor specializing in helping {user_context}. 
+    You will provide analysis via WhatsApp messages, so keep responses mobile-friendly.
+    Analyze the following ACTUAL financial data from a real user.
 
-USER'S ACTUAL FINANCIAL DATA:
-{json.dumps(data_summary, indent=2)}
+    USER'S ACTUAL FINANCIAL DATA:
+    {json.dumps(data_summary, indent=2)}
 
-IMPORTANT: Base your analysis on the SPECIFIC NUMBERS and PATTERNS shown above, not generic advice.
-"""
+    IMPORTANT: Base your analysis on the SPECIFIC NUMBERS and PATTERNS shown above, not generic advice.
+    """
         
         if report_type == "expenses":
             specific_prompt = f"""
-EXPENSE ANALYSIS FOCUS:
-- This user spends R{data_summary.get('total_expenses', 0):,.2f} total
-- Their daily average is R{data_summary.get('daily_average', 0):.2f}
-- Top spending category: {data_summary.get('top_category', 'Unknown')}
-- Essential expenses: {data_summary.get('essential_percentage', 0)}% of total
-- Peak spending day: {data_summary.get('peak_spending_day', 'Unknown')}
-- Potential savings identified: R{data_summary.get('cost_cutting_potential', 0):.2f}
+    EXPENSE ANALYSIS FOCUS:
+    - This user spends R{data_summary.get('total_expenses', 0):,.2f} total
+    - Their daily average is R{data_summary.get('daily_average', 0):.2f}
+    - Top spending category: {data_summary.get('top_category', 'Unknown')}
+    - Essential expenses: {data_summary.get('essential_percentage', 0)}% of total
+    - Peak spending day: {data_summary.get('peak_spending_day', 'Unknown')}
+    - Potential savings identified: R{data_summary.get('cost_cutting_potential', 0):.2f}
 
-Analyze THESE SPECIFIC NUMBERS and provide:
-1. PERSONALIZED ASSESSMENT: What do these specific spending patterns tell you about this user?
-2. SPECIFIC CONCERNS: Based on their R{data_summary.get('total_expenses', 0):,.2f} spending, what are the biggest issues?
-3. TARGETED OPPORTUNITIES: Given their {data_summary.get('top_category', 'Unknown')} spending is highest, what specific actions should they take?
-4. REALISTIC SAVINGS PLAN: Based on their actual spending of R{data_summary.get('daily_average', 0):.2f}/day, what's achievable?
-5. CATEGORY-SPECIFIC ADVICE: For each of their actual spending categories, give specific recommendations.
-"""
+    Provide your analysis in exactly this format:
+
+    **FINANCIAL HEALTH ASSESSMENT** (2-3 sentences max):
+    [Analyze what their R{data_summary.get('total_expenses', 0):,.2f} spending pattern tells you about their financial health]
+
+    **TOP 3 CONCERNS** (bullet points, 1 line each):
+    • [Specific concern based on their actual spending]
+    • [Another specific concern from their data]
+    • [Third concern from their patterns]
+
+    **TOP 3 OPPORTUNITIES** (bullet points, 1 line each):
+    • [Specific opportunity based on their R{data_summary.get('cost_cutting_potential', 0):.2f} savings potential]
+    • [Another opportunity from their spending patterns]
+    • [Third opportunity for improvement]
+
+    **IMMEDIATE ACTION STEPS** (numbered list, 1-2 lines each):
+    1. [Specific action based on their {data_summary.get('top_category', 'Unknown')} spending]
+    2. [Action related to their R{data_summary.get('daily_average', 0):.2f} daily spending]
+    3. [Action for their {data_summary.get('peak_spending_day', 'Unknown')} peak spending]
+
+    **ENCOURAGEMENT** (2-3 sentences):
+    [Motivational message specific to their situation and progress]
+    """
         
         elif report_type == "incomes":
             specific_prompt = f"""
-INCOME ANALYSIS FOCUS:
-- This user earns R{data_summary.get('total_income', 0):,.2f} total (R{data_summary.get('monthly_average', 0):,.2f}/month)
-- Primary income source: {data_summary.get('primary_source', 'Unknown')}
-- Income stability score: {data_summary.get('stability_score', 0)}/100
-- Regular income: {data_summary.get('regular_income_percentage', 0)}% of total
-- Diversification score: {data_summary.get('diversification_score', 0)}/100
-- Risk level: {data_summary.get('risk_level', 'Unknown')}
+    INCOME ANALYSIS FOCUS:
+    - This user earns R{data_summary.get('total_income', 0):,.2f} total (R{data_summary.get('monthly_average', 0):,.2f}/month)
+    - Primary income source: {data_summary.get('primary_source', 'Unknown')}
+    - Income stability score: {data_summary.get('stability_score', 0)}/100
+    - Regular income: {data_summary.get('regular_income_percentage', 0)}% of total
+    - Diversification score: {data_summary.get('diversification_score', 0)}/100
 
-Analyze THESE SPECIFIC NUMBERS and provide:
-1. INCOME HEALTH ASSESSMENT: What does earning R{data_summary.get('monthly_average', 0):,.2f}/month mean for this user?
-2. STABILITY CONCERNS: With {data_summary.get('stability_score', 0)}/100 stability, what are the risks?
-3. DIVERSIFICATION STRATEGY: Given their {data_summary.get('diversification_score', 0)}/100 score, what specific steps should they take?
-4. GROWTH OPPORTUNITIES: Based on their current {data_summary.get('primary_source', 'Unknown')} income, what's realistic?
-5. SOURCE-SPECIFIC ADVICE: For each of their actual income sources, give targeted recommendations.
-"""
+    Provide your analysis in exactly this format:
+
+    **INCOME HEALTH ASSESSMENT** (2-3 sentences max):
+    [Analyze what earning R{data_summary.get('monthly_average', 0):,.2f}/month means for this user in South Africa]
+
+    **TOP 3 INCOME CONCERNS** (bullet points, 1 line each):
+    • [Concern about their {data_summary.get('stability_score', 0)}/100 stability score]
+    • [Concern about their {data_summary.get('diversification_score', 0)}/100 diversification]
+    • [Third concern from their income pattern]
+
+    **TOP 3 GROWTH OPPORTUNITIES** (bullet points, 1 line each):
+    • [Opportunity based on their {data_summary.get('primary_source', 'Unknown')} income]
+    • [Opportunity for income diversification]
+    • [Third growth opportunity]
+
+    **INCOME BOOSTING ACTIONS** (numbered list, 1-2 lines each):
+    1. [Specific action for their primary income source]
+    2. [Action to improve their {data_summary.get('stability_score', 0)}/100 stability]
+    3. [Action to increase their {data_summary.get('diversification_score', 0)}/100 diversification]
+
+    **MOTIVATION** (2-3 sentences):
+    [Encouraging message about their income potential]
+    """
         
         elif report_type == "feelings":
             specific_prompt = f"""
-FINANCIAL WELLNESS FOCUS:
-- This user has {data_summary.get('total_entries', 0)} feeling entries
-- Most common feeling: {data_summary.get('most_common_feeling', 'Unknown')}
-- Stress level: {data_summary.get('stress_percentage', 0)}%
-- Wellness status: {data_summary.get('wellness_status', 'Unknown')}
-- Stress trend: {data_summary.get('stress_trend', 'Unknown')}
-- Mental health risk: {data_summary.get('mental_health_risk', 'Unknown')}
+    FINANCIAL WELLNESS FOCUS:
+    - This user has {data_summary.get('total_entries', 0)} feeling entries
+    - Most common feeling: {data_summary.get('most_common_feeling', 'Unknown')}
+    - Stress level: {data_summary.get('stress_percentage', 0)}%
+    - Wellness trend: {data_summary.get('stress_trend', 'Unknown')}
+    - Mental health risk: {data_summary.get('mental_health_risk', 'Unknown')}
 
-Analyze THESE SPECIFIC PATTERNS and provide:
-1. WELLNESS ASSESSMENT: What does {data_summary.get('stress_percentage', 0)}% stress level mean for this user?
-2. STRESS TRIGGERS: Based on their {data_summary.get('most_common_feeling', 'Unknown')} being most common, what's causing this?
-3. TREND ANALYSIS: With stress trend being {data_summary.get('stress_trend', 'Unknown')}, what should they expect?
-4. PERSONALIZED COPING STRATEGIES: Given their specific stress patterns, what will work for them?
-5. MENTAL HEALTH SUPPORT: With {data_summary.get('mental_health_risk', 'Unknown')} risk level, what specific help do they need?
-"""
+    Provide your analysis in exactly this format:
+
+    **WELLNESS ASSESSMENT** (2-3 sentences max):
+    [Analyze what {data_summary.get('stress_percentage', 0)}% stress level means for this user]
+
+    **TOP 3 STRESS FACTORS** (bullet points, 1 line each):
+    • [Factor related to their {data_summary.get('most_common_feeling', 'Unknown')} feeling]
+    • [Factor from their {data_summary.get('stress_trend', 'Unknown')} trend]
+    • [Third stress factor from their data]
+
+    **TOP 3 WELLNESS OPPORTUNITIES** (bullet points, 1 line each):
+    • [Opportunity to improve their stress level]
+    • [Opportunity based on their feeling patterns]
+    • [Third wellness improvement opportunity]
+
+    **STRESS MANAGEMENT ACTIONS** (numbered list, 1-2 lines each):
+    1. [Specific action for their stress level]
+    2. [Action for their {data_summary.get('stress_trend', 'Unknown')} trend]
+    3. [Action for overall wellness improvement]
+
+    **SUPPORT & ENCOURAGEMENT** (2-3 sentences):
+    [Supportive message acknowledging their challenges and progress]
+    """
         
         elif report_type == "comprehensive":
             specific_prompt = f"""
-COMPREHENSIVE FINANCIAL ANALYSIS:
-- Income: R{data_summary.get('total_income', 0):,.2f} vs Expenses: R{data_summary.get('total_expenses', 0):,.2f}
-- Net position: R{data_summary.get('net_position', 0):,.2f} ({data_summary.get('savings_rate', 0)}% savings rate)
-- Financial health score: {data_summary.get('health_score', 0)}/100
-- Emergency fund: {data_summary.get('emergency_months_covered', 0)} months covered
-- Status: {data_summary.get('financial_status', 'Unknown')}
+    COMPREHENSIVE FINANCIAL ANALYSIS:
+    - Income: R{data_summary.get('total_income', 0):,.2f} vs Expenses: R{data_summary.get('total_expenses', 0):,.2f}
+    - Net position: R{data_summary.get('net_position', 0):,.2f} ({data_summary.get('savings_rate', 0)}% savings rate)
+    - Financial health score: {data_summary.get('health_score', 0)}/100
+    - Emergency fund: {data_summary.get('emergency_months_covered', 0)} months covered
 
-Analyze THIS COMPLETE PICTURE and provide:
-1. OVERALL FINANCIAL HEALTH: What does a {data_summary.get('health_score', 0)}/100 score with R{data_summary.get('net_position', 0):,.2f} net position mean?
-2. PRIORITY ACTIONS: Given their specific situation, what are the top 3 most important things to do?
-3. REALISTIC GOALS: Based on their R{data_summary.get('savings_rate', 0)}% savings rate, what goals should they set?
-4. EMERGENCY PREPAREDNESS: With {data_summary.get('emergency_months_covered', 0)} months covered, what's the plan?
-5. LONG-TERM STRATEGY: Given their complete financial picture, what's the 6-month plan?
-"""
-        
-        closing_prompt = """
-REQUIREMENTS:
-- Use the ACTUAL NUMBERS provided, not generic ranges
-- Give SPECIFIC advice based on THEIR situation
-- Consider South African context (stokvels, government grants, local costs)
-- Keep language simple and actionable
-- Focus on small, achievable steps
-- Be encouraging but realistic about their specific challenges
+    Provide your analysis in exactly this format:
 
-Provide your analysis in clear sections with specific recommendations.
-"""
+    **OVERALL FINANCIAL HEALTH** (2-3 sentences max):
+    [Analyze their {data_summary.get('health_score', 0)}/100 score with R{data_summary.get('net_position', 0):,.2f} net position]
+
+    **TOP 3 PRIORITIES** (bullet points, 1 line each):
+    • [Priority based on their {data_summary.get('savings_rate', 0)}% savings rate]
+    • [Priority for their {data_summary.get('emergency_months_covered', 0)} months emergency fund]
+    • [Third priority from their overall situation]
+
+    **TOP 3 STRENGTHS** (bullet points, 1 line each):
+    • [Strength from their financial data]
+    • [Another positive aspect of their finances]
+    • [Third strength to build upon]
+
+    **6-MONTH ACTION PLAN** (numbered list, 1-2 lines each):
+    1. [Immediate action for next month]
+    2. [Action for months 2-3]
+    3. [Action for months 4-6]
+
+    **MOTIVATION & VISION** (2-3 sentences):
+    [Encouraging message about their financial journey and potential]
+    """
         
-        return base_prompt + specific_prompt + closing_prompt
+        # Enhanced closing prompt for WhatsApp optimization
+        whatsapp_closing_prompt = """
+    WHATSAPP DELIVERY REQUIREMENTS:
+    - Each section should be 300-800 characters (mobile-friendly)
+    - Use simple, conversational language (Grade 8 reading level)
+    - Include relevant emojis where appropriate
+    - Focus on specific, actionable advice they can implement this week
+    - Reference their actual numbers and South African context
+    - Be encouraging but realistic about their specific situation
+    - Avoid financial jargon - use everyday language
+
+    SOUTH AFRICAN CONTEXT:
+    - Consider stokvels, government grants, taxi fares, local retailers
+    - Reference local costs and income levels
+    - Acknowledge economic challenges in South Africa
+    - Suggest culturally appropriate financial strategies
+
+    TONE: Supportive financial friend who understands their specific situation and wants to help them succeed.
+    """
+        
+        return base_prompt + specific_prompt + whatsapp_closing_prompt
     
     def _parse_personalized_response(self, response_text: str, report_type: str) -> Dict[str, Any]:
         """Parse the AI response into structured, personalized insights"""
