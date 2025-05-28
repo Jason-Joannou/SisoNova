@@ -8,3 +8,5 @@ sqlalchemy[asyncio]
 aiosqlite 
 asyncpg
 reportlab
+google-generativeai
+google
