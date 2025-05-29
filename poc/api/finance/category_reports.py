@@ -214,7 +214,7 @@ class CategoryReportGenerator:
         }
     
     async def _identify_cost_cutting(self, expenses: List) -> List[Dict[str, Any]]:
-        """Identify specific cost-cutting opportunities"""
+        """Identify specific cost-cutting opportunities - ADJUSTED THRESHOLDS"""
         opportunities = []
         
         # Analyze categories for potential savings
@@ -226,9 +226,11 @@ class CategoryReportGenerator:
         
         total_spending = sum(exp.expense_amount for exp in expenses)
         
-        # Food spending analysis
+        # LOWERED THRESHOLDS for South African lower-income users
+        
+        # Food spending analysis - LOWERED from 35% to 8%
         food_total = categories.get("Food & Groceries", {}).get("total", 0)
-        if food_total > total_spending * 0.35:
+        if food_total > total_spending * 0.08:  # Changed from 0.35 to 0.08
             opportunities.append({
                 "category": "Food & Groceries",
                 "current_spending": round(food_total, 2),
@@ -237,9 +239,9 @@ class CategoryReportGenerator:
                 "priority": "High"
             })
         
-        # Transport analysis
+        # Transport analysis - LOWERED from 25% to 4%
         transport_total = categories.get("Transport", {}).get("total", 0)
-        if transport_total > total_spending * 0.25:
+        if transport_total > total_spending * 0.04:  # Changed from 0.25 to 0.04
             opportunities.append({
                 "category": "Transport",
                 "current_spending": round(transport_total, 2),
@@ -248,9 +250,31 @@ class CategoryReportGenerator:
                 "priority": "Medium"
             })
         
-        # Small frequent expenses
+        # Social spending analysis - NEW OPPORTUNITY
+        social_total = categories.get("Social", {}).get("total", 0)
+        if social_total > total_spending * 0.05:  # 5% threshold
+            opportunities.append({
+                "category": "Social",
+                "current_spending": round(social_total, 2),
+                "potential_savings": round(social_total * 0.25, 2),
+                "recommendation": "Review stokvel contributions and social spending for potential reductions",
+                "priority": "Medium"
+            })
+        
+        # Housing analysis - NEW OPPORTUNITY  
+        housing_total = categories.get("Housing", {}).get("total", 0)
+        if housing_total > total_spending * 0.40:  # 40% threshold
+            opportunities.append({
+                "category": "Housing",
+                "current_spending": round(housing_total, 2),
+                "potential_savings": round(housing_total * 0.10, 2),
+                "recommendation": "Negotiate rent, consider shared accommodation, or explore cheaper areas",
+                "priority": "High"
+            })
+        
+        # Small frequent expenses - LOWERED from 50 to 20
         small_expenses = [exp for exp in expenses if exp.expense_amount < 50]
-        if len(small_expenses) > 50:  # More than 50 small transactions
+        if len(small_expenses) > 20:  # Changed from 50 to 20
             small_total = sum(exp.expense_amount for exp in small_expenses)
             opportunities.append({
                 "category": "Small Purchases",
