@@ -20,6 +20,19 @@ def get_template_validation(template_name: str) -> TemplateValidation:
         "registration_no_template": {
             "inbound_validator": NumberedMenuValidator,
         },
+        "registered_user_template": {
+            "inbound_validator": NumberedMenuValidator,
+        },
+        "sisonova_personal_template": {
+            "inbound_validator": NumberedMenuValidator,
+        },
+        "sisonova_public_template": {
+            "inbound_validator": NumberedMenuValidator,
+        },
+        "sisonova_personal_expense_template": {
+            "inbound_validator": NumberedMenuValidator,
+        }
+
     }
 
     return templates[template_name]
