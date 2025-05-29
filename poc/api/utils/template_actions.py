@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from typing import List, Tuple, Dict, Any
 from api.services.s3_bucket import SecureS3Service
 
-async def create_poc_dummy_data_south_africa(user_object, query_manager) -> List[Tuple[str, Dict[str, Any]]]:
+async def create_poc_dummy_data_south_africa(user_object: User) -> List[Tuple[str, Dict[str, Any]]]:
     """
     Create South African lower-income representative dummy data for testing
     Updated to match actual table schema
