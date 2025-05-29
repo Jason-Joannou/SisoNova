@@ -150,10 +150,10 @@ sisonova_personal_template:
   previous_template: registered_user_template
 
   response_routing:
-    "1": "user_expenses_template"
-    "2": "user_incomes_template"
-    "3": "user_financial_feeling_template"
-    "4": "user_financial_profile_reports_template"
+    "1": "sisonova_personal_expense_template"
+    "2": "sisonova_personal_income_template"
+    "3": "sisonova_personal_financial_feeling_template"
+    "4": "sisonova_personal_financial_profile_reports_template"
     "5": "registered_user_template"
 
   error_message:
