@@ -284,6 +284,7 @@ class PersonalizedGeminiAnalyzer:
     - Reference their actual numbers and South African context
     - Be encouraging but realistic about their specific situation
     - Avoid financial jargon - use everyday language
+    - The Total message length SHOULD NOT EXCEED 1600 characters
 
     SOUTH AFRICAN CONTEXT:
     - Consider stokvels, government grants, taxi fares, local retailers
