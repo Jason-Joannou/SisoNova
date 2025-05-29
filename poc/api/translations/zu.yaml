@@ -164,3 +164,37 @@ sisonova_personal_template:
     - 4
     - 5
 
+sisonova_personal_expense_template:
+  template_error_message: |
+    Lokho akuyona inketho evumelekile.
+
+    Izinketho ezivumelekile yilezi:
+
+    {error_message}
+
+    Sicela uzame ukufaka inketho futhi.
+  template_message: |
+    Izindleko ziyingxenye ebalulekile yempilo yakho yezezimali. Ukuziqonda nokuyiphatha ngobuhlakani kubalulekile ekwakheni iphrofayili eqinile yezezimali.
+    Ungathanda ukusebenzelana kanjani nezindleko zakho?
+
+    1. Qopha Izindleko
+    2. Umbiko Wezindleko
+    3. Emuva
+    4. Ekhaya
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "record_expenses_template"
+    "3": "sisonova_personal_template"
+    "4": "registered_user_template"
+
+  actions:
+    "2": "generate_expense_report"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+

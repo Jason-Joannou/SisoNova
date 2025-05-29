@@ -137,6 +137,40 @@ sisonova_personal_template:
     - 4
     - 5
 
+sisonova_personal_expense_template:
+  template_error_message: |
+    That is not a valid option.
+
+    The valid options are:
+
+    {error_message}
+
+    Please try enter the option again.
+  template_message: |
+    Expenses are a key part of your financial life. Understanding and managing them wisely is essential to building a strong financial profile.
+    How would you like to engage with your expenses?
+
+    1. Record Expenses
+    2. Expense Report
+    3. Back
+    4. Home
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "record_expenses_template"
+    "3": "sisonova_personal_template"
+    "4": "registered_user_template"
+
+  actions:
+    "2": "generate_expense_report"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+
 registration_no_template:
   template_error_message: |
     That is not a valid option.

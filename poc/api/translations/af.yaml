@@ -162,3 +162,37 @@ sisonova_personal_template:
     - 3
     - 4
     - 5
+
+sisonova_personal_expense_template:
+  template_error_message: |
+    Dit is nie 'n geldige opsie nie.
+
+    Die geldige opsies is:
+
+    {error_message}
+
+    Probeer asseblief weer die opsie in te voer.
+  template_message: |
+    Uitgawes is 'n belangrike deel van jou finansiële lewe. Om hulle verstandig te verstaan en te bestuur, is noodsaaklik om 'n sterk finansiële profiel te bou.
+    Hoe wil jy met jou uitgawes omgaan?
+
+    1. Teken uitgawes aan
+    2. Onkosteverslag
+    3. Terug
+    4. Tuis
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "record_expenses_template"
+    "3": "sisonova_personal_template"
+    "4": "registered_user_template"
+
+  actions:
+    "2": "generate_expense_report"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
