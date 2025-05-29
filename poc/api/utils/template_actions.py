@@ -7,6 +7,7 @@ from api.db.query_manager import AsyncQueries
 import random
 from datetime import datetime, timedelta
 from typing import List, Tuple, Dict, Any
+from api.utils.utils import create_comprehensive_ai_message
 from api.services.s3_bucket import SecureS3Service
 
 async def create_poc_dummy_data_south_africa(user_object: User) -> List[Tuple[str, Dict[str, Any]]]:
@@ -235,10 +236,20 @@ async def generate_expense_report(report_dispatcher: PersonalizedReportDispatche
         # First message: Report ready notification
         messages.append({"body": "📊 Your expense report is ready!"})
         
-        # Second message: AI insight if available
-        if ai_insights and "personalized_assessment" in ai_insights:
-            assessment = ai_insights["personalized_assessment"]
-            messages.append({"body": f"💡 Key Insight: \n\n{assessment}"})
+        if ai_insights and not ai_insights.get("error"):
+            ai_message = create_comprehensive_ai_message(ai_insights)
+            if ai_message:
+                messages.append({"body": f"🤖 *AI Analysis:*\n\n{ai_message}"})
+            else:
+                # Fallback if parsing fails - use raw insights
+                print("DEBUG: AI message creation failed, using fallback")
+                if ai_insights.get("actionable_recommendations"):
+                    actions = ai_insights["actionable_recommendations"][:3]
+                    actions_text = "\n".join([f"{i+1}. {action}" for i, action in enumerate(actions)])
+                    messages.append({"body": f"🚀 *Quick Actions:*\n\n{actions_text}"})
+        elif ai_insights and ai_insights.get("error"):
+            print(f"DEBUG: AI insights error: {ai_insights['error']}")
+            # Don't add AI message if there was an error
 
         messages.append({
             "body": "📄 Here's your detailed expense analysis (link expires in 24 hours):",
