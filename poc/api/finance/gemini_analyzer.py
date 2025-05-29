@@ -8,7 +8,7 @@ class PersonalizedGeminiAnalyzer:
     
     def __init__(self, api_key: str):
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-pro')
+        self.model = genai.GenerativeModel('gemini-2.0-flash')
     
     async def generate_personalized_insights(self, report_data: Dict[str, Any], report_type: str, user_context: str = "South African lower-income user") -> Dict[str, Any]:
         """Generate AI insights based on the user's specific financial data"""
