@@ -46,25 +46,73 @@ class PersonalizedGeminiAnalyzer:
             return {}
     
     def _extract_expense_data_points(self, report_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Extract key expense data points"""
+        """Extract key expense data points - ENHANCED VERSION"""
         summary = report_data.get("summary", {})
         category_analysis = report_data.get("category_analysis", {})
         spending_patterns = report_data.get("spending_patterns", {})
         cost_cutting = report_data.get("cost_cutting_opportunities", [])
+        spending_triggers = report_data.get("spending_triggers", {})
+        
+        # Extract category breakdown properly
+        category_breakdown = category_analysis.get("category_breakdown", {})
+        essential_vs_non = category_analysis.get("essential_vs_non_essential", {})
+        
+        # Extract spending patterns
+        day_analysis = spending_patterns.get("day_of_week_analysis", {})
+        month_part = spending_patterns.get("month_part_spending", {})
+        
+        # Extract emotional triggers
+        emotional_triggers = spending_triggers.get("emotional_triggers", {})
+        weekend_vs_weekday = spending_triggers.get("weekend_vs_weekday", {})
         
         return {
+            # Basic summary data
             "total_expenses": summary.get("total_expenses", 0),
             "daily_average": summary.get("average_daily_spending", 0),
             "transaction_count": summary.get("total_transactions", 0),
+            "average_transaction_size": summary.get("average_transaction_size", 0),
+            
+            # Expense extremes
             "largest_expense": summary.get("largest_expense", {}),
-            "top_category": category_analysis.get("category_breakdown", {}).get("top_spending_category", "Unknown"),
-            "essential_percentage": category_analysis.get("essential_vs_non_essential", {}).get("essential_percentage", 0),
+            "smallest_expense": summary.get("smallest_expense", {}),
+            
+            # Category analysis
+            "top_spending_category": category_analysis.get("top_spending_category", "Unknown"),
+            "most_frequent_category": category_analysis.get("most_frequent_category", "Unknown"),
+            "category_breakdown": category_breakdown,
+            "category_count": len(category_breakdown),
+            
+            # Essential vs non-essential
+            "essential_total": essential_vs_non.get("essential_total", 0),
+            "non_essential_total": essential_vs_non.get("non_essential_total", 0),
+            "essential_percentage": essential_vs_non.get("essential_percentage", 0),
+            
+            # Spending patterns
             "peak_spending_day": spending_patterns.get("peak_spending_day", "Unknown"),
-            "cost_cutting_potential": sum(opp.get("potential_savings", 0) for opp in cost_cutting),
-            "category_breakdown": {
-                cat: data.get("total", 0) 
-                for cat, data in category_analysis.get("category_breakdown", {}).items()
-            }
+            "spending_frequency": spending_patterns.get("spending_frequency", 0),
+            "day_of_week_spending": day_analysis,
+            "month_part_spending": month_part,
+            
+            # Cost cutting opportunities
+            "cost_cutting_opportunities": cost_cutting,
+            "total_potential_savings": sum(opp.get("potential_savings", 0) for opp in cost_cutting),
+            "high_priority_savings": [opp for opp in cost_cutting if opp.get("priority") == "High"],
+            
+            # Emotional and behavioral patterns
+            "emotional_spending_triggers": emotional_triggers,
+            "weekend_spending": weekend_vs_weekday.get("weekend_total", 0),
+            "weekday_spending": weekend_vs_weekday.get("weekday_total", 0),
+            "weekend_vs_weekday_ratio": (
+                weekend_vs_weekday.get("weekend_total", 0) / weekend_vs_weekday.get("weekday_total", 1) 
+                if weekend_vs_weekday.get("weekday_total", 0) > 0 else 0
+            ),
+            
+            # Additional insights
+            "top_3_categories": list(sorted(
+                category_breakdown.items(), 
+                key=lambda x: x[1].get("total", 0), 
+                reverse=True
+            )[:3]) if category_breakdown else [],
         }
     
     def _extract_income_data_points(self, report_data: Dict[str, Any]) -> Dict[str, Any]:
