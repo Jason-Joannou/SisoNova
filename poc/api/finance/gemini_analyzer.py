@@ -317,28 +317,31 @@ class PersonalizedGeminiAnalyzer:
             if not line:
                 continue
             
-            # Identify sections based on keywords
+            # Improved section identification
             line_upper = line.upper()
-            if any(keyword in line_upper for keyword in ["ASSESSMENT", "HEALTH", "ANALYSIS"]):
+            
+            # More specific keyword matching
+            if any(keyword in line_upper for keyword in ["**FINANCIAL HEALTH ASSESSMENT**", "**INCOME HEALTH ASSESSMENT**", "**WELLNESS ASSESSMENT**", "**OVERALL FINANCIAL HEALTH**"]):
                 current_section = "personalized_assessment"
-            elif any(keyword in line_upper for keyword in ["CONCERN", "ISSUE", "PROBLEM", "RISK"]):
+                continue
+            elif any(keyword in line_upper for keyword in ["**TOP 3 CONCERNS**", "**TOP 3 INCOME CONCERNS**", "**TOP 3 STRESS FACTORS**"]):
                 current_section = "specific_concerns"
-            elif any(keyword in line_upper for keyword in ["OPPORTUNIT", "GROWTH", "IMPROVE"]):
+                continue
+            elif any(keyword in line_upper for keyword in ["**TOP 3 OPPORTUNITIES**", "**TOP 3 GROWTH OPPORTUNITIES**", "**TOP 3 WELLNESS OPPORTUNITIES**", "**TOP 3 STRENGTHS**"]):
                 current_section = "targeted_opportunities"
-            elif any(keyword in line_upper for keyword in ["RECOMMEND", "ACTION", "STEP", "ADVICE"]):
+                continue
+            elif any(keyword in line_upper for keyword in ["**IMMEDIATE ACTION STEPS**", "**INCOME BOOSTING ACTIONS**", "**STRESS MANAGEMENT ACTIONS**", "**6-MONTH ACTION PLAN**"]):
                 current_section = "actionable_recommendations"
-            elif any(keyword in line_upper for keyword in ["GOAL", "PLAN", "TARGET"]):
-                current_section = "realistic_goals"
-            elif any(keyword in line_upper for keyword in ["MOTIVAT", "ENCOURAG", "POSITIVE"]):
+                continue
+            elif any(keyword in line_upper for keyword in ["**ENCOURAGEMENT**", "**MOTIVATION**", "**SUPPORT & ENCOURAGEMENT**", "**MOTIVATION & VISION**"]):
                 current_section = "motivational_message"
+                continue
             elif current_section:
                 # Process content based on current section
                 if line.startswith(('•', '-', '1.', '2.', '3.', '4.', '5.')):
                     # List item
                     clean_line = line.lstrip('•-123456789. ').strip()
-                    if current_section in ["specific_concerns", "targeted_opportunities", "actionable_recommendations", "realistic_goals"]:
-                        sections[current_section].append(clean_line)
-                    elif current_section == "data_based_insights":
+                    if current_section in ["specific_concerns", "targeted_opportunities", "actionable_recommendations"]:
                         sections[current_section].append(clean_line)
                 else:
                     # Paragraph content
