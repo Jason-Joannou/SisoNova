@@ -13,13 +13,17 @@ import io
 from typing import Dict, Any
 
 # SisoNova Brand Colors
-SISONOVA_BLUE = HexColor('#1E3A8A')      # Deep blue
-SISONOVA_GREEN = HexColor('#059669')      # Emerald green  
-SISONOVA_LIGHT_BLUE = HexColor('#DBEAFE') # Light blue
-SISONOVA_LIGHT_GREEN = HexColor('#D1FAE5') # Light green
-SISONOVA_GRAY = HexColor('#6B7280')       # Professional gray
-SISONOVA_DARK_GRAY = HexColor('#374151')  # Dark gray
-SISONOVA_ACCENT = HexColor('#F59E0B')     # Amber accent
+# SisoNova African-Inspired Brand Colors
+AFRICAN_SUNSET = HexColor('#D2691E')      # Burnt orange/terracotta
+AFRICAN_EARTH = HexColor('#8B4513')       # Rich brown/earth
+AFRICAN_GOLD = HexColor('#DAA520')        # Golden yellow
+AFRICAN_SAGE = HexColor('#9CAF88')        # Sage green
+AFRICAN_CLAY = HexColor('#CD853F')        # Clay/sand
+AFRICAN_DEEP_EARTH = HexColor('#654321')  # Deep brown
+AFRICAN_CREAM = HexColor('#FFF8DC')       # Warm cream
+AFRICAN_RUST = HexColor('#B7410E')        # Rust red
+AFRICAN_LIGHT_SAGE = HexColor('#E8F5E8')  # Light sage
+AFRICAN_LIGHT_GOLD = HexColor('#FFF8DC')  # Light gold
 
 class SisoNovaHeaderFooter(Flowable):
     """Custom header/footer for SisoNova branding"""
@@ -57,76 +61,96 @@ class FinancialReportPDF:
 
     def __init__(self):
         self.styles = getSampleStyleSheet()
-        self._setup_custom_styles()
+        self._setup_african_styles()
     
-    def _setup_custom_styles(self):
-        """Setup SisoNova branded styles"""
+    def _setup_african_styles(self):
+        """Setup African-inspired branded styles"""
         
         # Main title style
         self.title_style = ParagraphStyle(
-            'SisoNovaTitle',
+            'AfricanTitle',
             parent=self.styles['Heading1'],
-            fontSize=24,
+            fontSize=26,
             spaceAfter=30,
             spaceBefore=20,
-            textColor=SISONOVA_BLUE,
+            textColor=AFRICAN_EARTH,
             fontName='Helvetica-Bold',
             alignment=1  # Center alignment
         )
         
         # Section heading style
         self.heading_style = ParagraphStyle(
-            'SisoNovaHeading',
+            'AfricanHeading',
             parent=self.styles['Heading2'],
-            fontSize=14,
+            fontSize=16,
             spaceAfter=15,
-            spaceBefore=20,
-            textColor=SISONOVA_BLUE,
+            spaceBefore=25,
+            textColor=AFRICAN_SUNSET,
             fontName='Helvetica-Bold',
-            borderWidth=0,
-            borderColor=SISONOVA_BLUE,
-            borderPadding=5
+            borderWidth=2,
+            borderColor=AFRICAN_GOLD,
+            borderPadding=8,
+            backColor=AFRICAN_LIGHT_GOLD
         )
         
         # Subheading style
         self.subheading_style = ParagraphStyle(
-            'SisoNovaSubHeading',
+            'AfricanSubHeading',
             parent=self.styles['Heading3'],
-            fontSize=12,
-            spaceAfter=10,
+            fontSize=13,
+            spaceAfter=12,
             spaceBefore=15,
-            textColor=SISONOVA_GREEN,
+            textColor=AFRICAN_RUST,
             fontName='Helvetica-Bold'
         )
         
         # Body text style
         self.body_style = ParagraphStyle(
-            'SisoNovaBody',
+            'AfricanBody',
             parent=self.styles['Normal'],
-            fontSize=10,
-            spaceAfter=6,
-            textColor=SISONOVA_DARK_GRAY,
-            fontName='Helvetica'
+            fontSize=11,
+            spaceAfter=8,
+            textColor=AFRICAN_DEEP_EARTH,
+            fontName='Helvetica',
+            leading=14
+        )
+        
+        # Description style for section intros
+        self.description_style = ParagraphStyle(
+            'AfricanDescription',
+            parent=self.styles['Normal'],
+            fontSize=12,
+            spaceAfter=20,
+            spaceBefore=10,
+            textColor=AFRICAN_EARTH,
+            fontName='Helvetica',
+            leading=16,
+            leftIndent=10,
+            rightIndent=10
         )
         
         # Highlight style for important numbers
         self.highlight_style = ParagraphStyle(
-            'SisoNovaHighlight',
+            'AfricanHighlight',
             parent=self.styles['Normal'],
-            fontSize=11,
-            spaceAfter=8,
-            textColor=SISONOVA_GREEN,
-            fontName='Helvetica-Bold'
+            fontSize=13,
+            spaceAfter=10,
+            textColor=AFRICAN_SUNSET,
+            fontName='Helvetica-Bold',
+            backColor=AFRICAN_LIGHT_GOLD,
+            borderWidth=1,
+            borderColor=AFRICAN_GOLD,
+            borderPadding=8
         )
         
         # Warning style for concerns
         self.warning_style = ParagraphStyle(
-            'SisoNovaWarning',
+            'AfricanWarning',
             parent=self.styles['Normal'],
-            fontSize=10,
-            spaceAfter=6,
-            textColor=colors.red,
-            fontName='Helvetica'
+            fontSize=11,
+            spaceAfter=8,
+            textColor=AFRICAN_RUST,
+            fontName='Helvetica-Bold'
         )
     
     def generate_financial_report_pdf(self, report_data: Dict[str, Any], user_phone: str) -> bytes:
@@ -238,7 +262,7 @@ class FinancialReportPDF:
         return buffer.getvalue()
     
     def generate_category_report_pdf(self, report_data: Dict[str, Any], report_type: str, user_phone: str) -> bytes:
-        """Generate professionally styled PDF for category-specific reports"""
+        """Generate African-styled PDF for category-specific reports"""
         
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(
@@ -286,41 +310,75 @@ class FinancialReportPDF:
         return buffer.getvalue()
     
     def _add_page_elements(self, canvas, doc):
-        """Add header and footer to each page"""
+        """Add African-themed header and footer to each page"""
         canvas.saveState()
         
-        # Header
-        header_height = 15*mm
-        canvas.setFillColor(SISONOVA_BLUE)
+        # Header with gradient effect (simulated with rectangles)
+        header_height = 18*mm
+        
+        # Main header background
+        canvas.setFillColor(AFRICAN_SUNSET)
         canvas.rect(0, A4[1] - header_height, A4[0], header_height, fill=1, stroke=0)
+        
+        # Accent stripe
+        canvas.setFillColor(AFRICAN_GOLD)
+        canvas.rect(0, A4[1] - 3*mm, A4[0], 3*mm, fill=1, stroke=0)
         
         # SisoNova logo/text in header
         canvas.setFillColor(colors.white)
-        canvas.setFont("Helvetica-Bold", 14)
-        canvas.drawString(25*mm, A4[1] - 10*mm, "SisoNova Financial Reports")
+        canvas.setFont("Helvetica-Bold", 16)
+        canvas.drawString(25*mm, A4[1] - 12*mm, "SisoNova")
+        canvas.setFont("Helvetica", 10)
+        canvas.drawString(25*mm, A4[1] - 8*mm, "Financial Empowerment")
         
-        # Footer
-        canvas.setFillColor(SISONOVA_GRAY)
-        canvas.setFont("Helvetica", 8)
-        canvas.drawString(25*mm, 15*mm, f"Generated by SisoNova • {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-        canvas.drawRightString(A4[0] - 25*mm, 15*mm, f"Page {canvas.getPageNumber()}")
+        # African pattern (simple geometric design)
+        canvas.setFillColor(AFRICAN_EARTH)
+        for i in range(5):
+            x = A4[0] - 40*mm + (i * 6*mm)
+            canvas.circle(x, A4[1] - 9*mm, 2*mm, fill=1)
+        
+        # Footer with African earth tones
+        canvas.setFillColor(AFRICAN_CLAY)
+        canvas.rect(0, 0, A4[0], 8*mm, fill=1, stroke=0)
+        
+        canvas.setFillColor(colors.white)
+        canvas.setFont("Helvetica", 9)
+        canvas.drawString(25*mm, 4*mm, f"Generated by SisoNova • {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+        canvas.drawRightString(A4[0] - 25*mm, 4*mm, f"Page {canvas.getPageNumber()}")
         
         canvas.restoreState()
     
     def _build_expense_pdf_content(self, report_data: Dict[str, Any]) -> list:
-        """Build professionally styled expense report content"""
+        """Build African-styled expense report content with sections on new pages"""
         story = []
         
-        # Executive Summary Box
-        story.append(self._create_summary_box(report_data.get('summary', {}), 'expense'))
-        story.append(Spacer(1, 20))
+        # PAGE 1: Executive Summary
+        story.append(self._create_african_summary_box(report_data.get('summary', {}), 'expense'))
+        story.append(Spacer(1, 30))
         
-        # Key Metrics Section
+        # Overview description
+        overview_desc = """
+        This comprehensive expense analysis provides insights into your spending patterns over the past 6 months. 
+        Understanding where your money goes is the first step toward financial empowerment and building wealth 
+        for your future. Let's explore your financial journey together.
+        """
+        story.append(Paragraph(overview_desc, self.description_style))
+        
+        # PAGE 2: Key Spending Metrics
+        story.append(PageBreak())
+        story.append(Paragraph("📊 Key Spending Metrics", self.heading_style))
+        
+        metrics_desc = """
+        These key metrics reveal the foundation of your spending habits. By understanding your daily patterns 
+        and transaction behaviors, we can identify opportunities to optimize your financial health and create 
+        more room for savings and investments.
+        """
+        story.append(Paragraph(metrics_desc, self.description_style))
+        
         if 'summary' in report_data:
-            story.append(Paragraph("📊 Key Spending Metrics", self.heading_style))
             summary = report_data['summary']
             
-            # Create metrics in a clean table
+            # Create metrics in a beautiful African-themed table
             metrics_data = [
                 ['Metric', 'Value', 'Insight'],
                 ['Total Expenses', f"R {summary.get('total_expenses', 0):,.2f}", self._get_expense_insight(summary.get('total_expenses', 0))],
@@ -330,13 +388,21 @@ class FinancialReportPDF:
             ]
             
             metrics_table = Table(metrics_data, colWidths=[45*mm, 35*mm, 70*mm])
-            metrics_table.setStyle(self._get_modern_table_style())
+            metrics_table.setStyle(self._get_african_table_style())
             story.append(metrics_table)
-            story.append(Spacer(1, 20))
         
-        # Category Analysis with Visual Appeal
+        # PAGE 3: Spending Categories
+        story.append(PageBreak())
+        story.append(Paragraph("🏷️ Spending Categories", self.heading_style))
+        
+        categories_desc = """
+        Your spending categories tell the story of your priorities and lifestyle. This breakdown helps identify 
+        which areas consume most of your resources and where you might find opportunities to redirect funds 
+        toward your financial goals and dreams.
+        """
+        story.append(Paragraph(categories_desc, self.description_style))
+        
         if 'category_analysis' in report_data:
-            story.append(Paragraph("🏷️ Spending Categories", self.heading_style))
             categories = report_data['category_analysis'].get('category_breakdown', {})
             
             # Sort categories by amount
@@ -354,82 +420,126 @@ class FinancialReportPDF:
                 ])
             
             category_table = Table(category_data, colWidths=[40*mm, 30*mm, 25*mm, 30*mm, 25*mm])
-            category_table.setStyle(self._get_category_table_style())
+            category_table.setStyle(self._get_african_category_table_style())
             story.append(category_table)
             story.append(Spacer(1, 20))
             
-            # Essential vs Non-essential with visual indicator
+            # Essential vs Non-essential analysis
             essential_data = report_data['category_analysis'].get('essential_vs_non_essential', {})
             if essential_data:
                 story.append(Paragraph("⚖️ Essential vs Non-Essential Analysis", self.subheading_style))
                 
                 essential_pct = essential_data.get('essential_percentage', 0)
-                status_color = SISONOVA_GREEN if essential_pct >= 70 else SISONOVA_ACCENT if essential_pct >= 50 else colors.red
-                status_text = "Excellent" if essential_pct >= 70 else "Good" if essential_pct >= 50 else "Needs Attention"
+                status_color = AFRICAN_SAGE if essential_pct >= 70 else AFRICAN_GOLD if essential_pct >= 50 else AFRICAN_RUST
+                status_text = "Excellent Balance" if essential_pct >= 70 else "Good Balance" if essential_pct >= 50 else "Needs Attention"
                 
                 essential_summary = f"""
                 <b>Essential Spending:</b> R {essential_data.get('essential_total', 0):,.2f} ({essential_pct:.1f}%)<br/>
                 <b>Non-Essential Spending:</b> R {essential_data.get('non_essential_total', 0):,.2f} ({100-essential_pct:.1f}%)<br/>
-                <b>Status:</b> <font color="{status_color}">{status_text}</font>
+                <b>Balance Status:</b> <font color="{status_color}"><b>{status_text}</b></font>
                 """
                 story.append(Paragraph(essential_summary, self.body_style))
-                story.append(Spacer(1, 15))
         
-        # Cost Cutting Opportunities with Action Focus
+        # PAGE 4: Savings Opportunities
+        story.append(PageBreak())
+        story.append(Paragraph("💡 Savings Opportunities", self.heading_style))
+        
+        savings_desc = """
+        Every rand saved is a rand that can work toward your future. These identified opportunities represent 
+        concrete steps you can take to free up money for emergency funds, investments, or achieving your dreams. 
+        Small changes can lead to significant financial transformation.
+        """
+        story.append(Paragraph(savings_desc, self.description_style))
+        
         if 'cost_cutting_opportunities' in report_data:
-            story.append(Paragraph("💡 Savings Opportunities", self.heading_style))
             opportunities = report_data['cost_cutting_opportunities']
             
             total_savings = sum(opp.get('potential_savings', 0) for opp in opportunities)
-            story.append(Paragraph(f"<b>Total Potential Monthly Savings: R {total_savings:,.2f}</b>", self.highlight_style))
-            story.append(Spacer(1, 10))
+            story.append(Paragraph(f"<b>🎯 Total Monthly Savings Potential: R {total_savings:,.2f}</b>", self.highlight_style))
+            story.append(Spacer(1, 15))
             
             for i, opp in enumerate(opportunities, 1):
-                priority_color = colors.red if opp.get('priority') == 'High' else SISONOVA_ACCENT if opp.get('priority') == 'Medium' else SISONOVA_GREEN
+                priority_color = AFRICAN_RUST if opp.get('priority') == 'High' else AFRICAN_GOLD if opp.get('priority') == 'Medium' else AFRICAN_SAGE
                 
                 opp_text = f"""
                 <b>{i}. {opp.get('category', 'Unknown Category')}</b> 
-                <font color="{priority_color}">({opp.get('priority', 'Medium')} Priority)</font><br/>
-                💰 <b>Potential Savings:</b> R {opp.get('potential_savings', 0):,.2f}/month<br/>
-                📋 <b>Action:</b> {opp.get('recommendation', 'No recommendation')}<br/>
+                <font color="{priority_color}"><b>({opp.get('priority', 'Medium')} Priority)</b></font><br/>
+                💰 <b>Monthly Savings Potential:</b> R {opp.get('potential_savings', 0):,.2f}<br/>
+                📋 <b>Recommended Action:</b> {opp.get('recommendation', 'No recommendation')}<br/>
                 """
                 story.append(Paragraph(opp_text, self.body_style))
-                story.append(Spacer(1, 10))
+                story.append(Spacer(1, 12))
         
-        # Spending Patterns Analysis
+        # PAGE 5: Spending Patterns
+        story.append(PageBreak())
+        story.append(Paragraph("📈 Spending Patterns", self.heading_style))
+        
+        patterns_desc = """
+        Your spending patterns reveal the rhythm of your financial life. Understanding when and how you spend 
+        helps you make conscious choices about your money and develop strategies that align with your natural 
+        habits while supporting your financial goals.
+        """
+        story.append(Paragraph(patterns_desc, self.description_style))
+        
         if 'spending_patterns' in report_data:
-            story.append(Paragraph("📈 Spending Patterns", self.heading_style))
             patterns = report_data['spending_patterns']
             
-            pattern_text = f"""
-            <b>Peak Spending Day:</b> {patterns.get('peak_spending_day', 'Unknown')}<br/>
-            <b>Spending Frequency:</b> {patterns.get('spending_frequency', 0):.1f} transactions per day<br/>
-            """
+            # Create a beautiful patterns summary table
+            patterns_data = [
+                ['Pattern Type', 'Details', 'Insight'],
+                ['Peak Spending Day', patterns.get('peak_spending_day', 'Unknown'), 'Plan extra carefully on this day'],
+                ['Daily Frequency', f"{patterns.get('spending_frequency', 0):.1f} transactions/day", 'Your spending rhythm'],
+            ]
             
             # Month part analysis
             month_parts = patterns.get('month_part_spending', {})
             if month_parts:
-                pattern_text += f"""
-                <b>Monthly Pattern:</b><br/>
-                • Beginning of month: R {month_parts.get('Beginning', 0):,.0f}<br/>
-                • Middle of month: R {month_parts.get('Middle', 0):,.0f}<br/>
-                • End of month: R {month_parts.get('End', 0):,.0f}<br/>
-                """
+                beginning = month_parts.get('Beginning', 0)
+                middle = month_parts.get('Middle', 0)
+                end = month_parts.get('End', 0)
+                
+                patterns_data.extend([
+                    ['Early Month', f"R {beginning:,.0f}", 'Start of month spending'],
+                    ['Mid Month', f"R {middle:,.0f}", 'Middle of month spending'],
+                    ['Late Month', f"R {end:,.0f}", 'End of month spending']
+                ])
             
-            story.append(Paragraph(pattern_text, self.body_style))
-            story.append(Spacer(1, 15))
+            patterns_table = Table(patterns_data, colWidths=[40*mm, 40*mm, 60*mm])
+            patterns_table.setStyle(self._get_african_patterns_table_style())
+            story.append(patterns_table)
         
-        # Actionable Recommendations
+        # PAGE 6: Action Plan
+        story.append(PageBreak())
+        story.append(Paragraph("🎯 Your Personal Action Plan", self.heading_style))
+        
+        action_desc = """
+        Knowledge without action is just information. This personalized action plan provides specific, 
+        achievable steps tailored to your unique financial situation. Each recommendation is designed 
+        to move you closer to financial freedom and prosperity.
+        """
+        story.append(Paragraph(action_desc, self.description_style))
+        
         if 'recommendations' in report_data:
-            story.append(Paragraph("🎯 Your Action Plan", self.heading_style))
+            story.append(Paragraph("🚀 Immediate Actions You Can Take:", self.subheading_style))
             for i, rec in enumerate(report_data['recommendations'], 1):
-                story.append(Paragraph(f"{i}. {rec}", self.body_style))
-            story.append(Spacer(1, 20))
+                action_text = f"<b>Step {i}:</b> {rec}"
+                story.append(Paragraph(action_text, self.body_style))
+                story.append(Spacer(1, 8))
+        
+        # Motivational closing
+        story.append(Spacer(1, 20))
+        motivation_text = """
+        <b>Remember:</b> Every financial journey begins with a single step. You've already taken the most 
+        important step by tracking and analyzing your expenses. Stay committed to your goals, celebrate 
+        small wins, and remember that building wealth is a marathon, not a sprint. Your future self will 
+        thank you for the decisions you make today.
+        """
+        story.append(Paragraph(motivation_text, self.highlight_style))
         
         return story
     
-    def _create_summary_box(self, summary: Dict[str, Any], report_type: str) -> Table:
-        """Create an attractive summary box"""
+    def _create_african_summary_box(self, summary: Dict[str, Any], report_type: str) -> Table:
+        """Create an attractive African-themed summary box"""
         if report_type == 'expense':
             total = summary.get('total_expenses', 0)
             daily = summary.get('average_daily_spending', 0)
@@ -444,59 +554,84 @@ class FinancialReportPDF:
             status = "Unknown"
         
         summary_data = [
-            [f'Total: R {total:,.2f}', f'Daily Avg: R {daily:,.2f}', f'Status: {status}']
+            ['📊 Total Expenses', '📅 Daily Average', '🎯 Financial Status'],
+            [f'R {total:,.2f}', f'R {daily:,.2f}', status]
         ]
         
         summary_table = Table(summary_data, colWidths=[50*mm, 50*mm, 50*mm])
         summary_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, -1), SISONOVA_LIGHT_BLUE),
-            ('TEXTCOLOR', (0, 0), (-1, -1), SISONOVA_BLUE),
+            ('BACKGROUND', (0, 0), (-1, 0), AFRICAN_SUNSET),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('BACKGROUND', (0, 1), (-1, 1), AFRICAN_LIGHT_GOLD),
+            ('TEXTCOLOR', (0, 1), (-1, 1), AFRICAN_EARTH),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 12),
-            ('PADDING', (0, 0), (-1, -1), 12),
-            ('GRID', (0, 0), (-1, -1), 1, SISONOVA_BLUE)
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 1), (-1, 1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
+            ('FONTSIZE', (0, 1), (-1, 1), 14),
+            ('PADDING', (0, 0), (-1, -1), 15),
+            ('GRID', (0, 0), (-1, -1), 2, AFRICAN_EARTH),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
         ]))
         
         return summary_table
     
-    def _get_modern_table_style(self) -> TableStyle:
-        """Modern, clean table styling"""
+    def _get_african_table_style(self) -> TableStyle:
+        """African-inspired table styling"""
         return TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), SISONOVA_BLUE),
+            ('BACKGROUND', (0, 0), (-1, 0), AFRICAN_SUNSET),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
             ('TOPPADDING', (0, 0), (-1, 0), 12),
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-            ('TEXTCOLOR', (0, 1), (-1, -1), SISONOVA_DARK_GRAY),
+            ('TEXTCOLOR', (0, 1), (-1, -1), AFRICAN_DEEP_EARTH),
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 9),
-            ('PADDING', (0, 1), (-1, -1), 8),
-            ('GRID', (0, 0), (-1, -1), 0.5, SISONOVA_GRAY),
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, SISONOVA_LIGHT_BLUE])
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('PADDING', (0, 1), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 1, AFRICAN_CLAY),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, AFRICAN_CREAM])
         ])
     
-    def _get_category_table_style(self) -> TableStyle:
-        """Category-specific table styling with color coding"""
+    def _get_african_category_table_style(self) -> TableStyle:
+        """Category-specific African table styling"""
         return TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), SISONOVA_GREEN),
+            ('BACKGROUND', (0, 0), (-1, 0), AFRICAN_EARTH),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),  # Right align numbers
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
             ('TOPPADDING', (0, 0), (-1, 0), 12),
             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-            ('TEXTCOLOR', (0, 1), (-1, -1), SISONOVA_DARK_GRAY),
+            ('TEXTCOLOR', (0, 1), (-1, -1), AFRICAN_DEEP_EARTH),
             ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 9),
-            ('PADDING', (0, 1), (-1, -1), 8),
-            ('GRID', (0, 0), (-1, -1), 0.5, SISONOVA_GRAY),
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, SISONOVA_LIGHT_GREEN])
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('PADDING', (0, 1), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 1, AFRICAN_CLAY),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, AFRICAN_LIGHT_SAGE])
+        ])
+    
+    def _get_african_patterns_table_style(self) -> TableStyle:
+        """Patterns-specific African table styling"""
+        return TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), AFRICAN_GOLD),
+            ('TEXTCOLOR', (0, 0), (-1, 0), AFRICAN_DEEP_EARTH),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('TOPPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('TEXTCOLOR', (0, 1), (-1, -1), AFRICAN_DEEP_EARTH),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('PADDING', (0, 1), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 1, AFRICAN_CLAY),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, AFRICAN_LIGHT_GOLD])
         ])
     
     def _get_expense_insight(self, amount: float) -> str:
