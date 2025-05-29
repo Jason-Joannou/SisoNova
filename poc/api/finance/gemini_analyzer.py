@@ -191,14 +191,40 @@ class PersonalizedGeminiAnalyzer:
     """
         
         if report_type == "expenses":
+            top_3_cats = data_summary.get('top_3_categories', [])
+            cost_cutting_opps = data_summary.get('cost_cutting_opportunities', [])
+            emotional_triggers = data_summary.get('emotional_spending_triggers', {})
             specific_prompt = f"""
     EXPENSE ANALYSIS FOCUS:
-    - This user spends R{data_summary.get('total_expenses', 0):,.2f} total
+    - This user spends R{data_summary.get('total_expenses', 0):,.2f} total over 6 months
     - Their daily average is R{data_summary.get('daily_average', 0):.2f}
-    - Top spending category: {data_summary.get('top_category', 'Unknown')}
-    - Essential expenses: {data_summary.get('essential_percentage', 0)}% of total
+    - Transaction count: {data_summary.get('transaction_count', 0)} (avg R{data_summary.get('average_transaction_size', 0):.2f} per transaction)
+    - Top spending category: {data_summary.get('top_spending_category', 'Unknown')}
+    - Most frequent category: {data_summary.get('most_frequent_category', 'Unknown')}
+    - Essential expenses: {data_summary.get('essential_percentage', 0):.1f}% of total
     - Peak spending day: {data_summary.get('peak_spending_day', 'Unknown')}
-    - Potential savings identified: R{data_summary.get('cost_cutting_potential', 0):.2f}
+    - Weekend vs weekday spending ratio: {data_summary.get('weekend_vs_weekday_ratio', 0):.2f}
+
+    CATEGORY BREAKDOWN:
+    - Top 3 categories: {[f"{cat[0]} (R{cat[1].get('total', 0):,.0f})" for cat in top_3_cats[:3]]}
+    - Category count: {data_summary.get('category_count', 0)} different spending categories
+
+    SPENDING PATTERNS:
+    - Month spending: Beginning R{data_summary.get('month_part_spending', {}).get('Beginning', 0):,.0f}, Middle R{data_summary.get('month_part_spending', {}).get('Middle', 0):,.0f}, End R{data_summary.get('month_part_spending', {}).get('End', 0):,.0f}
+    - Weekend spending: R{data_summary.get('weekend_spending', 0):,.2f}
+    - Weekday spending: R{data_summary.get('weekday_spending', 0):,.2f}
+    - Spending frequency: {data_summary.get('spending_frequency', 0):.2f} transactions per day
+
+    BEHAVIORAL INSIGHTS:
+    - Largest expense: R{data_summary.get('largest_expense', {}).get('amount', 0):,.2f} on {data_summary.get('largest_expense', {}).get('type', 'Unknown')}
+    - Smallest expense: R{data_summary.get('smallest_expense', {}).get('amount', 0):,.2f} on {data_summary.get('smallest_expense', {}).get('type', 'Unknown')}
+    - Emotional spending triggers: {list(emotional_triggers.keys()) if emotional_triggers else 'None recorded'}
+
+    COST-CUTTING OPPORTUNITIES:
+    - Total potential savings identified: R{data_summary.get('total_potential_savings', 0):,.2f}
+    - High-priority savings opportunities: {len(data_summary.get('high_priority_savings', []))} categories
+    - Monthly savings potential: R{data_summary.get('total_potential_savings', 0)/6:,.2f}
+    - Specific opportunities: {[f"{opp.get('category', 'Unknown')} (save R{opp.get('potential_savings', 0):,.0f})" for opp in cost_cutting_opps[:3]]}
 
     Provide your analysis in exactly this format:
 
@@ -211,12 +237,12 @@ class PersonalizedGeminiAnalyzer:
     • [Third concern from their patterns]
 
     **TOP 3 OPPORTUNITIES** (bullet points, 1 line each):
-    • [Specific opportunity based on their R{data_summary.get('cost_cutting_potential', 0):.2f} savings potential]
+    • [Specific opportunity based on their R{data_summary.get('total_potential_savings', 0):,.2f} savings potential]
     • [Another opportunity from their spending patterns]
     • [Third opportunity for improvement]
 
     **IMMEDIATE ACTION STEPS** (numbered list, 1-2 lines each):
-    1. [Specific action based on their {data_summary.get('top_category', 'Unknown')} spending]
+    1. [Specific action based on their {data_summary.get('top_spending_category', 'Unknown')} spending]
     2. [Action related to their R{data_summary.get('daily_average', 0):.2f} daily spending]
     3. [Action for their {data_summary.get('peak_spending_day', 'Unknown')} peak spending]
 
