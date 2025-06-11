@@ -171,6 +171,57 @@ sisonova_personal_expense_template:
     - 3
     - 4
 
+sisonova_personal_record_expense_template:
+  template_error_message: |
+    That is an invalid expense format. 
+
+    Please use this format:
+    Category - Amount - Feeling - Date (optional)
+
+    *Valid Feelings:*
+    Struggling, Worried, Coping, Okay, Fine, Good, Great
+
+    *Examples:*
+    • Rent-1000-Worried-2023/08/01
+    • Groceries-50-Good
+    • Transport-25-Okay
+
+    For multiple expenses, put each on a new line.
+    For dates, use "/" separator (YYYY/MM/DD)
+
+    *When finished, type:* 1
+
+  template_message: |
+    📝 *Expense Recording*
+
+    Record your expenses using this format:
+
+    Category - Amount - Feeling - Date (optional)
+
+    **Valid Feelings:**
+    Struggling, Worried, Coping, Okay, Fine, Good, Great
+
+    *Examples:*
+
+    • Rent-1000-Worried-2023/08/01
+    • Groceries-50-Good
+    • Transport-25-Okay
+
+    For multiple expenses, put each on a new line.
+    For dates, use "/" separator (YYYY/MM/DD)
+
+    *When you're finished recording expenses:*
+
+    1. Stop Recording Expenses
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "sisonova_personal_template"
+
+  error_message:
+    - "Invalid expense format"
+
 registration_no_template:
   template_error_message: |
     That is not a valid option.
