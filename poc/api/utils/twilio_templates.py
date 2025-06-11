@@ -5,7 +5,7 @@ from api.db.query_manager import AsyncQueries
 from api.finance.report import PersonalizedReportDispatcher
 from api.utils.language_config import load_language_config, get_template_validation
 from api.utils.twiml_responses import generate_twiml_message
-from api.utils.template_actions import generate_expense_report, record_expense_inputs_to_db
+from api.utils.template_actions import generate_expense_report, record_expense_inputs_to_db, record_income_inputs_to_db
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -106,6 +106,8 @@ class TwilioTemplateManager:
         try:
             if input_handler == "expense_recording":
                 return await record_expense_inputs_to_db(user_input=self.user_response, user_object=self.user_object, query_manager=self.query_manager)
+            elif input_handler == "income_recording":
+                return await record_income_inputs_to_db(user_input=self.user_response, user_object=self.user_object, query_manager=self.query_manager)
             else:
                 return {"error": f"No handler implemented for template: {input_handler}"}
             
