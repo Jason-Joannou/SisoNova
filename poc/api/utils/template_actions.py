@@ -304,5 +304,38 @@ async def record_expense_inputs_to_db(user_input: str, user_object: User, query_
             "error": True,
             "messages": [{"body": "Sorry, there was an error processing your input. Please try again later."}]
         }
-
     
+async def record_income_inputs_to_db(user_input: str, user_object: User, query_manager: AsyncQueries) -> Dict[str, Any]:
+    """Record user input to the database for income recording"""
+    user_id = user_object.id
+
+    input_text = user_input.strip()
+    incomes = []
+
+    try:
+        input_lines = [line.strip() for line in input_text.split('\n') if line.strip()]
+        for line in input_lines:
+            parts = line.split('-')
+            if len(parts) >= 3:
+                income_type = parts[0].strip()
+                income_amount_str = parts[1].strip()
+                income_feeling = parts[2].strip()
+                income_date_str = parts[3].strip() if len(parts) > 3 else datetime.now().strftime("%Y/%m/%d")
+                income_date = datetime.strptime(income_date_str, "%Y/%m/%d").date()
+                income_amount = float(income_amount_str)
+
+                income = UnverifiedIncomes(user_id=user_id, income_type=income_type, income_feeling=income_feeling, income_amount=income_amount, income_date=income_date)
+                incomes.append(income)
+
+        await query_manager.insert_user_unverified_incomes(user_id=user_id, incomes=incomes)
+        return {
+            "error": False,
+            "messages": [{"body": "Incomes recorded successfully!"}]
+        }
+
+    except Exception as e:
+        print(f"ERROR processing user input: {str(e)}")
+        return {
+            "error": True,
+            "messages": [{"body": "Sorry, there was an error processing your input. Please try again later."}]
+        }
