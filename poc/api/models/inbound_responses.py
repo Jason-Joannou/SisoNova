@@ -59,7 +59,7 @@ class NumberedMenuValidator(BaseValidator):
         return input_value.strip() in valid_options
     
 
-class ExpenseRecordingValidator(BaseValidator):
+class IncomeExpenseRecordingValidator(BaseValidator):
     input_text: str
 
     @field_validator("input_text", mode="before")
@@ -70,10 +70,10 @@ class ExpenseRecordingValidator(BaseValidator):
     @classmethod
     def validate_input(cls, input_value: str) -> bool:
         """
-        Validate expense recording input
+        Validate expense/income recording input
         Returns True if:
         1. Input is "1" (stop recording)
-        2. Input contains valid expense format(s)
+        2. Input contains valid expense/income format(s)
         """
         input_text = input_value.strip()
         
@@ -90,22 +90,22 @@ class ExpenseRecordingValidator(BaseValidator):
             if len(parts) < 3:
                 return False  # Invalid format
             
-            expense_type = parts[0]
-            expense_amount_str = parts[1]
-            expense_feeling = parts[2]
+            type = parts[0]
+            amount_str = parts[1]
+            feeling = parts[2]
 
-            if not expense_type:
+            if not type:
                 return False
             
             try:
-                amount = float(expense_amount_str.strip())
+                amount = float(amount_str.strip())
                 if amount <= 0:
                     return False
             except ValueError:
                 return False
             
             # Feeling should not be empty
-            if not expense_feeling:
+            if not feeling:
                 return False
             
             valid_feelings = [
@@ -118,19 +118,19 @@ class ExpenseRecordingValidator(BaseValidator):
                 "Great"
             ]
             
-            if expense_feeling not in valid_feelings:
+            if feeling not in valid_feelings:
                 return False
             
 
             if len(parts) >= 4:
-                expense_date_str = parts[3].strip()
-                if expense_date_str:  # Only validate if date is provided
-                    if '/' not in expense_date_str:
+                date_str = parts[3].strip()
+                if date_str:  # Only validate if date is provided
+                    if '/' not in date_str:
                         return False  # Date must use "/" separator
                     
                     date_format = '%Y/%m/%d'
                     try:
-                        datetime.strptime(expense_date_str, date_format)
+                        datetime.strptime(date_str, date_format)
                     except ValueError:
                         return False  # No valid date format found
                     
