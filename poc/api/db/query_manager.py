@@ -109,6 +109,13 @@ class AsyncQueries:
             update(LanguagePreference).where(LanguagePreference.user_id == user_id).values(preferred_language=new_language)
         )
         await self.session.commit()
+
+    # Insert Methods
+
+    async def insert_user_unverified_expenses(self, user_id: int, expenses: list[UnverifiedExpenses]) -> None:
+        """Insert unverified expenses for a user."""
+        self.session.add_all(expenses)
+        await self.session.commit()
     
 
     # Object related methods
