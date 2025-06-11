@@ -269,3 +269,40 @@ async def generate_expense_report(report_dispatcher: PersonalizedReportDispatche
             "error": True,
             "messages": [{"body": "Sorry, there was an error generating your expense report. Please try again later."}]
         }
+    
+async def record_expense_inputs_to_db(user_input: str, user_object: User, query_manager: AsyncQueries) -> Dict[str, Any]:
+    """Record user input to the database for expense recording"""
+    user_id = user_object.id
+
+    input_text = user_input.strip()
+    expenses = []
+
+    try:
+        input_lines = [line.strip() for line in input_text.split('\n') if line.strip()]
+        for line in input_lines:
+            parts = line.split('-')
+            if len(parts) >= 3:
+                expense_type = parts[0].strip()
+                expense_amount_str = parts[1].strip()
+                expense_feeling = parts[2].strip()
+                expense_date_str = parts[3].strip() if len(parts) > 3 else datetime.now().strftime("%Y/%m/%d")
+                expense_date = datetime.strptime(expense_date_str, "%Y/%m/%d").date()
+                expense_amount = float(expense_amount_str)
+
+                expense = UnverifiedExpenses(user_id=user_id, expense_type=expense_type, expense_amount=expense_amount, expense_feeling=expense_feeling, expense_date=expense_date)
+                expenses.append(expense)
+
+        await query_manager.insert_user_unverified_expenses(user_id=user_id, expenses=expenses)
+        return {
+            "error": False,
+            "messages": [{"body": "Expenses recorded successfully!"}]
+        }
+
+    except Exception as e:
+        print(f"ERROR processing user input: {str(e)}")
+        return {
+            "error": True,
+            "messages": [{"body": "Sorry, there was an error processing your input. Please try again later."}]
+        }
+
+    
