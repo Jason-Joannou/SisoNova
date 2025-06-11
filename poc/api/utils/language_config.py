@@ -1,6 +1,6 @@
 import yaml
 from pathlib import Path
-from api.models.inbound_responses import LanguageSelector, YesNoValidator, NumberedMenuValidator, ExpenseRecordingValidator
+from api.models.inbound_responses import LanguageSelector, YesNoValidator, NumberedMenuValidator, IncomeExpenseRecordingValidator
 from api.models.responses import TemplateValidation
 
 def load_language_config(path: str = "./api/translations") -> dict:
@@ -32,8 +32,14 @@ def get_template_validation(template_name: str) -> TemplateValidation:
         "sisonova_personal_expense_template": {
             "inbound_validator": NumberedMenuValidator,
         },
+        "sisonova_personal_income_template": {
+            "inbound_validator": NumberedMenuValidator,
+        },
         "sisonova_personal_record_expense_template":{
-            "inbound_validator": ExpenseRecordingValidator
+            "inbound_validator": IncomeExpenseRecordingValidator
+        },
+        "sisonova_personal_record_income_template":{
+            "inbound_validator": IncomeExpenseRecordingValidator
         }
 
     }
