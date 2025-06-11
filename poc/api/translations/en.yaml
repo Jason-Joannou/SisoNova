@@ -250,3 +250,92 @@ registration_no_template:
 
   error_message:
     - "1"
+
+sisonova_personal_income_template:
+  template_error_message: |
+    That is not a valid option.
+
+    The valid options are:
+
+    {error_message}
+
+    Please enter a valid option again.
+    
+  template_message: |
+    Income is the foundation of your financial well-being. Tracking and optimizing your sources of income is crucial for growth and stability.
+    How would you like to engage with your income?
+
+    1. Record Income
+    2. Income Report
+    3. Back
+    4. Home
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "sisonova_personal_record_income_template"
+    "3": "sisonova_personal_template"
+    "4": "registered_user_template"
+
+  actions:
+    "2": "generate_income_report"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+
+sisonova_personal_record_income_template:
+  template_error_message: |
+    That is an invalid income format. 
+
+    Please use this format:
+    Source - Amount - Feeling - Date (optional)
+
+    *Valid Feelings:*
+    Struggling, Worried, Coping, Okay, Fine, Good, Great
+
+    *Examples:*
+    • Salary-3000-Great-2023/08/01
+    • Freelance-500-Good
+    • Gift-100-Okay
+
+    For multiple incomes, put each on a new line.
+    For dates, use "/" separator (YYYY/MM/DD)
+
+    *When finished, type:* 1
+
+  template_message: |
+    💰 *Income Recording*
+
+    Record your income using this format:
+
+    Source - Amount - Feeling - Date (optional)
+
+    *Valid Feelings:*
+    Struggling, Worried, Coping, Okay, Fine, Good, Great
+
+    *Examples:*
+
+    • Salary-3000-Great-2023/08/01
+    • Freelance-500-Good
+    • Gift-100-Okay
+
+    For multiple incomes, put each on a new line.
+    For dates, use "/" separator (YYYY/MM/DD)
+
+    *When you're finished recording income:*
+
+    1. Stop Recording Income
+
+  previous_template: registered_user_template
+  continuous_template: True
+  input_handler: "income_recording"
+
+  response_routing:
+    "1": "sisonova_personal_template"
+
+  error_message:
+    - "Invalid income format"
+
