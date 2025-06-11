@@ -42,6 +42,7 @@ async def twilio_webhook(form_data: dict = Depends(validate_twilio_request)):
             template_manager = TwilioTemplateManager(
                 user_exists=False,
                 user_response=message_body,
+                query_manager=query_manager,
                 current_template=None,
                 language=None,
                 has_started=False  # New users haven't started
@@ -92,6 +93,7 @@ async def twilio_webhook(form_data: dict = Depends(validate_twilio_request)):
             user_exists=True,
             user_response=message_body,
             current_template=user_message_state.current_state,
+            query_manager=query_manager,
             language=language_preference.preferred_language,
             has_started=user_message_state.has_started
         )
@@ -139,6 +141,7 @@ async def twilio_webhook_poc(form_data: dict = Depends(validate_twilio_request))
                 user_exists=False,
                 user_response=message_body,
                 current_template=None,
+                query_manager=query_manager,
                 language=None,
                 has_started=False  # New users haven't started
             )
@@ -211,6 +214,7 @@ async def twilio_webhook_poc(form_data: dict = Depends(validate_twilio_request))
             user_response=message_body,
             current_template=user_message_state.current_state,
             language=language_preference.preferred_language,
+            query_manager=query_manager,
             has_started=user_message_state.has_started,
             user_object=user
         )
