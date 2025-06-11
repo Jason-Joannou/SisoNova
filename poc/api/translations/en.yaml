@@ -158,7 +158,7 @@ sisonova_personal_expense_template:
   previous_template: registered_user_template
 
   response_routing:
-    "1": "record_expenses_template"
+    "1": "sisonova_personal_record_expense_template"
     "3": "sisonova_personal_template"
     "4": "registered_user_template"
 
@@ -198,7 +198,7 @@ sisonova_personal_record_expense_template:
 
     Category - Amount - Feeling - Date (optional)
 
-    **Valid Feelings:**
+    *Valid Feelings:*
     Struggling, Worried, Coping, Okay, Fine, Good, Great
 
     *Examples:*
@@ -215,6 +215,8 @@ sisonova_personal_record_expense_template:
     1. Stop Recording Expenses
 
   previous_template: registered_user_template
+  continuous_template: True
+  input_handler: "expense_recording"
 
   response_routing:
     "1": "sisonova_personal_template"
