@@ -1,10 +1,11 @@
 from typing import Optional, Dict, Any, Tuple, List
 import os
 from api.db.models.tables import User
+from api.db.query_manager import AsyncQueries
 from api.finance.report import PersonalizedReportDispatcher
 from api.utils.language_config import load_language_config, get_template_validation
 from api.utils.twiml_responses import generate_twiml_message
-from api.utils.template_actions import generate_expense_report
+from api.utils.template_actions import generate_expense_report, record_expense_inputs_to_db
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,7 +13,7 @@ load_dotenv()
 
 class TwilioTemplateManager:
 
-    def __init__(self, user_exists: bool, user_response: str, current_template: Optional[str] = None, language: Optional[str] = None, has_started: bool = False, user_object: Optional[User] = None) -> None:
+    def __init__(self, user_exists: bool, user_response: str, query_manager: AsyncQueries,current_template: Optional[str] = None, language: Optional[str] = None, has_started: bool = False, user_object: Optional[User] = None) -> None:
         self.user_exists = user_exists
         self.has_started = has_started
         self.user_response = user_response
@@ -22,6 +23,7 @@ class TwilioTemplateManager:
         self.selected_language = None
         self.selected_option = None
         self.action_result = None
+        self.query_manager = query_manager
         self.preferred_language = self._language_selection_mapping(language=language)
         self.templates = {}
         self._set_message_template(template_name=self.current_template_name)
@@ -59,7 +61,7 @@ class TwilioTemplateManager:
                 if self.current_template_name == "unregistered_number_language_selector_template":
                     self.selected_language = self.user_response.strip().title()
                 else:
-                    self.selected_option = self.user_response.strip().lower()
+                    self.selected_option = self.user_response.strip()
 
             return is_valid
         except (ValueError, AttributeError) as e:
@@ -75,6 +77,9 @@ class TwilioTemplateManager:
         """Check if the selected option is a routing event"""
         response_routing = self.templates.get("response_routing", {})
         return self.selected_option in response_routing
+    
+    def _is_continuous_template(self) -> bool:
+        return self.templates.get("continuous_template", False)
 
     def _get_next_template_from_routing(self) -> Optional[str]:
         """Get the next template based on response_routing configuration."""
@@ -90,6 +95,23 @@ class TwilioTemplateManager:
     def _build_twiml_messages(self, messages: List[Dict[str, str]]) -> str:
         """Build TwiML from message list using existing function"""
         return generate_twiml_message(messages)
+    
+    async def _handle_continuous_input_templates(self) -> Dict[str, Any]:
+        """Handle continuous input templates"""
+        input_handler = self.templates.get("input_handler", None)
+
+        if not input_handler:
+            return {"error": "No input handler defined for this template"}
+        
+        try:
+            if input_handler == "expense_recording":
+                return await record_expense_inputs_to_db(user_input=self.user_response, user_object=self.user_object, query_manager=self.query_manager)
+            else:
+                return {"error": f"No handler implemented for template: {input_handler}"}
+            
+        except Exception as e:
+            print(f"ERROR executing input handler: {str(e)}")
+            return {"error": f"Failed to execute input handler: {str(e)}"}
     
     async def _execute_action(self) -> Dict[str, Any]:
         """Execute the actual async Python methods for actions"""
@@ -198,6 +220,20 @@ class TwilioTemplateManager:
                     next_template = self.current_template_name
                 
                 twiml_message = self._build_twiml_messages([{"body": message}])
+                return next_template, previous_template, twiml_message
+            
+            elif self._is_continuous_template():
+                cont_result = await self._handle_continuous_input_templates()
+                print(cont_result)
+                if cont_result["error"]:
+                    twiml_message = self._build_twiml_messages(cont_result["messages"])
+                    return self.current_template_name, None, twiml_message
+                
+                # Action succeeded - build complete TwiML with media
+                twiml_message = self._build_twiml_messages(cont_result["messages"])
+                
+                next_template = self.current_template_name
+                previous_template = self.templates.get("previous_template")
                 return next_template, previous_template, twiml_message
         
         # Error case
