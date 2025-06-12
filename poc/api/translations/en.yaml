@@ -339,3 +339,93 @@ sisonova_personal_record_income_template:
   error_message:
     - "Invalid income format"
 
+sisonova_personal_feeling_template:
+  template_error_message: |
+    That is not a valid option.
+
+    The valid options are:
+
+    {error_message}
+
+    Please try enter the option again.
+  template_message: |
+    Your financial feelings provide important insight into how you're experiencing your financial journey. Tracking them over time can help you identify patterns and make better decisions.
+
+    How would you like to engage with your financial feelings?
+
+    1. Record Financial Feelings
+    2. Feeling Report
+    3. Back
+    4. Home
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "sisonova_personal_record_feeling_template"
+    "3": "sisonova_personal_template"
+    "4": "registered_user_template"
+
+  actions:
+    "2": "generate_feeling_report"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+
+sisonova_personal_record_feeling_template:
+  template_error_message: |
+    That is an invalid financial feeling format.
+
+    Please use this format:
+    Feeling - Date (optional)
+
+    *Valid Feelings:*
+    Struggling, Worried, Coping, Okay, Fine, Good, Great
+
+    *Examples:*
+    • Worried-2023/08/01
+    • Good
+    • Okay-2025/06/11
+
+    For multiple entries:
+    → Put each on a new line  
+    → Include a date for each one
+
+    For dates, use "/" separator (YYYY/MM/DD)
+
+    *When finished, type:* 1
+
+  template_message: |
+    🧠 *Financial Feeling Recording*
+
+    Reflect on how you're feeling about your finances and record it using this format:
+
+    Feeling - Date (optional)
+
+    *Valid Feelings:*
+    Struggling, Worried, Coping, Okay, Fine, Good, Great
+
+    *Examples:*
+    • Worried-2023/08/01
+    • Good
+    • Okay-2025/06/11
+
+    🟡 *If you're sending more than one feeling (multiple lines), make sure each one includes a date.*
+
+    For dates, use "/" separator (YYYY/MM/DD)
+
+    *When you're finished recording feelings:*
+    
+    1. Stop Recording Feelings
+
+  previous_template: registered_user_template
+  continuous_template: True
+  input_handler: "feeling_recording"
+
+  response_routing:
+    "1": "sisonova_personal_template"
+
+  error_message:
+    - "Invalid financial feeling format"
