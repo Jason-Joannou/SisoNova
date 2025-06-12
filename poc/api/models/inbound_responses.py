@@ -136,7 +136,104 @@ class IncomeExpenseRecordingValidator(BaseValidator):
                     
 
         return True
+    
+class FinancialFeelingRecordingValidator(BaseValidator):
+    input_text: str
+
+    @field_validator("input_text", mode="before")
+    @classmethod
+    def normalize_input(cls, v: str) -> str:
+        return v.strip()
+    
+    @classmethod
+    def validate_input(cls, input_value: str) -> bool:
+        """
+        Validate expense/income recording input
+        Returns True if:
+        1. Input is "1" (stop recording)
+        2. Input contains valid financial feeling format(s)
+        """
+        input_text = input_value.strip()
+        
+        # Allow "1" to stop recording
+        if input_text == "1":
+            return True
+        
+        lines = [line.strip() for line in input_text.split('\n') if line.strip()]
+
+        if len(lines) == 1:
+            # Just need to check the format of what they entered
+            parts = [part.strip() for part in lines[0].split('-')]
+            
+            financial_feeling = parts[0]
+            date_str = parts[1] if len(parts) >= 2 else None
+
+            if not financial_feeling:
+                return False
+            
+            valid_feelings = [
+                "Struggling",
+                "Worried",
+                "Coping",
+                "Okay",
+                "Fine",
+                "Good",
+                "Great"
+            ]
+            
+            if financial_feeling not in valid_feelings:
+                return False
+            
+            if date_str and '/' not in date_str:
+                return False  # Date must use "/" separator
+            
+            if date_str:
+                date_format = '%Y/%m/%d'
+                try:
+                    datetime.strptime(date_str, date_format)
+                except ValueError:
+                    return False  # No valid date format found
+
+        # If multiple lines, we have to enforce a date for each line to be able to differentiate.
+
+        for line in lines:
+            
+            # Check if line has at least the basic format: something - something
+            parts = [part.strip() for part in line.split('-')]
+            if len(parts) == 1:
+                return False  # Invalid format
+            
+            financial_feeling = parts[0]
+            date_str = parts[1]
+
+            if not financial_feeling:
+                return False
+            
+            valid_feelings = [
+                "Struggling",
+                "Worried",
+                "Coping",
+                "Okay",
+                "Fine",
+                "Good",
+                "Great"
+            ]
+            
+            if financial_feeling not in valid_feelings:
+                return False
+            
+            if '/' not in date_str:
+                return False  # Date must use "/" separator
+            
+            if date_str:
+                date_format = '%Y/%m/%d'
+                try:
+                    datetime.strptime(date_str, date_format)
+                except ValueError:
+                    return False  # No valid date format found
                     
+
+        return True 
             
 
                     
