@@ -67,7 +67,7 @@ class SisoNovaAgent:
                 parameters=Schema(
                     type=Type.OBJECT,
                     properties={
-                        "feeling": Schema(type=Type.STRING, description="The financial feeling"),
+                        "feeling": Schema(type=Type.STRING, description="The financial feeling", enum=["Struggling","Worried","Coping","Okay","Fine","Good","Great"]),
                         "context": Schema(type=Type.STRING, description="Context or reason for the feeling")
                     },
                     required=["feeling"]
