@@ -95,6 +95,7 @@ class FinancialFeelings(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
     feeling = Column(String, nullable=False)
+    reason = Column(String, nullable=True)
     feeling_date = Column(DateTime, default=datetime.utcnow())
 
 
