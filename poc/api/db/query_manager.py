@@ -1,7 +1,8 @@
 from api.db.models.tables import User, LanguagePreference, MessageState, UnverifiedExpenses, UnverifiedIncomes, FinancialFeelings
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
-from datetime import datetime
+from sqlalchemy import select, update, func, desc
+from datetime import datetime, timedelta
+from typing import Dict, Optional
 
 class AsyncQueries:
 
@@ -80,6 +81,57 @@ class AsyncQueries:
         )
         return result.scalars().all()
     
+    async def get_user_financial_context(self, user_id: str, period_days: Optional[int] = 30) -> Dict:
+        cutoff_date = datetime.utcnow() - timedelta(days=period_days)
+
+        # Total expenses and count
+        expense_stmt = select(
+            func.coalesce(func.sum(UnverifiedExpenses.expense_amount), 0),
+            func.count(UnverifiedExpenses.id)
+        ).where(
+            UnverifiedExpenses.user_id == user_id,
+            UnverifiedExpenses.expense_date >= cutoff_date
+        )
+        expense_result = await self.session.execute(expense_stmt)
+        total_expenses, expense_count = expense_result.fetchone()
+
+        # Total income and count
+        income_stmt = select(
+            func.coalesce(func.sum(UnverifiedIncomes.income_amount), 0),
+            func.count(UnverifiedIncomes.id)
+        ).where(
+            UnverifiedIncomes.user_id == user_id,
+            UnverifiedIncomes.income_date >= cutoff_date
+        )
+        income_result = await self.session.execute(income_stmt)
+        total_income, income_count = income_result.fetchone()
+
+        # Top category
+        top_category_stmt = (
+            select(
+                UnverifiedExpenses.expense_type,
+                func.sum(UnverifiedExpenses.expense_amount).label("total")
+            )
+            .where(
+                UnverifiedExpenses.user_id == user_id,
+                UnverifiedExpenses.expense_date >= cutoff_date
+            )
+            .group_by(UnverifiedExpenses.expense_type)
+            .order_by(desc("total"))
+            .limit(1)
+        )
+        top_category_result = await self.session.execute(top_category_stmt)
+        top_category_row = top_category_result.first()
+        top_category = top_category_row[0] if top_category_row else "None"
+
+        return {
+            "total_expenses_30d": total_expenses,
+            "total_income_30d": total_income,
+            "net_position": total_income - total_expenses,
+            "recent_transaction_count": (expense_count or 0) + (income_count or 0),
+            "top_expense_category": top_category,
+        }
+    
     # Set methods
 
     async def update_user_message_state(self, user_id: int, **kwargs) -> None:
@@ -109,6 +161,11 @@ class AsyncQueries:
             update(LanguagePreference).where(LanguagePreference.user_id == user_id).values(preferred_language=new_language)
         )
         await self.session.commit()
+
+    async def update_user_registration_status(self, user_id: int, user_phone_number: str, registration_status: bool) -> None:
+        await self.session.execute(
+            update(User).where(User.id == user_id, User.phone_number == user_phone_number).values(registered=registration_status)
+        )
 
     # Insert Methods
 
