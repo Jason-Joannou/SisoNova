@@ -4,6 +4,7 @@ from api.services.s3_bucket import SecureS3Service
 from api.db.db_manager import DatabaseManager
 from api.db.models.tables import User, LanguagePreference, UnverifiedExpenses, UnverifiedIncomes, FinancialFeelings
 from typing import Optional, Dict
+from datetime import datetime
 import json
 import logging
 
@@ -225,15 +226,19 @@ def show_unregistered_limitations(self, attempted_action: str) -> Dict:
 # Expenses
 ###############################################################################################################################################
 
-async def save_expense(query_manager: AsyncQueries, user_id: int, amount: float, category: str, feeling: str, date: str) -> Dict:
+async def save_expense(query_manager: AsyncQueries, user_id: int, amount: float, category: str, feeling: Optional[str] = None, date: Optional[str] = None) -> Dict:
     """Save an expense to the database."""
     try:
+        if date is None:
+            date = datetime.utcnow().date()
+            date_str = date.strftime("%Y-%m-%d")
+
         expense = UnverifiedExpenses(
             user_id = user_id,
             expense_type = category,
             expense_amount = amount,
             expense_feeling = feeling,
-            expense_date = date
+            expense_date = date_str
         )
 
         await query_manager.add(expense)
@@ -259,15 +264,19 @@ async def get_expense_report(query_manager: AsyncQueries) -> Dict:
 # Incomes
 ###############################################################################################################################################
 
-async def save_income(query_manager: AsyncQueries, user_id: int, amount: float, source: str, feeling: str, date: str) -> Dict:
+async def save_income(query_manager: AsyncQueries, user_id: int, amount: float, source: str, feeling: Optional[str] = None, date: Optional[str] = None) -> Dict:
     """Save an expense to the database."""
     try:
+        if date is None:
+            date = datetime.utcnow().date()
+            date_str = date.strftime("%Y-%m-%d")
+
         expense = UnverifiedIncomes(
             user_id = user_id,
             income_type = source,
             income_amount = amount,
             income_feeling = feeling,
-            income_date = date
+            income_date = date_str
         )
 
         await query_manager.add(expense)
@@ -287,24 +296,32 @@ async def save_income(query_manager: AsyncQueries, user_id: int, amount: float, 
 # Feelings
 ###############################################################################################################################################
 
-async def save_feeling(query_manager: AsyncQueries, user_id: int, amount: float, source: str, feeling: str, date: str) -> Dict:
+async def save_feeling(query_manager: AsyncQueries, user_id: int, feeling: str, context: Optional[str] = None, date: Optional[str] = None) -> Dict:
     """Save an expense to the database."""
     try:
-        expense = UnverifiedIncomes(
+        if date is None:
+            date = datetime.utcnow().date()
+            date_str = date.strftime("%Y-%m-%d")
+
+
+        expense = FinancialFeelings(
             user_id = user_id,
-            income_type = source,
-            income_amount = amount,
-            income_feeling = feeling,
-            income_date = date
+            feeling = feeling,
+            reason = context,
+            feeling_date = date_str,
         )
 
         await query_manager.add(expense)
 
+        message = f"Feeling saved: {feeling}"
+        if context:
+            message += f"\nReason for feeling:\n({context})"
+
         return {
                 "success": True,
-                "message": f"Income saved: R{amount:,.2f} from {source}",
-                "amount": amount,
-                "source": source,
+                "message": message,
+                "feeling": feeling,
+                "context": context,
                 "feeling": feeling
             }
 
