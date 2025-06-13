@@ -6,6 +6,8 @@ from typing import Optional
 from botocore.exceptions import ClientError, NoCredentialsError
 import logging
 from dotenv import load_dotenv
+import json
+from typing import Dict
 
 load_dotenv()
 
@@ -138,6 +140,25 @@ class SecureS3Service:
         except Exception as e:
             logger.error(f"Unexpected error uploading to S3: {e}")
             return None
+        
+    async def upload_user_conversation_history(self, user_id: int, user_phone_number: str,conversation_history: Dict) -> None:
+        """Upload user conversation history to PRIVATE S3 bucket"""
+        try:
+            # Generate unique S3 object name
+            timestamp = int(datetime.now().timestamp())
+            object_name = f"{user_phone_number}/conversations/conversation_history_{timestamp}.json"
+            
+            # Upload to PRIVATE bucket
+            self.s3_client.put_object(
+                Bucket=self.bucket_name,
+                Key=object_name,
+                Body=json.dumps(conversation_history)
+            )
+            
+            logger.info(f"Successfully uploaded conversation history to PRIVATE S3: {object_name}")
+        except ClientError as e:
+            logger.error(f"Failed to upload conversation history to S3: {e}")
+        
     
     async def upload_pdf_from_bytes_secure(self, pdf_bytes: bytes, user_id: int, report_type: str,
                                           expiration_hours: int = 24) -> Optional[str]:
