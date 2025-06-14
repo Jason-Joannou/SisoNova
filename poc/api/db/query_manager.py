@@ -155,10 +155,10 @@ class AsyncQueries:
         )
         await self.session.commit()
 
-    async def update_user_language_preference(self, user_id: int, new_language: str) -> None:
+    async def update_user_language_preference(self, user_id: int, display_language: str, input_language: str, mixed_preference: bool) -> None:
         """Update a user's language preference."""
         await self.session.execute(
-            update(LanguagePreference).where(LanguagePreference.user_id == user_id).values(preferred_language=new_language)
+            update(LanguagePreference).where(LanguagePreference.user_id == user_id).values(display_language=display_language, input_language=input_language, mixed_preference=mixed_preference, updated_at=datetime.utcnow())
         )
         await self.session.commit()
 
