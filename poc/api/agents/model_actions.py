@@ -327,6 +327,162 @@ async def save_feeling(query_manager: AsyncQueries, user_id: int, feeling: str, 
 
     except Exception as e:
         return {"success": False, "error": str(e)}
+    
+
+# Language
+###############################################################################################################################################
+
+async def set_user_language_preferences(query_manager: AsyncQueries, user_id: int, display_language: str, input_language: Optional[str] = None, reason: Optional[str] = None) -> Dict:
+    try:
+        language_map = {
+            "english": "English",
+            "zulu": "Zulu", 
+            "afrikaans": "Afrikaans",
+            "en": "English",
+            "zu": "Zulu",
+            "af": "Afrikaans"
+            }
+
+        display_lang = language_map.get(display_language.lower(), display_language.title())
+        input_lang = language_map.get(input_language.lower(), input_language.title()) if input_language else display_lang
+        mixed_preference = display_lang != input_lang
+
+        await query_manager.update_user_language_preference(user_id=user_id, display_language=display_lang, input_language=input_lang, mixed_preference=mixed_preference)
+
+        if display_lang == "Zulu":
+            if input_lang == "English":
+                message = "✅ Kuhle! Ngizokuphendula ngesiZulu kodwa ngiyazi ukuthi uthanda ukubhala ngesiNgisi. Lokhu kulungile!"
+            else:
+                message = "✅ Kuhle! Ngisebenzise isiZulu manje."
+        elif display_lang == "Afrikaans":
+            if input_lang == "English":
+                message = "✅ Wonderlik! Ek sal in Afrikaans antwoord maar ek verstaan jy verkies om in Engels te tik. Dit is perfek!"
+            else:
+                message = "✅ Wonderlik! Ek sal nou in Afrikaans kommunikeer."
+        else:  # English
+            message = "✅ Perfect! I'll communicate in English."
+        
+        return {
+            "success": True,
+            "display_language": display_lang,
+            "input_language": input_lang,
+            "message": message,
+            "reason": reason,
+            "mixed_preference": display_lang != input_lang
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+    
+async def get_user_language_preferences(query_manager: AsyncQueries, user_id: int) -> Dict:
+    try:
+        language = await query_manager.get_user_language_preference(user_id=user_id)
+        return {
+            "success": True,
+            "display_language": language.display_language,
+            "input_language": language.input_language,
+            "mixed_preference": language.mixed_preference
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "display_language": "English",
+            "input_language": "English",
+            "mixed_preference": False
+        }
+
+async def show_language_options(current_language: str = None) -> Dict:
+    """Show language selection options"""
+    
+    if current_language == "Zulu":
+        message = """
+🌍 **Khetha Ulimi Lwakho / Choose Your Language**
+
+Ngisekela lezi zilimi:
+• **English** - English
+• **isiZulu** - isiZulu  
+• **Afrikaans** - Afrikaans
+
+Tshela nje uthi "Ngifuna isiZulu" noma "I want English" noma "Ek wil Afrikaans hê"
+        """
+    elif current_language == "Afrikaans":
+        message = """
+🌍 **Kies Jou Taal / Choose Your Language**
+
+Ek ondersteun hierdie tale:
+• **English** - Engels
+• **isiZulu** - Zoeloe
+• **Afrikaans** - Afrikaans
+
+Sê net "Ek wil Afrikaans hê" of "I want English" of "Ngifuna isiZulu"
+        """
+    else:  # Default to English
+        message = """
+🌍 **Choose Your Language / Khetha Ulimi Lwakho**
+
+SisoNova supports these languages:
+• **English** - English
+• **isiZulu** - Zulu
+• **Afrikaans** - Afrikaans
+
+Just say "I want English" or "Ngifuna isiZulu" or "Ek wil Afrikaans hê"
+        """
+    
+    return {
+        "success": True,
+        "message": message,
+        "current_language": current_language,
+        "available_languages": ["English", "Zulu", "Afrikaans"]
+    }
+
+async def detect_message_language(message: str) -> Dict:
+    """Detect language from user message"""
+    
+    # Simple keyword-based detection
+    zulu_indicators = ["ngifuna", "sawubona", "ngiyabonga", "yebo", "cha", "kunjani", "ngiyakwazi"]
+    afrikaans_indicators = ["ek wil", "dankie", "hallo", "goeie", "kan jy", "verstaan", "help"]
+    english_indicators = ["i want", "hello", "thank you", "can you", "help me", "how are"]
+    
+    message_lower = message.lower()
+    
+    zulu_score = sum(1 for word in zulu_indicators if word in message_lower)
+    afrikaans_score = sum(1 for word in afrikaans_indicators if word in message_lower)
+    english_score = sum(1 for word in english_indicators if word in message_lower)
+    
+    if zulu_score > afrikaans_score and zulu_score > english_score:
+        detected = "Zulu"
+        confidence = min(0.9, 0.5 + (zulu_score * 0.1))
+    elif afrikaans_score > english_score:
+        detected = "Afrikaans"
+        confidence = min(0.9, 0.5 + (afrikaans_score * 0.1))
+    else:
+        detected = "English"
+        confidence = min(0.9, 0.5 + (english_score * 0.1))
+    
+    return {
+        "success": True,
+        "detected_language": detected,
+        "confidence": confidence,
+        "message": message
+    }
+
+async def get_user_language(user_id: int, query_manager: AsyncQueries) -> Dict:
+
+    try:
+
+        language = await query_manager.get_user_language_preference(user_id=user_id)
+        return {
+            "success": True,
+            "preferred_language": language
+        }
+
+    except Exception as e:
+
+        return {
+            "success": False,
+            "default_language": "English",
+            "error": str(e)
+        }
 
 
 # Metadata
