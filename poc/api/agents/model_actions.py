@@ -42,7 +42,7 @@ async def check_user_registration(phone_number: str, query_manager: AsyncQueries
             "can_use_services": False
         }
     
-async def register_new_user(phone_number: str, consent_given: bool, query_manager: AsyncQueries, language_preference: str = "English") -> Dict:
+async def register_new_user(phone_number: str, consent_given: bool, query_manager: AsyncQueries) -> Dict:
 
     try:
         if not consent_given:
@@ -73,9 +73,13 @@ async def register_new_user(phone_number: str, consent_given: bool, query_manage
             )
             await query_manager.add(user)
 
+            
+
             language = LanguagePreference(
                 user_id = user.id,
-                preferred_language=language_preference
+                display_language = "English",
+                input_language = "English",
+                mixed_preference = False
             )
 
             await query_manager.add(language)
@@ -88,7 +92,7 @@ async def register_new_user(phone_number: str, consent_given: bool, query_manage
 
             return {
             "success": True,
-            "message": welcome_messages.get(language_preference, welcome_messages["English"]),
+            "message": welcome_messages["English"],
             "registered": True,
             "user_id": user.id
             }
