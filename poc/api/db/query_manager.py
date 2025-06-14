@@ -164,7 +164,7 @@ class AsyncQueries:
 
     async def update_user_registration_status(self, user_id: int, user_phone_number: str, registration_status: bool) -> None:
         await self.session.execute(
-            update(User).where(User.id == user_id, User.phone_number == user_phone_number).values(registered=registration_status)
+            update(User).where(User.id == user_id, User.phone_number == user_phone_number).values(registered=registration_status, updated_at=datetime.utcnow())
         )
 
     # Insert Methods
