@@ -8,6 +8,7 @@ from google.generativeai.protos import FunctionDeclaration, Schema, Type
 from model_actions import get_user_financial_context, check_user_registration, set_user_language_preferences, get_user_language_preferences
 from api.db.query_manager import AsyncQueries
 from api.services.s3_bucket import SecureS3Service
+from api.agents.conversation_state import AgentConversationManager
 
 class SisoNovaAgent:
 
@@ -16,8 +17,17 @@ class SisoNovaAgent:
         self.user_phone_number = user_phone_number
         self.query_manager = query_manager
         self.s3_bucket = s3_bucket
+        self.conversation_manager = AgentConversationManager(s3_bucket=self.s3_bucket, user_phone_number=self.user_phone_number, user_id=self.user_id)
+        self.model: Optional[genai.GenerativeModel] = None
 
-        self.model: genai.GenerativeModel = GeminiModel(model_name="gemini-2.0-flash", model_tools=self.get_function_declarations())
+    async def init_model(self) -> None:
+        model_tools = self.get_function_declarations()
+        model_context = await get_user_financial_context(user_id=self.user_id, query_manager=self.query_manager, s3_bucket=self.s3_bucket)
+        model_instructions = await self.build_system_instruction(context=model_context)
+
+        model_init = GeminiModel(model_name="gemini-2.0-flash", model_tools=model_tools, model_instructions=model_instructions)
+        gemini_model = model_init.get_model()
+        self.model: genai.GenerativeModel = gemini_model
 
     def get_function_declarations(self) -> List[FunctionDeclaration]:
         """
