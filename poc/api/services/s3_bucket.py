@@ -80,7 +80,89 @@ class SecureS3Service:
             logger.info("Ensured bucket is private with public access blocked")
         except ClientError as e:
             logger.warning(f"Failed to set public access block: {e}")
-    
+
+    async def load_conversation_history(self, user_phone_number: str) -> Optional[Dict]:
+        """Load conversation history for a user"""
+        try:
+            object_name = f"{user_phone_number}/conversations/conversation_history.json"
+            
+            response = self.s3_client.get_object(
+                Bucket=self.bucket_name,
+                Key=object_name
+            )
+            
+            content = response['Body'].read().decode('utf-8')
+            history = json.loads(content)
+            
+            logger.info(f"Loaded conversation history for {user_phone_number}")
+            return history
+            
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchKey':
+                logger.info(f"No conversation history found for {user_phone_number}")
+                return None
+            else:
+                logger.error(f"Failed to load conversation history: {e}")
+                return None
+        except Exception as e:
+            logger.error(f"Unexpected error loading conversation history: {e}")
+            return None
+
+    async def save_conversation_history(self, user_phone_number: str, history: Dict) -> bool:
+        """Save complete conversation history"""
+        try:
+            object_name = f"{user_phone_number}/conversations/conversation_history.json"
+            
+            # Update timestamp
+            history['last_updated'] = datetime.utcnow().isoformat()
+            
+            self.s3_client.put_object(
+                Bucket=self.bucket_name,
+                Key=object_name,
+                Body=json.dumps(history, indent=2),
+                ContentType='application/json',
+                Metadata={
+                    'user_phone': user_phone_number,
+                    'updated_at': datetime.utcnow().isoformat(),
+                    'total_turns': str(history.get('total_turns', 0))
+                }
+            )
+            
+            logger.info(f"Saved conversation history for {user_phone_number}")
+            return True
+            
+        except ClientError as e:
+            logger.error(f"Failed to save conversation history: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error saving conversation history: {e}")
+            return False
+        
+    async def append_conversation_turn(self, user_phone_number: str, turn_data: Dict, history: Optional[Dict] = None) -> bool:
+        """Append a new turn to conversation history"""
+        try:
+            
+            if history is None:
+                # Create new history
+                history = {
+                    "user_phone_number": user_phone_number,
+                    "created_at": datetime.utcnow().isoformat(),
+                    "last_updated": datetime.utcnow().isoformat(),
+                    "total_turns": 0,
+                    "turns": []
+                }
+            
+            # Append new turn
+            history['turns'].append(turn_data)
+            history['total_turns'] = len(history['turns'])
+            history['last_updated'] = datetime.utcnow().isoformat()
+            
+            # Save updated history
+            return await self.save_conversation_history(user_phone_number, history)
+            
+        except Exception as e:
+            logger.error(f"Failed to append conversation turn: {e}")
+            return False
     async def upload_pdf_from_file_secure(self, file_path: str, user_id: int, report_type: str, 
                                          expiration_hours: int = 24) -> Optional[str]:
         """
