@@ -23,7 +23,9 @@ class LanguagePreference(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
-    preferred_language = Column(String, nullable=True)
+    display_language = Column(String, nullable=False)
+    input_language = Column(String, nullable=False)
+    mixed_preference = Column(Boolean, default=False)
     updated_at = Column(DateTime, default=datetime.utcnow)
 
 
