@@ -5,7 +5,7 @@ import os
 from llm_factory import GeminiModel
 import google.generativeai as genai
 from google.generativeai.protos import FunctionDeclaration, Schema, Type
-from model_actions import get_user_financial_context, check_user_registration
+from model_actions import get_user_financial_context, check_user_registration, set_user_language_preferences, get_user_language_preferences
 from api.db.query_manager import AsyncQueries
 from api.services.s3_bucket import SecureS3Service
 
@@ -163,7 +163,6 @@ class SisoNovaAgent:
                     properties={
                         "phone_number": Schema(type=Type.STRING, description="User's phone number"),
                         "consent_given": Schema(type=Type.BOOLEAN, description="Whether user has given explicit consent"),
-                        "language_preference": Schema(type=Type.STRING, description="User's preferred language"),
                     },
                     required=["phone_number", "consent_given"]
                 )
@@ -187,6 +186,40 @@ class SisoNovaAgent:
                         "attempted_action": Schema(type=Type.STRING, description="Attempted action by unregistered user")
                     }
                 )
+            ),
+            FunctionDeclaration(
+                name="set_user_language_preferences",
+                description="Set different languages for display (reading) vs input (typing)",
+                parameters=Schema(
+                    type=Type.OBJECT,
+                    properties={
+                        "display_language": Schema(type=Type.STRING, description="User's preferred display language: English, Zulu, or Afrikaans"),
+                        "input_language": Schema(type=Type.STRING, description="User's preferred input language: English, Zulu, or Afrikaans"),
+                        "reason": Schema(type=Type.STRING, description="Why this language was selected (user request, detection, etc.)")
+                    },
+                    required=["display_language", "input_language"]
+                )
+            ),
+            FunctionDeclaration(
+                name="show_language_options",
+                description="Show available language options to the user",
+                parameters=Schema(
+                    type=Type.OBJECT,
+                    properties={
+                        "language": Schema(type=Type.STRING, description="User's preferred language: English, Zulu, or Afrikaans")
+                    }
+                )
+            ),
+            FunctionDeclaration(
+                name="detect_message_language",
+                description="Detect what language the user is speaking",
+                parameters=Schema(
+                    type=Type.OBJECT,
+                    properties={
+                        "message": Schema(type=Type.STRING, description="The user's message to analyze")
+                    },
+                    required=["message"]
+                )
             )
         ]
     
@@ -198,7 +231,7 @@ class SisoNovaAgent:
             context = await get_user_financial_context(user_id=self.user_id, query_manager=self.query_manager, s3_bucket=self.s3_bucket)
             
             # Build system instruction
-            system_instruction = self.build_system_instruction(context)
+            system_instruction = await self.build_system_instruction(context)
             
             # Start chat with Gemini
             chat = self.model.start_chat(history=[])
@@ -209,7 +242,7 @@ class SisoNovaAgent:
             response = chat.send_message(full_prompt)
             
             # Process Gemini's response
-            return self.process_gemini_response(response, message)
+            return await self.process_gemini_response(response, message)
             
         except Exception as e:
             return {
@@ -218,9 +251,9 @@ class SisoNovaAgent:
                 "error": str(e)
             }
         
-    def build_system_instruction(self, context: Dict) -> str:
+    async def build_system_instruction(self, context: Dict) -> str:
         """Build system instruction for Gemini"""
-        registration_status = check_user_registration(self.user_phone_number, self.query_manager)
+        registration_status = await check_user_registration(self.user_phone_number, self.query_manager)
         is_registered = registration_status.get("registered", False)
         registration_instruction = ""
         if not is_registered:
@@ -257,9 +290,24 @@ class SisoNovaAgent:
             - Access their financial history
             - Provide full SisoNova services
             """
+        
+        lang_prefs = await get_user_language_preferences() if is_registered else {"display": "English", "input": "English", "mixed": False}
+        display_lang = lang_prefs["display"]
+        input_lang = lang_prefs["input"]
+        is_mixed = lang_prefs["mixed"]
 
-        lang_prefs = self.get_user_language_preferences() if is_registered else {"display": "English", "input": "English", "mixed": False}
-
+        mixed_instruction = ""
+        if is_mixed:
+            mixed_instruction = f"""
+            SPECIAL MIXED LANGUAGE PREFERENCE:
+            - User prefers to READ in {display_lang}
+            - User prefers to INPUT/TYPE in {input_lang}
+            - This is completely normal and should be accommodated naturally
+            - Always respond in {display_lang} regardless of what language they type in
+            - Accept and understand input in {input_lang} without trying to correct them
+            - Don't constantly ask about language - just work with their preference
+            """
+        
         return f"""
         You are SisoNova's AI Financial Assistant for user {self.user_phone_number}.
         
@@ -282,9 +330,30 @@ class SisoNovaAgent:
         - "I agree to the terms"
 
         LANGUAGE SETTINGS:
-        - User's display language: {lang_prefs["display"]}
-        - User's input language: {lang_prefs["input"]}
-        - Mixed preference: {lang_prefs["mixed"]}
+        - User's display language (responses): {display_lang}
+        - User's input language (what they type): {input_lang}
+        - Mixed language preference: {is_mixed}
+        
+        {mixed_instruction}
+
+        LANGUAGE HANDLING RULES:
+        - ALWAYS respond in {display_lang}
+        - Accept input in ANY language but especially {input_lang}
+        - If user types "I spent R50 on groceries" but prefers Zulu responses, respond in Zulu
+        - If user types "Ngisebenzise R50" but prefers English responses, respond in English
+        - Don't correct their language choice - accommodate it
+        - Only offer language changes if they explicitly ask
+        
+        EXAMPLES FOR MIXED PREFERENCE (Display: Zulu, Input: English):
+        User: "I spent R50 on groceries today"
+        You: "Ngiyabona ukuthi usebenzise R50 ekudleni! Uzizwa kanjani ngalokhu kuthenga?"
+        
+        User: "Yes, record it, feeling okay"
+        You: [Save expense] "✅ Kugcinwe! R50 ekudleni, uzizwa kahle. Yiqhubeke ngokugcina!"
+        
+        EXAMPLES FOR SAME LANGUAGE (Display: English, Input: English):
+        User: "I spent R50 on groceries"
+        You: "I see you spent R50 on groceries! How are you feeling about this purchase?"
         
         ABOUT SISONOVA:
         SisoNova helps unbanked and underserved people in South Africa track their finances 
@@ -349,7 +418,7 @@ class SisoNovaAgent:
         """
     
 
-    def process_gemini_response(self, response, original_message: str) -> Dict[str, Any]:
+    async def process_gemini_response(self, response, original_message: str) -> Dict[str, Any]:
         """Process Gemini's response and execute any function calls"""
         
         # Check if Gemini wants to call functions
@@ -365,10 +434,10 @@ class SisoNovaAgent:
                         function_args[key] = value
                     
                     # Execute the function
-                    function_result = self.execute_tool(function_name, function_args)
+                    function_result = await self.execute_tool(function_name, function_args)
                     
                     # Get AI's response after function execution
-                    return self.get_response_after_function(function_result, function_name, original_message)
+                    return await self.get_response_after_function(function_result, function_name, original_message)
         
         # If no function calls, just return the text response
         response_text = response.text if hasattr(response, 'text') else "I'm here to help with your finances!"
@@ -382,7 +451,7 @@ class SisoNovaAgent:
         }
     
 
-    def get_response_after_function(self, function_result: Dict, function_name: str, original_message: str) -> Dict[str, Any]:
+    async def get_response_after_function(self, function_result: Dict, function_name: str, original_message: str) -> Dict[str, Any]:
         """Get AI's response after function execution"""
         
         # Create a follow-up prompt for natural response
@@ -423,7 +492,7 @@ class SisoNovaAgent:
         }
     
 
-    def execute_tool(self, function_name: str, arguments: Dict) -> Dict[str, Any]:
+    async def execute_tool(self, function_name: str, arguments: Dict) -> Dict[str, Any]:
         """Execute a tool function"""
 
         protected_tools = [
