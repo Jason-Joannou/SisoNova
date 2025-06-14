@@ -36,4 +36,4 @@ class GeminiModel:
         Returns:
             genai.GenerativeModel: The Gemini model
         """
-        return genai.GenerativeModel(self.model_name, model_tools=self.model_tools, system_instruction=self.model_instructions)
+        return genai.GenerativeModel(model_name=self.model_name, tools=self.model_tools, system_instruction=self.model_instructions)
