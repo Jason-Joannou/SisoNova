@@ -7,7 +7,7 @@ from typing import List
 
 class GeminiModel:
 
-    def __init__(self, model_name: str, model_tools: List[FunctionDeclaration]) -> None:
+    def __init__(self, model_name: str, model_tools: List[FunctionDeclaration], model_instructions: str) -> None:
         """
         Constructor for GeminiModel
 
@@ -18,6 +18,7 @@ class GeminiModel:
 
         self.model_name = model_name
         self.model_tools = model_tools
+        self.model_instructions = model_instructions
 
     def get_model_name(self) -> str:
         """
@@ -35,4 +36,4 @@ class GeminiModel:
         Returns:
             genai.GenerativeModel: The Gemini model
         """
-        return genai.GenerativeModel(self.model_name, model_tools=self.model_tools)
+        return genai.GenerativeModel(self.model_name, model_tools=self.model_tools, system_instruction=self.model_instructions)
