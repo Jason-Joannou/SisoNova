@@ -237,22 +237,25 @@ class SisoNovaAgent:
         """Fully agentic message processing with Gemini"""
         
         try:
-            # Get full context for AI
-            context = await get_user_financial_context(user_id=self.user_id, query_manager=self.query_manager, s3_bucket=self.s3_bucket)
+            # Initialize Chat History
+            chat_history = self.conversation_manager.get_conversation_history_for_agent()
             
-            # Build system instruction
-            system_instruction = await self.build_system_instruction(context)
-            
+
             # Start chat with Gemini
-            chat = self.model.start_chat(history=[])
+            chat = self.model.start_chat(history=chat_history)
             
-            # Send message with system context
-            full_prompt = f"{system_instruction}\n\nUser message: {message}"
+            # Send message
+            user_message = f"User message: {message}"
             
-            response = chat.send_message(full_prompt)
+            response = chat.send_message(user_message)
             
             # Process Gemini's response
-            return await self.process_gemini_response(response, message)
+            result = await self.process_gemini_response(response, message)
+
+            # Save turn to conversation
+            await self.conversation_manager.save_conversation_turn(user_message=user_message, assistant_response=result["message"], function_calls=result.get('function_calls', []))
+
+            return result
             
         except Exception as e:
             return {
