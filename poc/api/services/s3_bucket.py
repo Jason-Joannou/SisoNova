@@ -2,7 +2,7 @@ import boto3
 import os
 import io
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List, Dict
 from botocore.exceptions import ClientError, NoCredentialsError
 import logging
 from dotenv import load_dotenv
@@ -165,6 +165,61 @@ class SecureS3Service:
         except Exception as e:
             logger.error(f"Failed to append conversation turn: {e}")
             return False
+        
+    async def delete_user_conversations(self, user_phone_number: str) -> bool:
+        """Delete all conversation data for a user (GDPR compliance)"""
+        try:
+            # List all objects for this user
+            prefix = f"{user_phone_number}/conversations/"
+            
+            response = self.s3_client.list_objects_v2(
+                Bucket=self.bucket_name,
+                Prefix=prefix
+            )
+            
+            if 'Contents' not in response:
+                logger.info(f"No conversation data found for {user_phone_number}")
+                return True
+            
+            # Delete all objects
+            objects_to_delete = [{'Key': obj['Key']} for obj in response['Contents']]
+            
+            self.s3_client.delete_objects(
+                Bucket=self.bucket_name,
+                Delete={'Objects': objects_to_delete}
+            )
+            
+            logger.info(f"Deleted all conversation data for {user_phone_number}")
+            return True
+            
+        except ClientError as e:
+            logger.error(f"Failed to delete user conversations: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error deleting user conversations: {e}")
+            return False
+        
+    async def get_user_conversation_stats(self, user_phone_number: str) -> Dict:
+        """Get statistics about user's conversation data"""
+        try:
+            history = await self.load_conversation_history(user_phone_number)
+            session = await self.load_current_session(user_phone_number)
+            
+            if not history:
+                return {"total_turns": 0, "has_active_session": False}
+            
+            return {
+                "total_turns": history.get('total_turns', 0),
+                "created_at": history.get('created_at'),
+                "last_updated": history.get('last_updated'),
+                "has_active_session": session is not None,
+                "current_session_id": session.get('session_id') if session else None
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to get conversation stats: {e}")
+            return {"error": str(e)}
+        
     async def upload_pdf_from_file_secure(self, file_path: str, user_id: int, report_type: str, 
                                          expiration_hours: int = 24) -> Optional[str]:
         """

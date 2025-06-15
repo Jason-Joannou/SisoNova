@@ -197,7 +197,8 @@ class AsyncQueries:
     async def add(self, obj):
         """Add an object to the database."""
         self.session.add(obj)
-        await self.session.flush()
+        await self.session.commit()
+        await self.session.refresh(obj)
         return obj
     
     async def add_all(self, objects):

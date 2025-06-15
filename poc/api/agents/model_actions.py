@@ -24,7 +24,7 @@ async def check_user_registration(phone_number: str, query_manager: AsyncQueries
                 "exists": True,
                 "registered": user.registered,
                 "user_id": user.id,
-                "registration_date": user[2],
+                "registration_date": user.created_at,
                 "can_use_services": user.registered
             }
         else:
@@ -234,15 +234,17 @@ async def save_expense(query_manager: AsyncQueries, user_id: int, amount: float,
     """Save an expense to the database."""
     try:
         if date is None:
-            date = datetime.utcnow().date()
-            date_str = date.strftime("%Y-%m-%d")
+            expense_date = datetime.utcnow().date()  # Keep as date object
+        else:
+            # If date is provided as string, convert it to date object
+            expense_date = datetime.strptime(date, "%Y-%m-%d").date()
 
         expense = UnverifiedExpenses(
             user_id = user_id,
             expense_type = category,
             expense_amount = amount,
             expense_feeling = feeling,
-            expense_date = date_str
+            expense_date = expense_date
         )
 
         await query_manager.add(expense)
@@ -251,10 +253,40 @@ async def save_expense(query_manager: AsyncQueries, user_id: int, amount: float,
                 "success": True,
                 "message": f"Expense saved: R{amount:,.2f} for {category}",
                 "amount": amount,
+                "expense_id": expense.id,
                 "category": category,
                 "feeling": feeling
             }
 
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+    
+async def update_expense_feeling(query_manager: AsyncQueries, user_phone_number: str, s3_bucket: SecureS3Service, user_id: int, expense_id: int, feeling: str) -> Dict:
+    """Update expense with feeling and mark in context"""
+    try:
+        # Update in database (you'll need to add this method to query_manager)
+        await query_manager.update_expense_feeling(user_id=user_id, expense_id=expense_id, feeling=feeling)
+        
+        return {
+            "success": True,
+            "message": f"Updated expense feeling to: {feeling}",
+            "expense_id": expense_id,
+            "feeling": feeling
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+    
+async def update_income_feeling(query_manager: AsyncQueries, user_phone_number: str, s3_bucket: SecureS3Service, user_id: int, income_id: int, feeling: str) -> Dict:
+    """Update income with feeling and mark in context"""
+    try:
+        await query_manager.update_income_feeling(user_id=user_id, income_id=income_id, feeling=feeling)
+        
+        return {
+            "success": True,
+            "message": f"Updated income feeling to: {feeling}",
+            "income_id": income_id,
+            "feeling": feeling
+        }
     except Exception as e:
         return {"success": False, "error": str(e)}
     
@@ -272,23 +304,26 @@ async def save_income(query_manager: AsyncQueries, user_id: int, amount: float, 
     """Save an expense to the database."""
     try:
         if date is None:
-            date = datetime.utcnow().date()
-            date_str = date.strftime("%Y-%m-%d")
+            income_date = datetime.utcnow().date()  # Keep as date object
+        else:
+            # If date is provided as string, convert it to date object
+            income_date = datetime.strptime(date, "%Y-%m-%d").date()
 
-        expense = UnverifiedIncomes(
+        income = UnverifiedIncomes(
             user_id = user_id,
             income_type = source,
             income_amount = amount,
             income_feeling = feeling,
-            income_date = date_str
+            income_date = income_date
         )
 
-        await query_manager.add(expense)
+        await query_manager.add(income)
 
         return {
                 "success": True,
                 "message": f"Income saved: R{amount:,.2f} from {source}",
                 "amount": amount,
+                "income_id": income.id,
                 "source": source,
                 "feeling": feeling
             }
@@ -304,18 +339,20 @@ async def save_feeling(query_manager: AsyncQueries, user_id: int, feeling: str, 
     """Save an expense to the database."""
     try:
         if date is None:
-            date = datetime.utcnow().date()
-            date_str = date.strftime("%Y-%m-%d")
+            feeling_date = datetime.utcnow().date()  # Keep as date object
+        else:
+            # If date is provided as string, convert it to date object
+            feeling_date = datetime.strptime(date, "%Y-%m-%d").date()
 
 
-        expense = FinancialFeelings(
+        feeling_obj = FinancialFeelings(
             user_id = user_id,
             feeling = feeling,
             reason = context,
-            feeling_date = date_str,
+            feeling_date = feeling_date,
         )
 
-        await query_manager.add(expense)
+        await query_manager.add(feeling_obj)
 
         message = f"Feeling saved: {feeling}"
         if context:
@@ -325,6 +362,7 @@ async def save_feeling(query_manager: AsyncQueries, user_id: int, feeling: str, 
                 "success": True,
                 "message": message,
                 "feeling": feeling,
+                "feeling_id": feeling_obj,
                 "context": context,
                 "feeling": feeling
             }
@@ -751,54 +789,56 @@ Ready to continue your financial journey?
 async def get_user_financial_context(user_id: int, query_manager: AsyncQueries, s3_bucket: SecureS3Service, period_days: Optional[int] = 30) -> Dict:
     """Get a user's financial context."""
     user_financial_context = await query_manager.get_user_financial_context(user_id=user_id, period_days=period_days)
-    conversation_object = await get_user_conversation_state(user_id, s3_service=s3_bucket)
-    if conversation_object['exists']:
-        user_financial_context['conversation_context'] = conversation_object['conversation']
     return user_financial_context
 
-async def get_user_conversation_state(user_phone_number: str, s3_service: SecureS3Service) -> Dict:
-    """
-    Retrieve the most recent conversation state for a user from S3.
-
-    Args:
-        user_phone_number: The phone number of the user.
-        s3_service: An instance of the SecureS3Service.
-
-    Returns:
-        A dict with keys:
-            - 'exists' (bool): Whether a conversation history was found.
-            - 'conversation' (Dict or None): The conversation history if found, else None.
-    """
-    prefix = f"{user_phone_number}/conversations/"
+async def get_recent_transactions(query_manager: AsyncQueries, user_id: int, record_type: str, limit: int = 5) -> Dict:
+    """Get recent transactions for the user"""
     try:
-        response = s3_service.s3_client.list_objects_v2(
-            Bucket=s3_service.bucket_name,
-            Prefix=prefix
-        )
+        transactions = []
+        if record_type == "expense":
+            # Get recent expenses
+            expenses = await query_manager.get_user_expenses(user_id)
+            recent_expenses = expenses[-limit:] if expenses else []
 
-        if 'Contents' not in response or not response['Contents']:
-            return {'exists': False, 'conversation': None}
-
-        # Find the most recent file
-        sorted_objects = sorted(
-            response['Contents'],
-            key=lambda obj: obj['LastModified'],
-            reverse=True
-        )
-
-        latest_key = sorted_objects[0]['Key']
-
-        obj = s3_service.s3_client.get_object(
-            Bucket=s3_service.bucket_name,
-            Key=latest_key
-        )
-        conversation_data = json.loads(obj['Body'].read().decode('utf-8'))
-
-        return {'exists': True, 'conversation': conversation_data}
-
+            for expense in recent_expenses:
+                transactions.append({
+                    "type": "expense",
+                    "id": expense.id,
+                    "amount": expense.expense_amount,
+                    "category": expense.expense_type,
+                    "feeling": expense.expense_feeling,
+                    "date": expense.expense_date.isoformat() if expense.expense_date else None,
+                    "needs_feeling": expense.expense_feeling is None
+                })
+        
+        if record_type == "income":
+            # Get recent incomes
+            incomes = await query_manager.get_user_incomes(user_id)
+            recent_incomes = incomes[-limit:] if incomes else []
+            
+            for income in recent_incomes:
+                transactions.append({
+                    "type": "income", 
+                    "id": income.id,
+                    "amount": income.income_amount,
+                    "source": income.income_type,
+                    "feeling": income.income_feeling,
+                    "date": income.income_date.isoformat() if income.income_date else None,
+                    "needs_feeling": income.income_feeling is None
+                })
+        
+        # Sort by date (most recent first)
+        transactions.sort(key=lambda x: x["date"] or "", reverse=True)
+        
+        return {
+            "success": True,
+            "transactions": transactions[:limit],
+            "total_found": len(transactions),
+            "record_type": record_type
+        }
+        
     except Exception as e:
-        logger.error(f"Error retrieving conversation history: {e}")
-        return {'exists': False, 'conversation': None}
+        return {"success": False, "error": str(e)}
     
 
 # Misc

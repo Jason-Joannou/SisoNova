@@ -5,7 +5,7 @@ import os
 from api.agents.llm_factory import GeminiModel
 import google.generativeai as genai
 from google.generativeai.protos import FunctionDeclaration, Schema, Type
-from api.agents.model_actions import get_user_financial_context, check_user_registration, show_registration_info, show_registration_info, register_new_user, set_user_language_preferences, get_user_language_preferences, show_unregistered_limitations, save_expense, save_feeling, save_income, show_sisonova_services, show_getting_started_guide, show_personal_capabilities, show_language_options
+from api.agents.model_actions import get_user_financial_context, get_recent_transactions, check_user_registration, show_registration_info, show_registration_info, register_new_user, set_user_language_preferences, get_user_language_preferences, show_unregistered_limitations, save_expense, save_feeling, save_income, show_sisonova_services, show_getting_started_guide, show_personal_capabilities, show_language_options, update_expense_feeling, update_income_feeling
 from api.db.query_manager import AsyncQueries
 from api.services.s3_bucket import SecureS3Service
 from api.agents.conversation_state import AgentConversationManager
@@ -42,29 +42,37 @@ class SisoNovaAgent:
             
             FunctionDeclaration(
                 name="save_expense",
-                description="""IMMEDIATELY save user's expense when they mention spending money.
-    
-                **CRITICAL: SAVE FIRST, ASK LATER**
+                description="""🚨 MANDATORY: IMMEDIATELY save user's expense when they mention spending money.
+
+                **CRITICAL: SAVE FIRST, ASK LATER - NO CONFIRMATION NEEDED**
                 
                 **When to call IMMEDIATELY:**
-                - "I spent R50 on groceries" → SAVE NOW
-                - "Bought bread for R15" → SAVE NOW  
-                - "Taxi cost R25" → SAVE NOW
-                - "Paid rent R3500" → SAVE NOW
+                - "I spent R50 on groceries" → CALL NOW, don't ask for confirmation
+                - "Bought bread for R15" → CALL NOW, don't ask for confirmation  
+                - "Taxi cost R25" → CALL NOW, don't ask for confirmation
                 
-                **DO NOT ask for confirmation first - SAVE IMMEDIATELY**
+                **DO NOT:**
+                - Ask "Is that correct?" before saving
+                - Ask for confirmation
+                - Wait for user approval
+                
+                **DO:**
+                - Extract amount and category immediately
+                - Call this function right away
+                - Ask about feelings AFTER saving
                 
                 **Workflow:**
-                1. User mentions spending → Extract amount & category → CALL THIS FUNCTION
-                2. After saving → Ask "How are you feeling about this expense?"
-                3. User responds with feeling → Use update_expense_feeling()
+                1. User mentions spending → IMMEDIATELY call save_expense()
+                2. After successful save → Ask "How are you feeling about this expense?"
+                3. User responds with feeling → Use get_recent_transactions() + update_expense_feeling()
                 
-                **Examples:**
+                **Example:**
                 User: "I spent R50 on groceries"
                 You: [IMMEDIATELY call save_expense(50, "groceries")] 
                 Then: "✅ Saved R50 for groceries! How are you feeling about this expense?"
                 
-                **Categories:** groceries, transport, utilities, entertainment, clothing, airtime, rent, food""",
+                User: "Good"
+                You: [call get_recent_transactions("expense")] → [call update_expense_feeling(expense_id, "Good")]""",
                 parameters=Schema(
                     type=Type.OBJECT,
                     properties={
@@ -79,27 +87,41 @@ class SisoNovaAgent:
             
             FunctionDeclaration(
                 name="save_income",
-                description="""IMMEDIATELY save user's income when they mention earning money.
-    
-                **CRITICAL: SAVE FIRST, ASK LATER**
+                description="""🚨 MANDATORY: IMMEDIATELY save user's income when they mention earning money.
+
+                **CRITICAL: SAVE FIRST, ASK LATER - NO CONFIRMATION NEEDED**
                 
                 **When to call IMMEDIATELY:**
-                - "I earned R3000 from my job" → SAVE NOW
-                - "Got paid R4500" → SAVE NOW
-                - "Made R200 selling vegetables" → SAVE NOW
+                - "I earned R3000 from my job" → CALL NOW, don't ask for confirmation
+                - "Got paid R4500" → CALL NOW, don't ask for confirmation  
+                - "Made R200 selling vegetables" → CALL NOW, don't ask for confirmation
+                - "Received R1500 bonus" → CALL NOW, don't ask for confirmation
+                - "My salary was R5000" → CALL NOW, don't ask for confirmation
                 
-                **DO NOT ask for confirmation - SAVE IMMEDIATELY**
+                **DO NOT:**
+                - Ask "Is that correct?" before saving
+                - Ask for confirmation
+                - Wait for user approval
+                
+                **DO:**
+                - Extract amount and source immediately
+                - Call this function right away
+                - Ask about feelings AFTER saving
                 
                 **Workflow:**
-                1. User mentions earning → Extract amount & source → CALL THIS FUNCTION
-                2. After saving → Ask "How are you feeling about this income?"
-
-                **Examples:**
-                User: "I recieved R1000 bonus from my job"
-                You: [IMMEDIATELY call save_income(1000, "job")] 
-                Then: "✅ Saved R1000 for job! How are you feeling about this income?"
+                1. User mentions earning → IMMEDIATELY call save_income()
+                2. After successful save → Ask "How are you feeling about this income?"
+                3. User responds with feeling → Use get_recent_transactions() + update_income_feeling()
                 
-                **Sources:** salary, job, freelance, business, selling, piece_job, domestic_work""",
+                **Example:**
+                User: "I earned R3000 from my job"
+                You: [IMMEDIATELY call save_income(3000, "job")] 
+                Then: "✅ Saved R3000 from job! How are you feeling about this income?"
+                
+                User: "Great"
+                You: [call get_recent_transactions("income")] → [call update_income_feeling(income_id, "Great")]
+                
+                **Income Sources:** salary, job, freelance, business, selling, piece_job, domestic_work, grants, bonus, tips""",
                 parameters=Schema(
                     type=Type.OBJECT,
                     properties={
@@ -115,6 +137,9 @@ class SisoNovaAgent:
             FunctionDeclaration(
                 name="save_feeling",
                 description="""Save a GENERAL financial feeling for wellness tracking - SEPARATE from expense/income feelings.
+
+                **CRITICAL: SAVE EVERY SINGLE FEELING MENTIONED - NEVER SKIP**
+
     
                 **🚨 CRITICAL DISTINCTION:**
                 - This function is for GENERAL financial wellness, NOT transaction-specific feelings
@@ -541,7 +566,105 @@ class SisoNovaAgent:
                     },
                     required=["message"]
                 )
-            )
+            ),
+            FunctionDeclaration(
+                name="get_recent_transactions",
+                description="""Get recent transactions to find which one needs a feeling update.
+
+                **When to call:**
+                - User gives a short emotional response: "good", "bad", "worried", "fine", "great"
+                - You need to find the most recent transaction that needs a feeling
+                - User seems to be responding to your "How are you feeling?" question
+                
+                **Critical Workflow for Feeling Updates:**
+                1. User mentions transaction → save_expense/save_income
+                2. You ask "How are you feeling about this expense/income?"
+                3. User responds with feeling → CALL THIS FUNCTION FIRST
+                4. Find transaction with needs_feeling=true
+                5. Call update_expense_feeling or update_income_feeling with the ID
+                
+                **Example:**
+                User: "I spent R50 on groceries"
+                You: [save_expense] → "✅ Saved! How are you feeling?"
+                User: "Good"
+                You: [get_recent_transactions("expense")] → Find ID:1 needs_feeling=true → [update_expense_feeling(1, "Good")]
+                
+                **NEVER guess transaction IDs - always get them from this function first!**""",
+                parameters=Schema(
+                    type=Type.OBJECT,
+                    properties={
+                        "record_type": Schema(
+                            type=Type.STRING, 
+                            enum=["expense", "income"],
+                            description="Type of transactions to get: 'expense' for expenses, 'income' for incomes"
+                        ),
+                        "limit": Schema(
+                            type=Type.INTEGER, 
+                            description="Number of recent transactions to get (default 5)"
+                        )
+                    },
+                    required=["record_type"]
+                )
+            ),
+            FunctionDeclaration(
+                name="update_expense_feeling",
+                description="""Update a specific expense with feeling information.
+    
+                **When to call:**
+                - After calling get_recent_transactions(record_type="expense") 
+                - User has provided a feeling response like "good", "bad", "worried", "fine"
+                - You have an expense_id from the recent transactions that needs_feeling=true
+                
+                **Workflow:**
+                1. User gives emotional response after expense
+                2. Call get_recent_transactions(record_type="expense") 
+                3. Find the most recent expense with needs_feeling=true
+                4. Call this function with that expense_id and the user's feeling
+                
+                **Example:**
+                User: "I spent R50 on groceries" → save_expense → "How are you feeling?"
+                User: "Good" → get_recent_transactions(record_type="expense") → update_expense_feeling(expense_id=1, feeling="Good")
+                
+                **Always get the expense_id from get_recent_transactions() first - never guess the ID!**""",
+                parameters=Schema(
+                    type=Type.OBJECT,
+                    properties={
+                        "expense_id": Schema(type=Type.INTEGER, description="Expense ID from get_recent_transactions() - the expense that needs feeling update"),
+                        "feeling": Schema(type=Type.STRING, description="User's feeling: Good, Bad, Worried, Fine, etc.")
+                    },
+                    required=["expense_id", "feeling"]
+                )
+            ),
+
+            FunctionDeclaration(
+                name="update_income_feeling",
+                description="""Update a specific income with feeling information.
+    
+                **When to call:**
+                - After calling get_recent_transactions(record_type="income")
+                - User has provided a feeling response like "good", "great", "worried", "relieved"
+                - You have an income_id from the recent transactions that needs_feeling=true
+                
+                **Workflow:**
+                1. User gives emotional response after income
+                2. Call get_recent_transactions(record_type="income")
+                3. Find the most recent income with needs_feeling=true
+                4. Call this function with that income_id and the user's feeling
+                
+                **Example:**
+                User: "I earned R3000 from my job" → save_income → "How are you feeling?"
+                User: "Great" → get_recent_transactions(record_type="income") → update_income_feeling(income_id=1, feeling="Great")
+                
+                **Always get the income_id from get_recent_transactions() first - never guess the ID!**""",
+                parameters=Schema(
+                    type=Type.OBJECT,
+                    properties={
+                        "income_id": Schema(type=Type.INTEGER, description="Income ID from get_recent_transactions() - the income that needs feeling update"),
+                        "feeling": Schema(type=Type.STRING, description="User's feeling about income")
+                    },
+                    required=["income_id", "feeling"]
+                )
+            ),
         ]
     async def process_message(self, message: str) -> Dict[str, Any]:
         """Fully agentic message processing with Gemini"""
@@ -594,6 +717,14 @@ class SisoNovaAgent:
         CORE MISSION:
         Help South Africans track their finances to build financial profiles for accessing formal financial services.
 
+        🚨 CRITICAL FUNCTION CALLING RULES:
+        1. NEVER claim to have saved data without calling the actual function
+        2. When user mentions spending/earning, you MUST call save_expense/save_income
+        3. If you say "✅ Saved", you MUST have called the function first
+        4. NEVER hallucinate function results - always call the actual functions
+        5. Wait for function results before responding
+        6. You are allowed to call more than one function per turn
+
         USER STATUS:
         - Registration: {"✅ REGISTERED" if is_registered else "❌ NOT REGISTERED"}
         - Display Language: {display_lang}
@@ -623,9 +754,6 @@ class SisoNovaAgent:
         - Net position: R{context.get('net_position', 0):,.2f}
         - Top category: {context.get('top_expense_category', 'None yet')}
 
-        CONVERSATION CONTEXT:
-        {context.get('conversation_context', 'This is a new conversation.')}
-
         IMPORTANT:
         - Trust your function declarations - they contain the detailed logic
         - Focus on natural conversation flow
@@ -651,6 +779,8 @@ class SisoNovaAgent:
     async def process_gemini_response(self, response, original_message: str, chat_session: genai.ChatSession) -> Dict[str, Any]:
         """Process Gemini's response and execute any function calls"""
         
+        print(f"🔍 DEBUG: Processing response for message: {original_message}")
+        
         function_calls_executed = []  # Track all function calls
         
         # Check if Gemini wants to call functions
@@ -661,12 +791,18 @@ class SisoNovaAgent:
                     function_name = part.function_call.name
                     function_args = {}
                     
+                    print(f"🔍 DEBUG: Gemini wants to call function: {function_name}")
+                    
                     # Extract arguments
                     for key, value in part.function_call.args.items():
                         function_args[key] = value
+
+                    print(f"🔍 DEBUG: Function arguments: {function_args}")
                     
                     # Execute the function
                     function_result = await self.execute_tool(function_name, function_args)
+                    
+                    print(f"🔍 DEBUG: Function result: {function_result}")
                     
                     # Track this function call
                     function_calls_executed.append({
@@ -675,82 +811,81 @@ class SisoNovaAgent:
                         "result": function_result
                     })
                     
-                    # Get AI's response after function execution
-                    return await self.get_response_after_function(
-                        function_result, 
-                        function_name, 
-                        original_message, 
-                        chat_session,
-                        function_calls_executed  # Pass all function calls
-                    )
+                    # ✅ DON'T return here - continue processing other function calls
+            
+            # ✅ After processing ALL function calls, get the AI's response
+            if function_calls_executed:
+                return await self.get_response_after_function(
+                    function_calls_executed[-1]["result"],  # Use last function result
+                    function_calls_executed[-1]["function_name"],  # Use last function name
+                    original_message, 
+                    chat_session,
+                    function_calls_executed  # Pass all function calls
+                )
         
-        # If no function calls, just return the text response
-        response_text = response.text if hasattr(response, 'text') else "I'm here to help with your finances!"
+        # 🚨 NEW: Validate response for hallucinated saves
+        response_text = response.text if hasattr(response, 'text') else ""
+        
+        # Check if AI claims to have saved something without calling functions
+        if any(phrase in response_text.lower() for phrase in ["✅ saved", "saved r", "recorded r", "tracked r"]):
+            if not function_calls_executed:
+                print(f"🚨 CRITICAL: AI hallucinated saving data without calling functions!")
+                print(f"🚨 Response: {response_text}")
+                
+                # Force a retry with stronger instruction
+                retry_prompt = f"""
+                CRITICAL ERROR: You just claimed to save data but didn't call any functions.
+                
+                Original message: "{original_message}"
+                Your response: "{response_text}"
+                
+                You MUST call the appropriate function (save_expense, save_income, etc.) when user mentions financial transactions.
+                
+                Please process the original message again and ACTUALLY call the required function.
+                """
+                
+                retry_response = chat_session.send_message(retry_prompt)
+                return await self.process_gemini_response(retry_response, original_message, chat_session)
         
         return {
             "message": response_text,
             "success": True,
             "function_result": None,
-            "function_calls": function_calls_executed  # Empty list if no functions called
+            "function_calls": function_calls_executed
         }
     
 
     async def get_response_after_function(self, function_result: Dict, function_name: str, 
-                                original_message: str, chat_session: genai.ChatSession,
-                                function_calls_executed: List[Dict]) -> Dict[str, Any]:
-        """Get AI's response after function execution using the same chat session"""
-        
-        # Create a follow-up prompt
+                            original_message: str, chat_session: genai.ChatSession,
+                            function_calls_executed: List[Dict]) -> Dict[str, Any]:
+    
         follow_up_prompt = f"""
         I just executed the function '{function_name}' with this result:
         {json.dumps(function_result, indent=2)}
         
-        Please provide a natural, friendly response to the user based on this function result. 
-        Be encouraging and helpful. If it's a report, explain the key insights in simple terms.
-        If it's a save operation, confirm what was saved and encourage continued tracking.
-        If it's service information, present it clearly and ask what they'd like to do next.
-        If it's registration, welcome them warmly and explain what they can do now.
+        Please provide a natural, friendly text response to the user based on this function result. 
         
-        IMPORTANT: Respond with ONLY text - no function calls in this response.
+        🚨 CRITICAL: Respond with ONLY TEXT - DO NOT call any functions.
+        🚨 CRITICAL: Do not use function calls in this response.
+        🚨 CRITICAL: Just give me a conversational text response.
+        
+        If it's a save operation, confirm what was saved.
+        If it's a report, explain the insights.
+        Be encouraging and helpful.
         """
         
         try:
-            # Use the same chat session - maintains full context
-            response = chat_session.send_message(follow_up_prompt)
+            # Send with explicit instruction to not use tools
+            response = chat_session.send_message(
+                follow_up_prompt,
+                tool_config={'function_calling_config': {'mode': 'NONE'}}  # 🚨 Disable function calling
+            )
             
-            # Better error handling for response text extraction
-            if hasattr(response, 'text') and response.text:
-                final_message = response.text
-            elif hasattr(response, 'candidates') and response.candidates:
-                # Extract text from candidates if direct text access fails
-                candidate = response.candidates[0]
-                if hasattr(candidate, 'content') and candidate.content.parts:
-                    text_parts = []
-                    for part in candidate.content.parts:
-                        if hasattr(part, 'text') and part.text:
-                            text_parts.append(part.text)
-                    final_message = ''.join(text_parts) if text_parts else "✅ Done! How else can I help you today?"
-                else:
-                    final_message = "✅ Done! How else can I help you today?"
-            else:
-                final_message = "✅ Done! How else can I help you today?"
-                
+            final_message = response.text if hasattr(response, 'text') else "✅ Done!"
+            
         except Exception as e:
             print(f"❌ Error in follow-up response: {e}")
-            # Enhanced fallback responses based on function type
-            if function_name == 'register_new_user':
-                if function_result.get('success'):
-                    final_message = "🎉 Welcome to SisoNova! You're now registered and can start tracking your finances. Try saying 'I spent R50 on groceries' to get started!"
-                else:
-                    final_message = "❌ There was an issue with registration. Please try again or contact support."
-            elif function_name.startswith('save_'):
-                final_message = "✅ Great! I've recorded that information. Keep up the good work tracking your finances!"
-            elif function_name.startswith('get_'):
-                final_message = "📊 Here's your report! This data helps build your financial profile."
-            elif function_name.startswith('show_'):
-                final_message = "ℹ️ Here's the information about SisoNova's services. What would you like to try?"
-            else:
-                final_message = "✅ Done! How else can I help you today?"
+            final_message = "✅ Done!"
         
         return {
             "message": final_message,
@@ -775,14 +910,14 @@ class SisoNovaAgent:
         if function_name in protected_tools:
             registration_status = await check_user_registration(self.user_phone_number, self.query_manager)
             if not registration_status.get("registered", False):
-                return await show_unregistered_limitations(function_name)  # Make sure this is async
+                return show_unregistered_limitations(function_name)  # Make sure this is async
         
         if function_name == "save_expense":
-            return await save_expense(query_manager=self.query_manager,**arguments)
+            return await save_expense(query_manager=self.query_manager, user_id=self.user_id, **arguments)
         elif function_name == "save_income":
-            return await save_income(query_manager=self.query_manager,**arguments)
+            return await save_income(query_manager=self.query_manager, user_id=self.user_id,**arguments)
         elif function_name == "save_feeling":
-            return await save_feeling(query_manager=self.query_manager,**arguments)
+            return await save_feeling(query_manager=self.query_manager, user_id=self.user_id,**arguments)
         # elif function_name == "get_expense_report":
         #     return self.get_expense_report(**arguments)
         # elif function_name == "get_income_report":
@@ -807,8 +942,14 @@ class SisoNovaAgent:
             return show_getting_started_guide(**arguments)
         # Language tools (always allowed)
         elif function_name == "set_user_language":
-            return await set_user_language_preferences(query_manager=self.query_manager, **arguments)
+            return await set_user_language_preferences(query_manager=self.query_manager, user_id=self.user_id, **arguments)
         elif function_name == "show_language_options":
             return show_language_options(**arguments)
+        elif function_name == "get_recent_transactions":
+            return await get_recent_transactions(query_manager=self.query_manager, user_id=self.user_id, **arguments)
+        elif function_name == "update_expense_feeling":
+            return await update_expense_feeling(query_manager=self.query_manager, s3_bucket=self.s3_bucket, user_phone_number=self.user_phone_number, user_id=self.user_id, **arguments)
+        elif function_name == "update_income_feeling":
+            return await update_income_feeling(query_manager=self.query_manager, s3_bucket=self.s3_bucket, user_phone_number=self.user_phone_number, user_id=self.user_id, **arguments)
         else:
             return {"error": f"Unknown function: {function_name}"}
