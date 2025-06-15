@@ -167,6 +167,19 @@ class AsyncQueries:
             update(User).where(User.id == user_id, User.phone_number == user_phone_number).values(registered=registration_status, updated_at=datetime.utcnow())
         )
 
+    async def update_income_feeling(self, user_id: int, income_id: int, feeling: str) -> None:
+        await self.session.execute(
+            update(UnverifiedIncomes).where(UnverifiedIncomes.user_id == user_id, UnverifiedIncomes.id == income_id).values(feeling=feeling, updated_at=datetime.utcnow())
+        )
+        await self.session.commit()
+
+    async def update_expense_feeling(self, user_id: int, expense_id: int, feeling: str) -> None:
+        await self.session.execute(
+            update(UnverifiedExpenses).where(UnverifiedExpenses.user_id == user_id, UnverifiedExpenses.id == expense_id).values(feeling=feeling, updated_at=datetime.utcnow())
+        )
+        await self.session.commit()
+        
+
     # Insert Methods
 
     async def insert_user_unverified_expenses(self, user_id: int, expenses: list[UnverifiedExpenses]) -> None:
