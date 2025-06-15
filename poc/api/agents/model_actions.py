@@ -53,7 +53,7 @@ async def register_new_user(phone_number: str, consent_given: bool, query_manage
             }
         
         # Check if user already exists
-        user_info = check_user_registration(phone_number=phone_number, query_manager=query_manager)
+        user_info = await check_user_registration(phone_number=phone_number, query_manager=query_manager)
         if user_info["exists"]:
             if user_info["registered"]:
                 return {
@@ -104,7 +104,7 @@ async def register_new_user(phone_number: str, consent_given: bool, query_manage
             "registered": False
         }
     
-def show_registration_info(self, language: str = "English") -> Dict:
+def show_registration_info(language: str = "English") -> Dict:
     """Show registration information and terms"""
     
     registration_info = {
@@ -206,7 +206,7 @@ Om SisoNova se finansiële opvolging en bystandsdienste te gebruik, moet jy eers
     }
 
 
-def show_unregistered_limitations(self, attempted_action: str) -> Dict:
+def show_unregistered_limitations(attempted_action: str) -> Dict:
     """Explain what unregistered users cannot do"""
     
     limitation_messages = {
@@ -488,6 +488,261 @@ async def get_user_language(user_id: int, query_manager: AsyncQueries) -> Dict:
             "error": str(e)
         }
 
+# Services
+###############################################################################################################################################
+
+def show_sisonova_services(service_type: str = "overview") -> Dict:
+    """Show SisoNova services information"""
+    
+    if service_type == "overview" or service_type == "all":
+        overview = """
+🌟 **Welcome to SisoNova Financial Services!** 🌟
+
+SisoNova is designed specifically for South Africans who want to build a stronger financial future. We help you track your money, understand your spending patterns, and build a financial profile that can help you access formal financial services.
+
+**🏠 SisoNova Personal**
+Your personal financial assistant that helps you:
+• Track expenses and income easily
+• Record how you feel about money (financial wellness)
+• Get detailed reports and insights
+• Build your financial profile over time
+• Process receipt photos automatically
+
+**🌍 SisoNova Public** 
+Community financial resources including:
+• Shared financial education content
+• Community support programs  
+• Group savings challenges
+• Financial literacy resources
+
+**💡 Why SisoNova?**
+• Built for the unbanked and underserved
+• No complex forms or rigid formats
+• Just chat naturally about your money
+• Build data that banks and lenders trust
+• Free to start, powerful insights included
+
+**Ready to begin?** Just tell me what you'd like to do, like:
+• "I want to track my spending"
+• "Show me how SisoNova Personal works"
+• "I spent money today"
+• "Help me get started"
+        """
+        
+        if service_type == "all":
+            overview += "\n\n" + show_personal_capabilities(detailed=True)["content"]
+        
+        return {
+            "success": True,
+            "content": overview,
+            "service_type": service_type
+        }
+    
+    elif service_type == "personal":
+        return show_personal_capabilities(detailed=True)
+    
+    elif service_type == "public":
+        return {
+            "success": True,
+            "content": """
+🌍 **SisoNova Public - Community Financial Resources**
+
+**📚 Financial Education**
+• Budgeting basics for South African families
+• Understanding credit and how to build it
+• Savings strategies that work with irregular income
+• How to prepare for financial emergencies
+
+**🤝 Community Support**
+• Connect with others on similar financial journeys
+• Share tips and success stories
+• Group challenges and savings goals
+• Peer support for financial stress
+
+**🎯 Group Programs**
+• Stokvel integration and tracking
+• Family financial planning tools
+• Community investment education
+• Local business support resources
+
+**📱 How to Access:**
+Currently in development! SisoNova Personal is available now and helps you build the foundation for community features.
+
+Want to start with Personal services? Just say "I want to track my money" or "Show me Personal services"
+            """,
+            "service_type": "public"
+        }
+
+def show_personal_capabilities( detailed: bool = False) -> Dict:
+    """Show SisoNova Personal capabilities"""
+    
+    if detailed:
+        content = """
+🏠 **SisoNova Personal - Your AI Financial Assistant**
+
+**💰 EXPENSE TRACKING**
+Just tell me naturally when you spend money:
+• "I spent R50 on groceries at Shoprite"
+• "Paid rent today, R3500, feeling stressed"
+• "Bought airtime R30"
+• "Taxi to work was R25, expensive today"
+
+**📈 INCOME TRACKING** 
+Tell me when you earn money:
+• "Got paid R4500 from my job, feeling good"
+• "Made R200 from selling vegetables"
+• "Received R150 from cleaning job"
+
+**💭 FINANCIAL FEELINGS**
+Share how money makes you feel:
+• "I'm worried about money this month"
+• "Feeling good about my savings"
+• "Stressed about unexpected expenses"
+
+**📊 REPORTS & INSIGHTS**
+Get detailed analysis:
+• "Show me my expense report"
+• "How am I doing this month?"
+• "What's my biggest spending category?"
+• "Generate my financial summary"
+
+**📸 RECEIPT PROCESSING** (Coming Soon)
+• Send photos of receipts
+• Automatic expense extraction
+• Higher verification for your financial profile
+
+**🎯 WHY TRACK WITH SISONOVA?**
+• Build a financial history that banks trust
+• Identify where you can save money
+• Understand your spending patterns
+• Prepare for loans, credit, formal banking
+• Track progress toward financial goals
+
+**🚀 GETTING STARTED IS EASY:**
+1. Just start telling me about your money
+2. I'll ask questions to understand better
+3. I'll save everything securely
+4. You'll get insights and reports
+5. Build your financial profile over time
+
+**Ready to start?** Try saying something like:
+"I bought groceries for R150 today"
+        """
+    else:
+        content = """
+🏠 **SisoNova Personal Services:**
+
+• 💰 Track expenses naturally
+• 📈 Record income easily  
+• 💭 Monitor financial feelings
+• 📊 Get detailed reports
+• 🎯 Build your financial profile
+
+Say "show me detailed Personal info" for examples and instructions.
+        """
+    
+    return {
+        "success": True,
+        "content": content,
+        "detailed": detailed
+    }
+
+def show_getting_started_guide( user_type: str = "complete_beginner") -> Dict:
+    """Show getting started guide"""
+    
+    if user_type == "complete_beginner":
+        guide = """
+🎯 **Getting Started with SisoNova - Complete Beginner's Guide**
+
+**STEP 1: Understand What We Do**
+SisoNova helps you track your money to build a financial profile. Think of it as your personal money diary that becomes valuable data for your future.
+
+**STEP 2: Start Simple - Track One Thing**
+Don't worry about being perfect. Just start with ONE thing:
+• Next time you buy something, tell me: "I spent R[amount] on [what]"
+• Example: "I spent R25 on bread"
+
+**STEP 3: Add How You Feel (Optional)**
+Money affects emotions. You can add:
+• "I spent R25 on bread, feeling okay"
+• "I spent R25 on bread, worried about money"
+
+**STEP 4: Try It Right Now!**
+Think of something you bought recently and tell me about it. I'll show you how easy it is.
+
+**STEP 5: See Your Progress**
+After a few days, ask me:
+• "Show me my spending report"
+• "How am I doing?"
+
+**🌟 Remember:**
+• No wrong way to start
+• I understand natural language
+• Every entry builds your financial profile
+• You're taking control of your financial future!
+
+**Ready to try?** Tell me about something you bought recently!
+        """
+    
+    elif user_type == "has_some_data":
+        guide = """
+📈 **Welcome Back! Let's Build on Your Progress**
+
+I can see you already have some financial data tracked. Great start! 
+
+**NEXT STEPS TO MAXIMIZE SISONOVA:**
+
+**1. Make It a Daily Habit**
+• Track expenses as they happen
+• "I just spent R15 on taxi"
+• "Bought lunch R45"
+
+**2. Include Your Feelings**
+• "Paid electricity R200, stressed"
+• "Got paid today R3000, relieved"
+
+**3. Use Reports for Insights**
+• "Show me my expense report"
+• "What's my biggest spending category?"
+• "How am I doing this month?"
+
+**4. Set Simple Goals**
+• "I want to spend less on transport"
+• "I'm trying to save R500 this month"
+
+**Want to see your current progress?** Ask me:
+• "Show me my expense report"
+• "How much have I spent this month?"
+        """
+    
+    else:  # returning_user
+        guide = """
+👋 **Welcome Back to SisoNova!**
+
+**QUICK REFRESHER:**
+• Tell me about expenses: "I spent R[amount] on [category]"
+• Record income: "I earned R[amount] from [source]"
+• Share feelings: "I'm feeling [emotion] about money"
+• Get reports: "Show me my [expense/income/feelings] report"
+
+**NEW FEATURES YOU MIGHT HAVE MISSED:**
+• More detailed financial insights
+• Better spending pattern analysis
+• Improved report generation
+
+**CONTINUE WHERE YOU LEFT OFF:**
+• "Show me my recent activity"
+• "How am I doing this month?"
+• "What's changed since last time?"
+
+Ready to continue your financial journey?
+        """
+    
+    return {
+        "success": True,
+        "content": guide,
+        "user_type": user_type
+    }
 
 # Metadata
 ###############################################################################################################################################
