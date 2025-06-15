@@ -42,32 +42,29 @@ class SisoNovaAgent:
             
             FunctionDeclaration(
                 name="save_expense",
-                description="""Save a user's expense to build their financial profile.
+                description="""IMMEDIATELY save user's expense when they mention spending money.
+    
+                **CRITICAL: SAVE FIRST, ASK LATER**
                 
-                **When to call:**
-                - User mentions spending money: "I spent R50 on groceries"
-                - User confirms they want to save an expense after you've clarified details
-                - User provides amount and category information
+                **When to call IMMEDIATELY:**
+                - "I spent R50 on groceries" → SAVE NOW
+                - "Bought bread for R15" → SAVE NOW  
+                - "Taxi cost R25" → SAVE NOW
+                - "Paid rent R3500" → SAVE NOW
+                
+                **DO NOT ask for confirmation first - SAVE IMMEDIATELY**
                 
                 **Workflow:**
-                1. User mentions spending → Ask clarifying questions if needed
-                2. Confirm amount, category, and feeling
-                3. User agrees to save → Call this function
-                4. Celebrate the tracking and encourage continued use
+                1. User mentions spending → Extract amount & category → CALL THIS FUNCTION
+                2. After saving → Ask "How are you feeling about this expense?"
+                3. User responds with feeling → Use update_expense_feeling()
                 
-                **Do NOT call if:**
-                - User is just asking about expenses casually
-                - User hasn't confirmed they want to save it
-                - Missing required information (amount/category)
-                - User is not registered (function will handle this)
+                **Examples:**
+                User: "I spent R50 on groceries"
+                You: [IMMEDIATELY call save_expense(50, "groceries")] 
+                Then: "✅ Saved R50 for groceries! How are you feeling about this expense?"
                 
-                **Examples of when to use:**
-                - "I bought bread for R15" → Clarify → Save
-                - "Spent R200 on groceries, feeling good" → Save directly
-                - "Taxi cost me R25 today" → Clarify category → Save
-                
-                **South African context:** Common categories include groceries, taxi/transport, 
-                airtime, electricity, rent, clothing, entertainment.""",
+                **Categories:** groceries, transport, utilities, entertainment, clothing, airtime, rent, food""",
                 parameters=Schema(
                     type=Type.OBJECT,
                     properties={
@@ -82,27 +79,27 @@ class SisoNovaAgent:
             
             FunctionDeclaration(
                 name="save_income",
-                description="""Save a user's income to build their financial profile.
+                description="""IMMEDIATELY save user's income when they mention earning money.
+    
+                **CRITICAL: SAVE FIRST, ASK LATER**
                 
-                **When to call:**
-                - User mentions earning money: "Got paid R3000 today"
-                - User confirms they want to record income
-                - User provides amount and source information
+                **When to call IMMEDIATELY:**
+                - "I earned R3000 from my job" → SAVE NOW
+                - "Got paid R4500" → SAVE NOW
+                - "Made R200 selling vegetables" → SAVE NOW
+                
+                **DO NOT ask for confirmation - SAVE IMMEDIATELY**
                 
                 **Workflow:**
-                1. User mentions earning → Clarify source and amount if needed
-                2. Ask about their feeling (optional but valuable)
-                3. User confirms → Call this function
-                4. Celebrate and encourage regular income tracking
-                
-                **Common income sources in South Africa:**
-                - Salary/wages, freelance work, business income, piece jobs,
-                - selling goods, domestic work, construction, grants
-                
+                1. User mentions earning → Extract amount & source → CALL THIS FUNCTION
+                2. After saving → Ask "How are you feeling about this income?"
+
                 **Examples:**
-                - "Got my salary R4500" → Save with source "salary"
-                - "Made R200 selling vegetables" → Save with source "business"
-                - "Cleaning job paid R150" → Save with source "domestic work" """,
+                User: "I recieved R1000 bonus from my job"
+                You: [IMMEDIATELY call save_income(1000, "job")] 
+                Then: "✅ Saved R1000 for job! How are you feeling about this income?"
+                
+                **Sources:** salary, job, freelance, business, selling, piece_job, domestic_work""",
                 parameters=Schema(
                     type=Type.OBJECT,
                     properties={
@@ -117,27 +114,44 @@ class SisoNovaAgent:
             
             FunctionDeclaration(
                 name="save_feeling",
-                description="""Save a user's financial feeling for wellness tracking.
+                description="""Save a GENERAL financial feeling for wellness tracking - SEPARATE from expense/income feelings.
+    
+                **🚨 CRITICAL DISTINCTION:**
+                - This function is for GENERAL financial wellness, NOT transaction-specific feelings
+                - Use update_expense_feeling() or update_income_feeling() for transaction feelings
+                - This is for overall financial mood, stress, confidence about money in general
                 
-                **When to call:**
-                - User expresses emotions about money: "I'm worried about money"
-                - User shares financial stress or confidence
-                - User wants to track their financial wellness journey
+                **When to call save_feeling:**
+                - User expresses GENERAL emotions about money: "I'm worried about money this month"
+                - User shares overall financial stress or confidence: "I'm feeling good about my finances"
+                - User wants to track their general financial wellness journey
+                - User talks about money anxiety, financial goals, or overall money mood
+                
+                **When NOT to call save_feeling:**
+                - User just spent/earned money and you're asking "How are you feeling?" → Use update_expense_feeling/update_income_feeling instead
+                - User responds with feeling after a transaction → Use transaction-specific update functions
+                - User gives feeling about a specific purchase/income → Use transaction update functions
+                
+                **EXAMPLES of when to use save_feeling:**
+                ✅ "I'm stressed about money this month" → save_feeling("Worried", "monthly financial stress")
+                ✅ "Feeling good about my savings progress" → save_feeling("Good", "savings progress")
+                ✅ "I'm worried about my financial future" → save_feeling("Worried", "financial future concerns")
+                ✅ "Money has been tight lately" → save_feeling("Struggling", "tight budget")
+                
+                **EXAMPLES of when NOT to use save_feeling:**
+                ❌ User: "I spent R50 on groceries" You: "How are you feeling?" User: "Good" → Use update_expense_feeling()
+                ❌ User: "I earned R3000" You: "How are you feeling?" User: "Great" → Use update_income_feeling()
+                ❌ Any feeling response immediately after a transaction → Use transaction update functions
                 
                 **Workflow:**
-                1. User expresses financial emotion
-                2. Ask for context if not provided
-                3. Validate feeling is in allowed enum
-                4. Save and provide supportive response
+                1. User expresses GENERAL financial emotion (not about specific transaction)
+                2. Extract feeling and context
+                3. Call this function to save general financial wellness data
+                4. Provide supportive response about their overall financial journey
                 
                 **Allowed feelings:** Struggling, Worried, Coping, Okay, Fine, Good, Great
                 
-                **Examples:**
-                - "I'm stressed about money this month" → feeling: "Worried", context: "monthly budget concerns"
-                - "Feeling good about my savings" → feeling: "Good", context: "savings progress"
-                
-                **Important:** This helps track financial wellness over time and is valuable 
-                for understanding the emotional impact of financial decisions.""",
+                **Purpose:** Track overall financial wellness patterns over time, separate from specific transaction emotions.""",
                 parameters=Schema(
                     type=Type.OBJECT,
                     properties={
