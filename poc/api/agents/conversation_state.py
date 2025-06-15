@@ -26,8 +26,9 @@ class AgentConversationManager:
         return gemini_history
     
     async def save_conversation_turn(self, user_message: str, assistant_response: str, function_calls: List[Dict] = None) -> None:
+
         turn_id = await self._get_next_turn_id()
-    
+
         # Create turn data
         turn_data = {
             "turn_id": turn_id,
@@ -37,13 +38,15 @@ class AgentConversationManager:
             "function_calls": function_calls or []
         }
         
-        # Save to S3
+        
         success = await self.s3_bucket.append_conversation_turn(self.user_phone_number, turn_data)
         
         if success:
-            print(f"✅ Conversation turn saved for {self.user_phone_number}")
+            print(f"✅ Conversation turn {turn_id} saved for {self.user_phone_number}")
         else:
-            print(f"❌ Failed to save conversation turn for {self.user_phone_number}")
+            print(f"❌ Failed to save conversation turn {turn_id}")
+        
+        return success
 
 
 
