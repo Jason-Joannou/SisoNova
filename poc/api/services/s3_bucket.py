@@ -138,9 +138,11 @@ class SecureS3Service:
             logger.error(f"Unexpected error saving conversation history: {e}")
             return False
         
-    async def append_conversation_turn(self, user_phone_number: str, turn_data: Dict, history: Optional[Dict] = None) -> bool:
+    async def append_conversation_turn(self, user_phone_number: str, turn_data: Dict) -> bool:
         """Append a new turn to conversation history"""
         try:
+            # Load existing history
+            history = await self.load_conversation_history(user_phone_number)
             
             if history is None:
                 # Create new history
