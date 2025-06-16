@@ -544,19 +544,27 @@ class FinancialReportPDF:
             total = summary.get('total_expenses', 0)
             daily = summary.get('average_daily_spending', 0)
             status = self._get_spending_status(total)
+
+            summary_data = [
+                ['📊 Total Expenses', '📅 Daily Average', '🎯 Financial Status'],
+                [f'R {total:,.2f}', f'R {daily:,.2f}', status]
+            ]
         elif report_type == 'income':
             total = summary.get('total_income', 0)
             daily = summary.get('monthly_average', 0)
             status = self._get_income_status(total)
+            summary_data = [
+                ['📊 Total Incomes', '📅 Daily Average', '🎯 Financial Status'],
+                [f'R {total:,.2f}', f'R {daily:,.2f}', status]
+            ]
         else:
             total = 0
             daily = 0
             status = "Unknown"
-        
-        summary_data = [
-            ['📊 Total Expenses', '📅 Daily Average', '🎯 Financial Status'],
-            [f'R {total:,.2f}', f'R {daily:,.2f}', status]
-        ]
+            summary_data = [
+                ['📊 Total', '📅 Average', '🎯 Status'],
+                [f'R {total:,.2f}', f'R {daily:,.2f}', status]
+            ]
         
         summary_table = Table(summary_data, colWidths=[50*mm, 50*mm, 50*mm])
         summary_table.setStyle(TableStyle([
@@ -673,84 +681,239 @@ class FinancialReportPDF:
             return "Moderate Earner"
         else:
             return "Building Income"
+        
+    def _get_income_insight(self, amount: float) -> str:
+        """Get insight text for income amounts"""
+        if amount > 50000:
+            return "Strong income period"
+        elif amount > 20000:
+            return "Moderate income"
+        else:
+            return "Building income base"
+
+    def _get_monthly_insight(self, amount: float) -> str:
+        """Get insight text for monthly income averages"""
+        if amount > 8000:
+            return "Above average monthly income"
+        elif amount > 4000:
+            return "Moderate monthly income"
+        else:
+            return "Growing monthly income"
+
+    def _get_income_event_insight(self, amount: float) -> str:
+        """Get insight text for income per event"""
+        if amount > 2000:
+            return "Large income events"
+        elif amount > 500:
+            return "Medium income events"
+        else:
+            return "Small income events"
+
+    def _get_stability_status(self, score: float) -> str:
+        """Get status text for stability score"""
+        if score >= 80:
+            return "Very Stable"
+        elif score >= 60:
+            return "Moderately Stable"
+        elif score >= 40:
+            return "Somewhat Unstable"
+        else:
+            return "Highly Variable"
+
+    def _calculate_consistency_rating(self, stability_data: dict) -> str:
+        """Calculate consistency rating from stability data"""
+        score = stability_data.get('stability_score', 0)
+        if score >= 80:
+            return "Highly Consistent"
+        elif score >= 60:
+            return "Moderately Consistent"
+        elif score >= 40:
+            return "Somewhat Inconsistent"
+        else:
+            return "Highly Variable"
     
     def _build_income_pdf_content(self, report_data: Dict[str, Any]) -> list:
-        """Build PDF content for income reports"""
+        """Build African-styled income report content with sections on new pages - matching expense structure"""
         story = []
         
-        # Summary Section
+        # PAGE 1: Executive Summary
+        story.append(self._create_african_summary_box(report_data.get('summary', {}), 'income'))
+        story.append(Spacer(1, 30))
+        
+        # Overview description
+        overview_desc = """
+        This comprehensive income analysis provides insights into your earning patterns over the past 6 months. 
+        Understanding your income sources and emotional patterns is the foundation for building financial security 
+        and growing your wealth. Let's explore your income journey together.
+        """
+        story.append(Paragraph(overview_desc, self.description_style))
+        
+        # PAGE 2: Key Income Metrics
+        story.append(PageBreak())
+        story.append(Paragraph("📊 Key Income Metrics", self.heading_style))
+        
+        metrics_desc = """
+        These key metrics reveal the foundation of your earning patterns. By understanding your income frequency, 
+        sources, and stability, we can identify opportunities to optimize your financial growth and create 
+        more consistent income streams.
+        """
+        story.append(Paragraph(metrics_desc, self.description_style))
+        
         if 'summary' in report_data:
-            story.append(Paragraph("Income Summary", self.heading_style))
             summary = report_data['summary']
             
-            summary_data = [
-                ['Total Income:', f"R {summary.get('total_income', 0):,.2f}"],
-                ['Monthly Average:', f"R {summary.get('monthly_average', 0):,.2f}"],
-                ['Income Events:', str(summary.get('total_income_events', 0))],
-                ['Average per Event:', f"R {summary.get('average_income_per_event', 0):,.2f}"]
+            # Create metrics in a beautiful African-themed table
+            metrics_data = [
+                ['Metric', 'Value', 'Insight'],
+                ['Total Income', f"R {summary.get('total_income', 0):,.2f}", self._get_income_insight(summary.get('total_income', 0))],
+                ['Monthly Average', f"R {summary.get('monthly_average', 0):,.2f}", self._get_monthly_insight(summary.get('monthly_average', 0))],
+                ['Income Events', str(summary.get('total_income_events', 0)), f"{summary.get('total_income_events', 0)} income receipts tracked"],
+                ['Avg per Event', f"R {summary.get('average_income_per_event', 0):,.2f}", self._get_income_event_insight(summary.get('average_income_per_event', 0))]
             ]
             
             if 'largest_income' in summary:
                 largest = summary['largest_income']
-                summary_data.append(['Largest Income:', f"R {largest.get('amount', 0):,.2f} - {largest.get('type', 'Unknown')}"])
+                metrics_data.append(['Largest Income', f"R {largest.get('amount', 0):,.2f}", f"From {largest.get('type', 'Unknown')} source"])
             
-            summary_table = Table(summary_data, colWidths=[2.5*inch, 2.5*inch])
-            summary_table.setStyle(self._get_table_style())
-            story.append(summary_table)
-            story.append(Spacer(1, 20))
+            metrics_table = Table(metrics_data, colWidths=[45*mm, 35*mm, 70*mm])
+            metrics_table.setStyle(self._get_african_table_style())
+            story.append(metrics_table)
         
-        # Source Analysis
+        # PAGE 3: Income Sources Analysis
+        story.append(PageBreak())
+        story.append(Paragraph("🏢 Income Sources Analysis", self.heading_style))
+        
+        sources_desc = """
+        Your income sources tell the story of your financial foundation and security. This breakdown helps identify 
+        which sources provide the most stability and where you might find opportunities to diversify or strengthen 
+        your earning potential for long-term financial growth.
+        """
+        story.append(Paragraph(sources_desc, self.description_style))
+        
         if 'source_analysis' in report_data:
-            story.append(Paragraph("Income Sources", self.heading_style))
             sources = report_data['source_analysis'].get('source_breakdown', {})
             
-            source_data = [['Source', 'Amount', 'Count', 'Percentage']]
-            for source, data in sources.items():
+            # Sort sources by amount
+            sorted_sources = sorted(sources.items(), key=lambda x: x[1].get('total', 0), reverse=True)
+            
+            source_data = [['Income Source', 'Amount', 'Count', 'Average', '% of Total']]
+            for source, data in sorted_sources:
                 source_data.append([
                     source,
                     f"R {data.get('total', 0):,.2f}",
                     str(data.get('count', 0)),
-                    f"{data.get('percentage', 0)}%"
+                    f"R {data.get('average', 0):,.2f}",
+                    f"{data.get('percentage', 0):.1f}%"
                 ])
             
-            source_table = Table(source_data, colWidths=[2*inch, 1.2*inch, 0.8*inch, 1*inch])
-            source_table.setStyle(self._get_table_style())
+            source_table = Table(source_data, colWidths=[40*mm, 30*mm, 20*mm, 30*mm, 25*mm])
+            source_table.setStyle(self._get_african_category_table_style())
             story.append(source_table)
             story.append(Spacer(1, 20))
+            
+            # Primary vs Secondary income analysis
+            if sorted_sources:
+                primary_source = sorted_sources[0]
+                primary_percentage = primary_source[1].get('percentage', 0)
+                
+                story.append(Paragraph("⚖️ Income Diversification Analysis", self.subheading_style))
+                
+                diversification_status = "High Dependency" if primary_percentage > 80 else "Moderate Dependency" if primary_percentage > 60 else "Well Diversified"
+                status_color = AFRICAN_RUST if primary_percentage > 80 else AFRICAN_GOLD if primary_percentage > 60 else AFRICAN_SAGE
+                
+                diversification_summary = f"""
+                <b>Primary Income Source:</b> {primary_source[0]} ({primary_percentage:.1f}%)<br/>
+                <b>Diversification Status:</b> <font color="{status_color}"><b>{diversification_status}</b></font><br/>
+                <b>Risk Level:</b> {"High" if primary_percentage > 80 else "Medium" if primary_percentage > 60 else "Low"}
+                """
+                story.append(Paragraph(diversification_summary, self.body_style))
+        
+        # PAGE 4: Income Stability & Growth
+        story.append(PageBreak())
+        story.append(Paragraph("📈 Income Stability & Growth Opportunities", self.heading_style))
+        
+        stability_desc = """
+        Income stability is crucial for financial planning and peace of mind. These insights reveal how predictable 
+        your income is and identify specific opportunities to increase your earning potential and build a more 
+        secure financial future.
+        """
+        story.append(Paragraph(stability_desc, self.description_style))
         
         # Stability Analysis
         if 'stability_analysis' in report_data:
-            story.append(Paragraph("Income Stability", self.heading_style))
             stability = report_data['stability_analysis']
             
             stability_data = [
-                ['Stability Score:', f"{stability.get('stability_score', 0)}/100"],
-                ['Regular Income %:', f"{stability.get('income_predictability', {}).get('regular_percentage', 0)}%"]
+                ['Stability Metric', 'Score', 'Status'],
+                ['Overall Stability Score', f"{stability.get('stability_score', 0):.1f}/100", self._get_stability_status(stability.get('stability_score', 0))],
+                ['Regular Income %', f"{stability.get('income_predictability', {}).get('regular_percentage', 0):.1f}%", 'Predictable income sources'],
+                ['Income Consistency', self._calculate_consistency_rating(stability), 'Month-to-month reliability']
             ]
             
-            stability_table = Table(stability_data, colWidths=[2.5*inch, 2*inch])
-            stability_table.setStyle(self._get_table_style())
+            stability_table = Table(stability_data, colWidths=[50*mm, 30*mm, 70*mm])
+            stability_table.setStyle(self._get_african_table_style())
             story.append(stability_table)
             story.append(Spacer(1, 20))
         
         # Growth Opportunities
         if 'growth_opportunities' in report_data:
-            story.append(Paragraph("Growth Opportunities", self.heading_style))
+            story.append(Paragraph("🚀 Growth Opportunities", self.subheading_style))
             opportunities = report_data['growth_opportunities']
             
-            for opp in opportunities:
-                story.append(Paragraph(f"<b>{opp.get('type', 'Unknown')}</b>", self.styles['Normal']))
-                story.append(Paragraph(f"Description: {opp.get('description', 'No description')}", self.styles['Normal']))
-                story.append(Paragraph(f"Potential Increase: {opp.get('potential_monthly_increase', 'Unknown')}", self.styles['Normal']))
-                story.append(Paragraph(f"Action Required: {opp.get('action_required', 'No action specified')}", self.styles['Normal']))
-                story.append(Spacer(1, 10))
+            for i, opp in enumerate(opportunities, 1):
+                priority_color = AFRICAN_SAGE if opp.get('priority') == 'High' else AFRICAN_GOLD if opp.get('priority') == 'Medium' else AFRICAN_CLAY
+                
+                opp_text = f"""
+                <b>{i}. {opp.get('type', 'Unknown Opportunity')}</b> 
+                <font color="{priority_color}"><b>({opp.get('priority', 'Medium')} Priority)</b></font><br/>
+                💰 <b>Potential Monthly Increase:</b> {opp.get('potential_monthly_increase', 'Unknown')}<br/>
+                📋 <b>Action Required:</b> {opp.get('action_required', 'No action specified')}<br/>
+                📝 <b>Description:</b> {opp.get('description', 'No description available')}<br/>
+                """
+                story.append(Paragraph(opp_text, self.body_style))
+                story.append(Spacer(1, 12))
         
-        # Recommendations
+        # PAGE 5: Income Behavioral Triggers (NEW SECTION)
+        story.append(PageBreak())
+        story.append(Paragraph("🧠 Your Income Behavioral Patterns", self.heading_style))
+        
+        behavior_desc = """
+        Understanding how you emotionally respond to different income situations helps you make better financial 
+        decisions and optimize your earning behavior. These insights reveal specific patterns that affect how you 
+        pursue, receive, and feel about your income.
+        """
+        story.append(Paragraph(behavior_desc, self.description_style))
+        
+        # Add behavioral analysis section
+        story.extend(self._build_income_behavior_triggers_section(report_data))
+        
+        # PAGE 6: Action Plan
+        story.append(PageBreak())
+        story.append(Paragraph("🎯 Your Personal Income Action Plan", self.heading_style))
+        
+        action_desc = """
+        Knowledge without action is just information. This personalized action plan provides specific, 
+        achievable steps tailored to your unique income situation. Each recommendation is designed 
+        to help you increase your earning potential and build long-term financial security.
+        """
+        story.append(Paragraph(action_desc, self.description_style))
+        
         if 'recommendations' in report_data:
-            story.append(Paragraph("Recommendations", self.heading_style))
-            for rec in report_data['recommendations']:
-                story.append(Paragraph(f"• {rec}", self.styles['Normal']))
-            story.append(Spacer(1, 20))
+            story.append(Paragraph("🚀 Immediate Actions You Can Take:", self.subheading_style))
+            for i, rec in enumerate(report_data['recommendations'], 1):
+                action_text = f"<b>Step {i}:</b> {rec}"
+                story.append(Paragraph(action_text, self.body_style))
+                story.append(Spacer(1, 8))
+        
+        # Motivational closing
+        story.append(Spacer(1, 20))
+        motivation_text = """
+        <b>Remember:</b> Every income journey is unique, and you have the power to shape your financial future. 
+        You've already taken an important step by tracking and analyzing your income patterns. Use these insights 
+        to make informed decisions, celebrate your progress, and stay focused on building the financial life you deserve. 
+        Your future self will thank you for the actions you take today.
+        """
+        story.append(Paragraph(motivation_text, self.highlight_style))
         
         return story
     
@@ -867,3 +1030,124 @@ class FinancialReportPDF:
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
             ('GRID', (0, 0), (-1, -1), 1, colors.black)
         ])
+    
+    def _build_income_behavior_triggers_section(self, report_data: Dict[str, Any]) -> list:
+        """Build the behavioral triggers section for PAGE 5 - focused on actionable insights"""
+        story = []
+        
+        behavior_data = report_data.get('income_behavior_triggers', {})
+        print(f"DEBUG: Behavior data structure: {behavior_data}")
+        
+        # Check if we have behavioral data using the correct key
+        if not behavior_data.get('has_data', False):
+            # Brief section if no behavioral data
+            no_data_desc = """
+            Start tracking how you feel about your income to unlock powerful behavioral insights. 
+            Understanding your emotional patterns with money helps you make better financial decisions 
+            and optimize your income-earning behavior.
+            """
+            story.append(Paragraph(no_data_desc, self.body_style))
+            story.append(Spacer(1, 15))
+            
+            # Encourage tracking
+            story.append(Paragraph("💡 How to unlock behavioral insights:", self.subheading_style))
+            tracking_tips = [
+                "Track your feelings each time you receive income",
+                "Note which income sources make you feel most confident",
+                "Pay attention to timing patterns in your income confidence",
+                "Record your emotional state when pursuing income opportunities"
+            ]
+            
+            for tip in tracking_tips:
+                story.append(Paragraph(f"• {tip}", self.body_style))
+                story.append(Spacer(1, 5))
+            
+            return story
+        
+        # If behavioral data is available, show the insights
+        # Use the correct key names from your actual data structure
+        insights = behavior_data.get('behavioral_insights', [])
+        patterns_found = len(insights)
+        
+        if patterns_found > 0:
+            intro_text = f"""
+            We analyzed your income feelings and found {patterns_found} specific behavioral patterns that affect 
+            your financial decisions. Use these insights to optimize when and how you pursue income opportunities.
+            """
+            story.append(Paragraph(intro_text, self.body_style))
+            story.append(Spacer(1, 15))
+            
+            # Display behavioral insights (max 3 for clarity)
+            for i, insight in enumerate(insights[:3], 1):
+                # Insight header
+                insight_title = f"{i}. {insight.get('type', 'Behavioral Pattern').replace('_', ' ').title()}"
+                story.append(Paragraph(insight_title, self.subheading_style))
+                story.append(Spacer(1, 8))
+                
+                # Pattern description
+                pattern_text = insight.get('insight', 'No pattern description available')
+                story.append(Paragraph(f"<b>📊 Pattern:</b> {pattern_text}", self.body_style))
+                story.append(Spacer(1, 5))
+                
+                # Behavior change recommendation
+                behavior_change = insight.get('behavior_change', 'No behavior change recommendation available')
+                story.append(Paragraph(f"<b>🎯 Recommended Change:</b> {behavior_change}", self.body_style))
+                story.append(Spacer(1, 5))
+                
+                # Specific action (highlighted)
+                specific_action = insight.get('specific_action', 'No specific action specified')
+                story.append(Paragraph(f"<b>💡 Next Step:</b> {specific_action}", self.highlight_style))
+                
+                story.append(Spacer(1, 15))
+        else:
+            # If has_data is True but no insights found
+            story.append(Paragraph("📊 Behavioral Analysis in Progress", self.subheading_style))
+            story.append(Paragraph("We're analyzing your income patterns. Keep tracking your feelings to unlock more insights!", self.body_style))
+            story.append(Spacer(1, 15))
+        
+        # Show behavior change recommendations
+        recommendations = behavior_data.get('behavior_change_recommendations', [])
+        if recommendations:
+            story.append(Paragraph("🎯 Behavior Change Action Plan", self.subheading_style))
+            
+            strategy_desc = """
+            Based on your income patterns, here are specific actions you can take to improve your financial behavior:
+            """
+            story.append(Paragraph(strategy_desc, self.body_style))
+            story.append(Spacer(1, 10))
+            
+            for i, rec in enumerate(recommendations, 1):
+                story.append(Paragraph(f"<b>{i}.</b> {rec}", self.body_style))
+                story.append(Spacer(1, 8))
+        
+        # Quick action checklist
+        story.append(Paragraph("✅ Quick Action Checklist", self.subheading_style))
+        
+        checklist_desc = """
+        Use this checklist to immediately apply your behavioral insights:
+        """
+        story.append(Paragraph(checklist_desc, self.body_style))
+        story.append(Spacer(1, 10))
+        
+        # Generate checklist from insights and recommendations
+        checklist_items = []
+        
+        # Add specific actions from insights
+        for insight in insights[:3]:
+            specific_action = insight.get('specific_action', '')
+            if specific_action:
+                checklist_items.append(f"☐ {specific_action}")
+        
+        # Add general behavioral items
+        checklist_items.extend([
+            "☐ Track your income feelings for the next 2 weeks",
+            "☐ Schedule income activities for your optimal days/times",
+            "☐ Focus effort on income sources that make you feel best",
+            "☐ Set income targets based on your confidence patterns"
+        ])
+        
+        for item in checklist_items[:5]:  # Max 5 items
+            story.append(Paragraph(item, self.body_style))
+            story.append(Spacer(1, 5))
+        
+        return story
