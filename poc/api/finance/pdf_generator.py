@@ -349,10 +349,10 @@ class FinancialReportPDF:
         canvas.restoreState()
 
     def _build_feelings_pdf_content(self, report_data: Dict[str, Any]) -> list:
-        """Build African-styled feelings/wellness report content with visuals"""
+        """Build African-styled feelings/wellness report content - USER FRIENDLY VERSION"""
         story = []
         
-        # PAGE 1: Wellness Summary with Visual Dashboard
+        # PAGE 1: Wellness Summary
         story.append(self._create_african_summary_box(report_data.get('summary', {}), 'feelings'))
         story.append(Spacer(1, 30))
         
@@ -364,7 +364,7 @@ class FinancialReportPDF:
         """
         story.append(Paragraph(overview_desc, self.description_style))
         
-        # PAGE 2: Wellness Metrics with Visuals
+        # PAGE 2: Wellness Metrics
         story.append(PageBreak())
         story.append(Paragraph("🧠 Your Financial Wellness Metrics", self.heading_style))
         
@@ -377,33 +377,56 @@ class FinancialReportPDF:
         if 'summary' in report_data:
             summary = report_data['summary']
             
-            # Wellness status with progress bar
+            # Wellness status
             stress_level = summary.get('stress_level_percentage', 0)
             wellness_status = summary.get('wellness_status', 'Unknown')
+            wellness_score = 100 - stress_level
+            total_entries = summary.get('total_feeling_entries', 0)
+            most_common_feeling = summary.get('most_common_feeling', 'Unknown')
             
             story.append(Paragraph("📊 Current Wellness Status", self.subheading_style))
             
-            # Create wellness progress bar (inverted - lower stress is better)
-            wellness_score = 100 - stress_level  # Convert stress to wellness score
-            wellness_bar = self._create_progress_bar(
-                wellness_score, 100, 
-                f"Wellness Score: {wellness_score:.0f}% ({wellness_status})"
-            )
-            story.append(wellness_bar)
+            wellness_text = f"""
+            <b>Wellness Score:</b> {wellness_score:.0f}% ({wellness_status})<br/>
+            <b>Stress Level:</b> {stress_level:.1f}%<br/>
+            <b>Total Feeling Entries:</b> {total_entries}<br/>
+            <b>Most Common Feeling:</b> {most_common_feeling}
+            """
+            story.append(Paragraph(wellness_text, self.highlight_style))
             story.append(Spacer(1, 20))
             
-            # Feeling distribution pie chart
+            # Feeling distribution - show top 3 only
             feeling_distribution = summary.get('feeling_distribution', {})
             if feeling_distribution:
-                story.append(Paragraph("🎭 Your Feeling Patterns", self.subheading_style))
-                feelings_pie = self._create_pie_chart(
-                    feeling_distribution,
-                    "Distribution of Financial Feelings"
-                )
-                story.append(feelings_pie)
+                story.append(Paragraph("🎭 Your Top Feeling Patterns", self.subheading_style))
+                
+                total_entries = sum(feeling_distribution.values())
+                sorted_feelings = sorted(feeling_distribution.items(), key=lambda x: x[1], reverse=True)
+                
+                # Show only top 3 feelings
+                for feeling, count in sorted_feelings[:3]:
+                    percentage = (count / total_entries * 100) if total_entries > 0 else 0
+                    
+                    feeling_text = f"""
+                    <b>{feeling}:</b> {count} times ({percentage:.1f}% of all entries)
+                    """
+                    story.append(Paragraph(feeling_text, self.body_style))
+                    story.append(Spacer(1, 5))
+                
+                # Show summary for remaining feelings if there are more than 3
+                if len(sorted_feelings) > 3:
+                    remaining_count = sum(count for _, count in sorted_feelings[3:])
+                    remaining_percentage = (remaining_count / total_entries * 100) if total_entries > 0 else 0
+                    other_feelings = [feeling for feeling, _ in sorted_feelings[3:]]
+                    
+                    other_text = f"""
+                    <b>Other feelings ({', '.join(other_feelings[:2])}{', and others' if len(other_feelings) > 2 else ''}):</b> {remaining_count} times ({remaining_percentage:.1f}%)
+                    """
+                    story.append(Paragraph(other_text, self.body_style))
+                
                 story.append(Spacer(1, 20))
         
-        # PAGE 3: Stress Analysis with Trends
+        # PAGE 3: Stress Analysis & Trends
         story.append(PageBreak())
         story.append(Paragraph("📈 Stress Analysis & Trends", self.heading_style))
         
@@ -417,22 +440,44 @@ class FinancialReportPDF:
         if 'stress_analysis' in report_data:
             stress_analysis = report_data['stress_analysis']
             
-            # Monthly stress trends line chart
+            # Monthly stress trends - show summary instead of every month
             monthly_trends = stress_analysis.get('monthly_stress_trends', {})
             if len(monthly_trends) > 1:
-                story.append(Paragraph("Monthly Stress Trends", self.subheading_style))
-                stress_chart = self._create_line_chart(monthly_trends, "Stress Levels Over Time")
-                story.append(stress_chart)
-                story.append(Spacer(1, 20))
+                story.append(Paragraph("📅 Stress Trend Summary", self.subheading_style))
+                
+                # Calculate highest and lowest stress months
+                if monthly_trends:
+                    highest_month = max(monthly_trends.items(), key=lambda x: x[1])
+                    lowest_month = min(monthly_trends.items(), key=lambda x: x[1])
+                    avg_stress = sum(monthly_trends.values()) / len(monthly_trends)
+                    
+                    trend_summary = f"""
+                    <b>Average Stress Level:</b> {avg_stress:.1f}%<br/>
+                    <b>Highest Stress Month:</b> {highest_month[0]} ({highest_month[1]:.1f}%)<br/>
+                    <b>Lowest Stress Month:</b> {lowest_month[0]} ({lowest_month[1]:.1f}%)
+                    """
+                    story.append(Paragraph(trend_summary, self.body_style))
+                    story.append(Spacer(1, 15))
             
             # Stress trend analysis
             trend_direction = stress_analysis.get('stress_trend_direction', 'Unknown')
-            trend_color = AFRICAN_SAGE if 'Decreasing' in trend_direction else AFRICAN_RUST if 'Increasing' in trend_direction else AFRICAN_GOLD
+            high_stress_periods = stress_analysis.get('high_stress_periods', [])
+            low_stress_periods = stress_analysis.get('low_stress_periods', [])
+            
+            # Color coding based on trend
+            if 'Decreasing' in trend_direction:
+                trend_color = '#9CAF88'  # AFRICAN_SAGE
+            elif 'Increasing' in trend_direction:
+                trend_color = '#B7410E'  # AFRICAN_RUST
+            else:
+                trend_color = '#DAA520'  # AFRICAN_GOLD
+            
+            story.append(Paragraph("📊 Overall Stress Pattern", self.subheading_style))
             
             trend_text = f"""
             <b>Stress Trend:</b> <font color="{trend_color}"><b>{trend_direction}</b></font><br/>
-            <b>High Stress Periods:</b> {len(stress_analysis.get('high_stress_periods', []))} months<br/>
-            <b>Low Stress Periods:</b> {len(stress_analysis.get('low_stress_periods', []))} months
+            <b>High Stress Periods:</b> {len(high_stress_periods)} months<br/>
+            <b>Low Stress Periods:</b> {len(low_stress_periods)} months
             """
             story.append(Paragraph(trend_text, self.body_style))
             story.append(Spacer(1, 20))
@@ -450,7 +495,7 @@ class FinancialReportPDF:
         if 'correlation_analysis' in report_data:
             correlation = report_data['correlation_analysis']
             
-            # High expense day feelings
+            # High expense day feelings - show top 3 only
             high_expense_feelings = correlation.get('high_expense_day_feelings', [])
             if high_expense_feelings:
                 story.append(Paragraph("💸 How You Feel on High Spending Days", self.subheading_style))
@@ -460,20 +505,29 @@ class FinancialReportPDF:
                     feeling_counts[feeling] = feeling_counts.get(feeling, 0) + 1
                 
                 if feeling_counts:
-                    expense_feelings_chart = self._create_bar_chart(
-                        feeling_counts, 
-                        "Feelings on High Expense Days"
-                    )
-                    story.append(expense_feelings_chart)
+                    total_high_expense_days = sum(feeling_counts.values())
+                    sorted_feelings = sorted(feeling_counts.items(), key=lambda x: x[1], reverse=True)
+                    
+                    # Show top 3 feelings on high spending days
+                    for feeling, count in sorted_feelings[:3]:
+                        percentage = (count / total_high_expense_days * 100) if total_high_expense_days > 0 else 0
+                        
+                        feeling_text = f"""
+                        <b>{feeling}:</b> {count} high spending days ({percentage:.1f}%)
+                        """
+                        story.append(Paragraph(feeling_text, self.body_style))
+                        story.append(Spacer(1, 5))
+                    
                     story.append(Spacer(1, 15))
             
-            # Correlation insights
+            # Correlation insights - show top 3 insights only
             insights = correlation.get('correlation_insights', [])
             if insights:
-                story.append(Paragraph("🔍 Key Insights:", self.subheading_style))
-                for insight in insights:
+                story.append(Paragraph("🔍 Key Insights", self.subheading_style))
+                for insight in insights[:3]:  # Limit to top 3 insights
                     story.append(Paragraph(f"• {insight}", self.body_style))
                     story.append(Spacer(1, 5))
+                story.append(Spacer(1, 15))
         
         # PAGE 5: Wellness Trends & Progress
         story.append(PageBreak())
@@ -488,23 +542,32 @@ class FinancialReportPDF:
         if 'wellness_trends' in report_data:
             wellness_trends = report_data['wellness_trends']
             
-            # Weekly wellness chart
+            # Weekly wellness scores - show summary instead of every week
             weekly_scores = wellness_trends.get('weekly_wellness_scores', {})
             if len(weekly_scores) > 1:
-                story.append(Paragraph("Weekly Wellness Progress", self.subheading_style))
-                wellness_chart = self._create_line_chart(weekly_scores, "Wellness Scores Over Time")
-                story.append(wellness_chart)
-                story.append(Spacer(1, 20))
+                story.append(Paragraph("📈 Wellness Progress Summary", self.subheading_style))
+                
+                # Calculate best and worst weeks, and average
+                if weekly_scores:
+                    best_week = max(weekly_scores.items(), key=lambda x: x[1])
+                    worst_week = min(weekly_scores.items(), key=lambda x: x[1])
+                    avg_wellness = sum(weekly_scores.values()) / len(weekly_scores)
+                    
+                    progress_summary = f"""
+                    <b>Average Wellness Score:</b> {avg_wellness:.1f}%<br/>
+                    <b>Best Week:</b> {best_week[0]} ({best_week[1]:.1f}%)<br/>
+                    <b>Most Challenging Week:</b> {worst_week[0]} ({worst_week[1]:.1f}%)
+                    """
+                    story.append(Paragraph(progress_summary, self.body_style))
+                    story.append(Spacer(1, 15))
             
-            # Best and worst periods
-            best_week = wellness_trends.get('best_wellness_week', 'No data')
-            worst_week = wellness_trends.get('worst_wellness_week', 'No data')
+            # Overall wellness trend
             wellness_trend = wellness_trends.get('wellness_trend', 'Unknown')
             
+            story.append(Paragraph("📋 Overall Wellness Direction", self.subheading_style))
+            
             trend_summary = f"""
-            <b>Overall Trend:</b> {wellness_trend}<br/>
-            <b>Best Wellness Period:</b> {best_week}<br/>
-            <b>Most Challenging Period:</b> {worst_week}
+            <b>Overall Wellness Trend:</b> {wellness_trend}
             """
             story.append(Paragraph(trend_summary, self.body_style))
             story.append(Spacer(1, 20))
@@ -526,22 +589,29 @@ class FinancialReportPDF:
             support_needed = mental_health.get('support_needed', False)
             positive_percentage = mental_health.get('positive_feelings_percentage', 0)
             
+            story.append(Paragraph("🧠 Mental Health Assessment", self.subheading_style))
+            
             # Risk assessment with color coding
-            risk_color = AFRICAN_RUST if risk_level == 'High' else AFRICAN_GOLD if risk_level == 'Medium' else AFRICAN_SAGE
+            if risk_level == 'High':
+                risk_color = '#B7410E'  # AFRICAN_RUST
+            elif risk_level == 'Medium':
+                risk_color = '#DAA520'  # AFRICAN_GOLD
+            else:
+                risk_color = '#9CAF88'  # AFRICAN_SAGE
             
             mental_health_summary = f"""
             <b>Mental Health Risk Level:</b> <font color="{risk_color}"><b>{risk_level}</b></font><br/>
             <b>Positive Feelings:</b> {positive_percentage}% of the time<br/>
-            <b>Support Recommended:</b> {'Yes' if support_needed else 'No'}
+            <b>Professional Support Recommended:</b> {'Yes' if support_needed else 'No'}
             """
             story.append(Paragraph(mental_health_summary, self.body_style))
             story.append(Spacer(1, 15))
             
-            # Support resources
+            # Support resources - show top 5 only
             support_resources = mental_health.get('support_resources', [])
             if support_resources:
-                story.append(Paragraph("📞 Support Resources Available to You:", self.subheading_style))
-                for resource in support_resources:
+                story.append(Paragraph("📞 Available Support Resources", self.subheading_style))
+                for resource in support_resources[:5]:  # Limit to top 5 resources
                     story.append(Paragraph(f"• {resource}", self.body_style))
                     story.append(Spacer(1, 5))
                 story.append(Spacer(1, 15))
@@ -557,11 +627,13 @@ class FinancialReportPDF:
         story.append(Paragraph(action_desc, self.description_style))
         
         if 'support_recommendations' in report_data:
-            story.append(Paragraph("🚀 Immediate Wellness Actions:", self.subheading_style))
-            for i, rec in enumerate(report_data['support_recommendations'], 1):
+            story.append(Paragraph("🚀 Immediate Wellness Actions", self.subheading_style))
+            # Limit to top 5 recommendations for readability
+            for i, rec in enumerate(report_data['support_recommendations'][:5], 1):
                 action_text = f"<b>Step {i}:</b> {rec}"
                 story.append(Paragraph(action_text, self.body_style))
                 story.append(Spacer(1, 8))
+            story.append(Spacer(1, 15))
         
         # Motivational closing
         story.append(Spacer(1, 20))
