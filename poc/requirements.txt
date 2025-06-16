@@ -11,3 +11,4 @@ reportlab
 google-generativeai
 google
 boto3
+pandas

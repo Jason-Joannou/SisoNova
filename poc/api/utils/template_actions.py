@@ -434,3 +434,62 @@ async def record_income_inputs_to_db(user_input: str, user_object: User, query_m
             "error": True,
             "messages": [{"body": "Sorry, there was an error processing your input. Please try again later."}]
         }
+    
+
+async def main():
+    db_manager = DatabaseManager(db_url='sqlite+aiosqlite:///test_db.db')
+    
+    # Use async context manager properly
+    async with db_manager.session_scope() as db_session:
+        # Query Manager
+        query_manager = AsyncQueries(session=db_session)
+
+        # Extract message details
+
+        from_number = "+27798782441"
+
+        # Check if the user exists in your database
+        user = await query_manager.get_user_by_phone(phone_number=from_number)
+
+        if user is None:
+            print("ADDING NEW USER")
+            new_user = User(phone_number=from_number)
+            await query_manager.add(new_user)
+            user = new_user
+
+        from api.utils.template_actions import create_poc_dummy_data_south_africa
+        
+        dummy_data_list = await create_poc_dummy_data_south_africa(user)
+        
+        # Add all dummy data to database
+        for data_type, data_dict in dummy_data_list:
+            if data_type == 'expense':
+                expense_record = UnverifiedExpenses(**data_dict)
+                await query_manager.add(expense_record)
+            elif data_type == 'income':
+                income_record = UnverifiedIncomes(**data_dict)
+                await query_manager.add(income_record)
+            elif data_type == 'feeling':
+                feeling_record = FinancialFeelings(**data_dict)
+                await query_manager.add(feeling_record)
+
+        
+        report_dispatcher = PersonalizedReportDispatcher(
+            user=user, 
+        )
+
+        print("Starting report generation...")
+        income_report = await generate_income_report(
+            report_dispatcher=report_dispatcher, 
+            user_object=user
+        )
+        
+        print(f"Report generation result: {income_report}")
+
+
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
+
+    
