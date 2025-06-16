@@ -172,11 +172,104 @@ async def create_poc_dummy_data_south_africa(user_object: User) -> List[Tuple[st
     
     return dummy_data
 
+async def generate_comprehensive_report(report_dispatcher: PersonalizedReportDispatcher, user_object: User) -> Dict[str, Any]:
+    """Generate actual comprehensive report using async PersonalizedReportDispatcher"""
+
+    s3_bucket = SecureS3Service()
+    if not report_dispatcher or not s3_bucket:
+        return {"body": "Something went wrong generating your report. Please try again later."}
+    
+    try:
+        report_result = await report_dispatcher.generate_personalized_report(
+            report_type="comprehensive",
+            months_back=6,
+            include_ai=False,
+            generate_pdf=True
+        )
+
+        if "error" in report_result:
+            return {
+                "error": report_result["error"],
+                "message": "Sorry, I couldn't generate your financial profile report right now. Please try again later."
+            }
+        
+        # Extract results
+        pdf_filename = report_result.get("pdf_filename")
+        ai_insights = report_result.get("personalized_ai_insights", {})
+
+        if not pdf_filename or not os.path.exists(pdf_filename):
+            return {
+                "error": True,
+                "messages": [{"body": "Sorry, the financial profile report file could not be found."}]
+            }
+        
+        
+        # Upload to secure S3
+        presigned_url = await s3_bucket.upload_pdf_from_file_secure(
+            file_path=pdf_filename,
+            user_id=user_object.id,
+            report_type="feelings",
+            expiration_hours=24
+        )
+        
+        # Clean up local file
+        if presigned_url:
+            try:
+                os.remove(pdf_filename)
+                print(f"Cleaned up local file: {pdf_filename}")
+            except Exception as e:
+                print(f"Failed to clean up local file: {e}")
+
+        if not presigned_url:
+            return {
+                "error": True,
+                "messages": [{"body": "Sorry, there was an error uploading your wellness report. Please try again."}]
+            }
+        
+        # Build message sequence
+        messages = []
+        
+        # First message: Report ready notification
+        messages.append({"body": "🧠 Your financial wellness report is ready!"})
+        
+        if ai_insights and not ai_insights.get("error"):
+            ai_message = create_comprehensive_ai_message(ai_insights)
+            if ai_message:
+                messages.append({"body": f"🤖 *AI Wellness Analysis:*\n\n{ai_message}"})
+            else:
+                # Fallback if parsing fails - use raw insights
+                print("DEBUG: AI message creation failed, using fallback")
+                if ai_insights.get("actionable_recommendations"):
+                    actions = ai_insights["actionable_recommendations"][:3]
+                    actions_text = "\n".join([f"{i+1}. {action}" for i, action in enumerate(actions)])
+                    messages.append({"body": f"🚀 *Wellness Actions:*\n\n{actions_text}"})
+        elif ai_insights and ai_insights.get("error"):
+            print(f"DEBUG: AI insights error: {ai_insights['error']}")
+            # Don't add AI message if there was an error
+
+        messages.append({
+            "body": "📄 Here's your detailed wellness analysis (link expires in 24 hours):",
+            "media_url": presigned_url
+        })
+
+        return {
+            "error": False,
+            "messages": messages,
+            "stay_on_current": True
+        }
+
+    except Exception as e:
+        print(f"ERROR generating wellness report: {str(e)}")
+        return {
+            "error": True,
+            "messages": [{"body": "Sorry, there was an error generating your wellness report. Please try again later."}]
+        }
+
+
 async def generate_feelings_report(report_dispatcher: PersonalizedReportDispatcher, user_object: User) -> Dict[str, Any]:
     """Generate actual feelings report using async PersonalizedReportDispatcher"""
 
     s3_bucket = SecureS3Service()
-    print("HERE - Generating Feelings Report")
     if not report_dispatcher or not s3_bucket:
         return {"body": "Something went wrong generating your report. Please try again later."}
     
@@ -551,21 +644,21 @@ async def main():
             await query_manager.add(new_user)
             user = new_user
 
-        from api.utils.template_actions import create_poc_dummy_data_south_africa
-        
-        dummy_data_list = await create_poc_dummy_data_south_africa(user)
-        
-        # Add all dummy data to database
-        for data_type, data_dict in dummy_data_list:
-            if data_type == 'expense':
-                expense_record = UnverifiedExpenses(**data_dict)
-                await query_manager.add(expense_record)
-            elif data_type == 'income':
-                income_record = UnverifiedIncomes(**data_dict)
-                await query_manager.add(income_record)
-            elif data_type == 'feeling':
-                feeling_record = FinancialFeelings(**data_dict)
-                await query_manager.add(feeling_record)
+            from api.utils.template_actions import create_poc_dummy_data_south_africa
+            
+            dummy_data_list = await create_poc_dummy_data_south_africa(user)
+            
+            # Add all dummy data to database
+            for data_type, data_dict in dummy_data_list:
+                if data_type == 'expense':
+                    expense_record = UnverifiedExpenses(**data_dict)
+                    await query_manager.add(expense_record)
+                elif data_type == 'income':
+                    income_record = UnverifiedIncomes(**data_dict)
+                    await query_manager.add(income_record)
+                elif data_type == 'feeling':
+                    feeling_record = FinancialFeelings(**data_dict)
+                    await query_manager.add(feeling_record)
 
         
         report_dispatcher = PersonalizedReportDispatcher(
@@ -573,7 +666,7 @@ async def main():
         )
 
         print("Starting report generation...")
-        income_report = await generate_feelings_report(
+        income_report = await generate_comprehensive_report(
             report_dispatcher=report_dispatcher, 
             user_object=user
         )

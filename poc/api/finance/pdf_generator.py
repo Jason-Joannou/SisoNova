@@ -865,6 +865,15 @@ class FinancialReportPDF:
                 ['🧠 Total Entries', '😰 Stress Level', '💚 Wellness Status'],
                 [f'{total} entries', f'{stress_level:.1f}%', status]
             ]
+        elif report_type == 'comprehensive':
+            total_income = summary.get('total_income', 0)
+            total_expenses = summary.get('total_expenses', 0)
+            net_position = summary.get('net_position', 0)
+            
+            summary_data = [
+                ['💰 Total Income', '💸 Total Expenses', '💎 Net Position'],
+                [f'R {total_income:,.2f}', f'R {total_expenses:,.2f}', f'R {net_position:,.2f}'],
+            ]
         else:
             total = 0
             daily = 0
@@ -1226,30 +1235,306 @@ class FinancialReportPDF:
         return story
     
     def _build_comprehensive_pdf_content(self, report_data: Dict[str, Any]) -> list:
-        """Build PDF content for comprehensive reports (fallback)"""
-        # This is the same as the original generate_financial_report_pdf content
-        # but returned as a list for consistency
+        """Build comprehensive financial report content with all aggregated data"""
         story = []
         
-        # Summary Section
-        if 'summary' in report_data:
-            story.append(Paragraph("Financial Summary", self.heading_style))
-            summary = report_data['summary']
-            summary_data = [
-                ['Total Income:', f"R {summary.get('total_income', 0):,.2f}"],
-                ['Total Expenses:', f"R {summary.get('total_expenses', 0):,.2f}"],
-                ['Net Position:', f"R {summary.get('net_position', 0):,.2f}"],
-                ['Savings Rate:', f"{summary.get('savings_rate', 0)}%"],
-                ['Daily Spending:', f"R {summary.get('average_daily_spending', 0):,.2f}"],
-                ['Status:', summary.get('financial_status', 'Unknown')]
-            ]
+        # PAGE 1: Executive Summary
+        story.append(self._create_african_summary_box(report_data.get('summary', {}), 'comprehensive'))
+        story.append(Spacer(1, 30))
+        
+        # Overview description
+        overview_desc = f"""
+        This comprehensive financial analysis covers the period from {report_data.get('period', 'the past 6 months')}. 
+        This report provides a complete picture of your financial health, spending patterns, income sources, and actionable 
+        insights to help you build a stronger financial future. Let's explore your complete financial journey together.
+        """
+        story.append(Paragraph(overview_desc, self.description_style))
+        
+        # PAGE 2: Financial Health Assessment
+        story.append(PageBreak())
+        story.append(Paragraph("🏥 Your Financial Health Assessment", self.heading_style))
+        
+        health_desc = """
+        Your financial health score provides an overall assessment of your financial well-being, taking into account 
+        your income, expenses, stress levels, and financial behaviors. This score helps identify areas for improvement 
+        and celebrates your financial strengths.
+        """
+        story.append(Paragraph(health_desc, self.description_style))
+        
+        if 'financial_health' in report_data:
+            health = report_data['financial_health']
+            health_score = health.get('health_score', {})
             
-            summary_table = Table(summary_data, colWidths=[2*inch, 2*inch])
-            summary_table.setStyle(self._get_table_style())
-            story.append(summary_table)
+            story.append(Paragraph("📊 Overall Financial Health", self.subheading_style))
+            
+            # Health score with color coding
+            score = health_score.get('score', 0)
+            status = health_score.get('status', 'Unknown')
+            
+            if score >= 80:
+                score_color = '#9CAF88'  # AFRICAN_SAGE
+            elif score >= 60:
+                score_color = '#DAA520'  # AFRICAN_GOLD
+            else:
+                score_color = '#B7410E'  # AFRICAN_RUST
+            
+            health_text = f"""
+            <b>Financial Health Score:</b> <font color="{score_color}"><b>{score}/100 ({status})</b></font><br/>
+            <b>Financial Stress Level:</b> {health.get('financial_stress_level', 0)}%<br/>
+            <b>Most Common Feeling:</b> {max(health.get('feeling_distribution', {}).items(), key=lambda x: x[1])[0] if health.get('feeling_distribution') else 'No data'}
+            """
+            story.append(Paragraph(health_text, self.highlight_style))
+            story.append(Spacer(1, 15))
+            
+            # Stress indicators
+            stress_indicators = health.get('stress_indicators', [])
+            if stress_indicators:
+                story.append(Paragraph("⚠️ Areas Requiring Attention", self.subheading_style))
+                for indicator in stress_indicators:
+                    story.append(Paragraph(f"• {indicator}", self.warning_style))
+                    story.append(Spacer(1, 5))
+                story.append(Spacer(1, 15))
+            
+            # Top 3 feelings
+            feeling_distribution = health.get('feeling_distribution', {})
+            if feeling_distribution:
+                story.append(Paragraph("💭 Your Financial Feelings", self.subheading_style))
+                sorted_feelings = sorted(feeling_distribution.items(), key=lambda x: x[1], reverse=True)
+                
+                for feeling, count in sorted_feelings[:3]:
+                    feeling_text = f"<b>{feeling}:</b> {count} times"
+                    story.append(Paragraph(feeling_text, self.body_style))
+                    story.append(Spacer(1, 5))
+                story.append(Spacer(1, 20))
+        
+        # PAGE 3: Income Analysis
+        story.append(PageBreak())
+        story.append(Paragraph("💰 Income Analysis", self.heading_style))
+        
+        income_desc = """
+        Understanding your income sources and patterns is crucial for financial planning. This analysis shows where 
+        your money comes from, how diverse your income streams are, and opportunities for income growth and stability.
+        """
+        story.append(Paragraph(income_desc, self.description_style))
+        
+        if 'income_analysis' in report_data:
+            income_analysis = report_data['income_analysis']
+            
+            story.append(Paragraph("📈 Income Sources Breakdown", self.subheading_style))
+            
+            # Income sources
+            income_sources = income_analysis.get('income_sources', {})
+            primary_source = income_analysis.get('primary_income_source', 'Unknown')
+            income_diversity = income_analysis.get('income_diversity', 0)
+            gov_dependency = income_analysis.get('government_dependency', 0)
+            
+            income_summary = f"""
+            <b>Primary Income Source:</b> {primary_source}<br/>
+            <b>Number of Income Sources:</b> {income_diversity}<br/>
+            <b>Government Grant Dependency:</b> {gov_dependency}%
+            """
+            story.append(Paragraph(income_summary, self.body_style))
+            story.append(Spacer(1, 15))
+            
+            # Income sources breakdown
+            if income_sources:
+                story.append(Paragraph("💼 Income by Source", self.subheading_style))
+                for source, amount in sorted(income_sources.items(), key=lambda x: x[1], reverse=True):
+                    source_text = f"<b>{source}:</b> R {amount:,.2f}"
+                    story.append(Paragraph(source_text, self.body_style))
+                    story.append(Spacer(1, 5))
+                story.append(Spacer(1, 20))
+        
+        # PAGE 4: Spending Patterns & Categories
+        story.append(PageBreak())
+        story.append(Paragraph("🛒 Spending Patterns & Categories", self.heading_style))
+        
+        spending_desc = """
+        Your spending patterns reveal important insights about your financial habits and priorities. Understanding 
+        where your money goes helps identify opportunities to optimize your budget and align spending with your values.
+        """
+        story.append(Paragraph(spending_desc, self.description_style))
+        
+        if 'spending_patterns' in report_data:
+            patterns = report_data['spending_patterns']
+            
+            story.append(Paragraph("📊 Spending Overview", self.subheading_style))
+            
+            # Essential vs non-essential
+            essential_spending = patterns.get('essential_spending', 0)
+            non_essential_spending = patterns.get('non_essential_spending', 0)
+            essential_percentage = patterns.get('essential_percentage', 0)
+            peak_day = patterns.get('peak_spending_day', {})
+            
+            spending_summary = f"""
+            <b>Essential Spending:</b> R {essential_spending:,.2f} ({essential_percentage}%)<br/>
+            <b>Non-Essential Spending:</b> R {non_essential_spending:,.2f} ({100-essential_percentage:.1f}%)<br/>
+            <b>Peak Spending Day:</b> {peak_day.get('day', 'Unknown')} (R {peak_day.get('amount', 0):,.2f})
+            """
+            story.append(Paragraph(spending_summary, self.highlight_style))
             story.append(Spacer(1, 20))
         
-        # Add other sections as needed...
+        # Category breakdown
+        if 'category_breakdown' in report_data:
+            breakdown = report_data['category_breakdown']
+            categories = breakdown.get('by_category', {})
+            
+            story.append(Paragraph("🏷️ Top Spending Categories", self.subheading_style))
+            
+            # Show top 5 categories
+            sorted_categories = sorted(categories.items(), key=lambda x: x[1]['total'], reverse=True)
+            for category, data in sorted_categories[:5]:
+                category_text = f"""
+                <b>{category}:</b> R {data['total']:,.2f} ({data['count']} transactions)
+                """
+                story.append(Paragraph(category_text, self.body_style))
+                story.append(Spacer(1, 5))
+            story.append(Spacer(1, 20))
+        
+        # PAGE 5: Monthly Trends
+        story.append(PageBreak())
+        story.append(Paragraph("📈 Monthly Trends", self.heading_style))
+        
+        trends_desc = """
+        Monthly trends show how your financial situation evolves over time. Understanding these patterns helps 
+        you identify seasonal variations, track progress, and make informed decisions about future spending and saving.
+        """
+        story.append(Paragraph(trends_desc, self.description_style))
+        
+        if 'monthly_trends' in report_data:
+            trends = report_data['monthly_trends']
+            
+            story.append(Paragraph("📅 Monthly Financial Summary", self.subheading_style))
+            
+            # Trend direction
+            trend_direction = trends.get('trend_direction', 'Unknown')
+            if 'Increasing' in trend_direction:
+                trend_color = '#B7410E'  # AFRICAN_RUST
+            elif 'Decreasing' in trend_direction:
+                trend_color = '#9CAF88'  # AFRICAN_SAGE
+            else:
+                trend_color = '#DAA520'  # AFRICAN_GOLD
+            
+            trend_text = f"""
+            <b>Spending Trend:</b> <font color="{trend_color}"><b>{trend_direction}</b></font>
+            """
+            story.append(Paragraph(trend_text, self.body_style))
+            story.append(Spacer(1, 15))
+            
+            # Monthly expenses summary
+            monthly_expenses = trends.get('monthly_expenses', {})
+            monthly_incomes = trends.get('monthly_incomes', {})
+            
+            if monthly_expenses:
+                story.append(Paragraph("💸 Monthly Expenses Summary", self.subheading_style))
+                
+                # Calculate highest and lowest expense months
+                highest_expense = max(monthly_expenses.items(), key=lambda x: x[1])
+                lowest_expense = min(monthly_expenses.items(), key=lambda x: x[1])
+                avg_expense = sum(monthly_expenses.values()) / len(monthly_expenses)
+                
+                expense_summary = f"""
+                <b>Average Monthly Expenses:</b> R {avg_expense:,.2f}<br/>
+                <b>Highest Expense Month:</b> {highest_expense[0]} (R {highest_expense[1]:,.2f})<br/>
+                <b>Lowest Expense Month:</b> {lowest_expense[0]} (R {lowest_expense[1]:,.2f})
+                """
+                story.append(Paragraph(expense_summary, self.body_style))
+                story.append(Spacer(1, 15))
+            
+            if monthly_incomes:
+                story.append(Paragraph("💰 Monthly Income Summary", self.subheading_style))
+                
+                # Calculate highest and lowest income months
+                highest_income = max(monthly_incomes.items(), key=lambda x: x[1])
+                lowest_income = min(monthly_incomes.items(), key=lambda x: x[1])
+                avg_income = sum(monthly_incomes.values()) / len(monthly_incomes)
+                
+                income_summary = f"""
+                <b>Average Monthly Income:</b> R {avg_income:,.2f}<br/>
+                <b>Highest Income Month:</b> {highest_income[0]} (R {highest_income[1]:,.2f})<br/>
+                <b>Lowest Income Month:</b> {lowest_income[0]} (R {lowest_income[1]:,.2f})
+                """
+                story.append(Paragraph(income_summary, self.body_style))
+                story.append(Spacer(1, 20))
+        
+        # PAGE 6: Emergency Preparedness
+        story.append(PageBreak())
+        story.append(Paragraph("🚨 Emergency Preparedness", self.heading_style))
+        
+        emergency_desc = """
+        Emergency preparedness is crucial for financial security. This assessment shows how well-prepared you are 
+        for unexpected expenses and provides guidance on building a stronger financial safety net for you and your family.
+        """
+        story.append(Paragraph(emergency_desc, self.description_style))
+        
+        if 'emergency_preparedness' in report_data:
+            emergency = report_data['emergency_preparedness']
+            
+            story.append(Paragraph("🛡️ Emergency Fund Assessment", self.subheading_style))
+            
+            months_covered = emergency.get('months_covered', 0)
+            monthly_avg = emergency.get('monthly_expense_average', 0)
+            status = emergency.get('emergency_fund_status', 'Unknown')
+            recommendation = emergency.get('recommendation', '')
+            
+            # Color code based on preparedness
+            if months_covered >= 3:
+                status_color = '#9CAF88'  # AFRICAN_SAGE
+            elif months_covered >= 1:
+                status_color = '#DAA520'  # AFRICAN_GOLD
+            else:
+                status_color = '#B7410E'  # AFRICAN_RUST
+            
+            emergency_summary = f"""
+            <b>Emergency Fund Status:</b> <font color="{status_color}"><b>{status}</b></font><br/>
+            <b>Months of Expenses Covered:</b> {months_covered} months<br/>
+            <b>Average Monthly Expenses:</b> R {monthly_avg:,.2f}<br/>
+            <b>Recommendation:</b> {recommendation}
+            """
+            story.append(Paragraph(emergency_summary, self.highlight_style))
+            story.append(Spacer(1, 20))
+        
+        # PAGE 7: Actionable Insights & Recommendations
+        story.append(PageBreak())
+        story.append(Paragraph("💡 Actionable Insights & Recommendations", self.heading_style))
+        
+        insights_desc = """
+        These personalized insights and recommendations are designed specifically for your financial situation. 
+        Each suggestion is practical and achievable, helping you take concrete steps toward better financial health 
+        and long-term prosperity.
+        """
+        story.append(Paragraph(insights_desc, self.description_style))
+        
+        if 'actionable_insights' in report_data:
+            insights = report_data['actionable_insights']
+            
+            story.append(Paragraph("🎯 Your Personalized Action Plan", self.subheading_style))
+            
+            for i, insight in enumerate(insights, 1):
+                # Determine insight type for appropriate styling
+                if "⚠️" in insight:
+                    insight_style = self.warning_style
+                elif "✅" in insight:
+                    insight_style = self.highlight_style
+                else:
+                    insight_style = self.body_style
+                
+                action_text = f"<b>{i}.</b> {insight}"
+                story.append(Paragraph(action_text, insight_style))
+                story.append(Spacer(1, 8))
+            
+            story.append(Spacer(1, 20))
+        
+        # Motivational closing
+        story.append(Spacer(1, 20))
+        motivation_text = """
+        <b>Your Financial Journey Continues:</b> Every step you take toward understanding and improving your finances 
+        brings you closer to financial freedom and security. Remember that building wealth is a marathon, not a sprint. 
+        Stay committed to your goals, celebrate small victories, and don't hesitate to seek support when needed. 
+        Your future self will thank you for the wise financial decisions you make today.
+        """
+        story.append(Paragraph(motivation_text, self.highlight_style))
+        
         return story
     
     def _get_table_style(self) -> TableStyle:
