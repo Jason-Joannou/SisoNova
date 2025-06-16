@@ -784,6 +784,15 @@ class FinancialReportPDF:
                 ['📊 Total Incomes', '📅 Daily Average', '🎯 Financial Status'],
                 [f'R {total:,.2f}', f'R {daily:,.2f}', status]
             ]
+        elif report_type == 'feelings':  # ADD THIS
+            total = summary.get('total_feeling_entries', 0)
+            stress_level = summary.get('stress_level_percentage', 0)
+            status = summary.get('wellness_status', 'Unknown')
+            
+            summary_data = [
+                ['🧠 Total Entries', '😰 Stress Level', '💚 Wellness Status'],
+                [f'{total} entries', f'{stress_level:.1f}%', status]
+            ]
         else:
             total = 0
             daily = 0
@@ -1141,80 +1150,6 @@ class FinancialReportPDF:
         Your future self will thank you for the actions you take today.
         """
         story.append(Paragraph(motivation_text, self.highlight_style))
-        
-        return story
-    
-    def _build_feelings_pdf_content(self, report_data: Dict[str, Any]) -> list:
-        """Build PDF content for feelings reports"""
-        story = []
-        
-        # Summary Section
-        if 'summary' in report_data:
-            story.append(Paragraph("Financial Wellness Summary", self.heading_style))
-            summary = report_data['summary']
-            
-            summary_data = [
-                ['Total Entries:', str(summary.get('total_feeling_entries', 0))],
-                ['Most Common Feeling:', summary.get('most_common_feeling', 'Unknown')],
-                ['Stress Level:', f"{summary.get('stress_level_percentage', 0)}%"],
-                ['Wellness Status:', summary.get('wellness_status', 'Unknown')]
-            ]
-            
-            summary_table = Table(summary_data, colWidths=[2.5*inch, 2.5*inch])
-            summary_table.setStyle(self._get_table_style())
-            story.append(summary_table)
-            story.append(Spacer(1, 20))
-            
-            # Feeling Distribution
-            if 'feeling_distribution' in summary:
-                story.append(Paragraph("Feeling Distribution", self.subheading_style))
-                feelings = summary['feeling_distribution']
-                feeling_data = [['Feeling', 'Count']]
-                for feeling, count in feelings.items():
-                    feeling_data.append([feeling, str(count)])
-                
-                feeling_table = Table(feeling_data, colWidths=[2.5*inch, 1.5*inch])
-                feeling_table.setStyle(self._get_table_style())
-                story.append(feeling_table)
-                story.append(Spacer(1, 20))
-        
-        # Stress Analysis
-        if 'stress_analysis' in report_data:
-            story.append(Paragraph("Stress Analysis", self.heading_style))
-            stress = report_data['stress_analysis']
-            
-            stress_data = [
-                ['Stress Trend:', stress.get('stress_trend_direction', 'Unknown')],
-                ['High Stress Periods:', str(len(stress.get('high_stress_periods', [])))],
-                ['Low Stress Periods:', str(len(stress.get('low_stress_periods', [])))]
-            ]
-            
-            stress_table = Table(stress_data, colWidths=[2.5*inch, 2*inch])
-            stress_table.setStyle(self._get_table_style())
-            story.append(stress_table)
-            story.append(Spacer(1, 20))
-        
-        # Mental Health Insights
-        if 'mental_health_insights' in report_data:
-            story.append(Paragraph("Mental Health Assessment", self.heading_style))
-            mental_health = report_data['mental_health_insights']
-            
-            story.append(Paragraph(f"Risk Level: {mental_health.get('mental_health_risk_level', 'Unknown')}", self.styles['Normal']))
-            story.append(Paragraph(f"Positive Feelings: {mental_health.get('positive_feelings_percentage', 0)}%", self.styles['Normal']))
-            
-            if mental_health.get('support_resources'):
-                story.append(Paragraph("Support Resources:", self.styles['Normal']))
-                for resource in mental_health['support_resources']:
-                    story.append(Paragraph(f"• {resource}", self.styles['Normal']))
-            
-            story.append(Spacer(1, 20))
-        
-        # Support Recommendations
-        if 'support_recommendations' in report_data:
-            story.append(Paragraph("Wellness Recommendations", self.heading_style))
-            for rec in report_data['support_recommendations']:
-                story.append(Paragraph(f"• {rec}", self.styles['Normal']))
-            story.append(Spacer(1, 20))
         
         return story
     
