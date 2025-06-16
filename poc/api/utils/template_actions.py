@@ -172,6 +172,101 @@ async def create_poc_dummy_data_south_africa(user_object: User) -> List[Tuple[st
     
     return dummy_data
 
+async def generate_income_report(report_dispatcher: PersonalizedReportDispatcher, user_object: User) -> Dict[str, Any]:
+    """Generate actual income report using async PersonalizedReportDispatcher"""
+
+    s3_bucket = SecureS3Service()
+    print("HERE")
+    if not report_dispatcher or not s3_bucket:
+        return {"body": "Something went wrong generating your report. Please try again later."}
+    
+    try:
+        report_result = await report_dispatcher.generate_personalized_report(
+            report_type="incomes",
+            months_back=6,
+            include_ai=False,
+            generate_pdf=True
+        )
+
+        if "error" in report_result:
+            return {
+                "error": report_result["error"],
+                "message": "Sorry, I couldn't generate your income report right now. Please try again later."
+            }
+        
+        # Extract results
+        pdf_filename = report_result.get("pdf_filename")
+        ai_insights = report_result.get("personalized_ai_insights", {})
+
+        if not pdf_filename or not os.path.exists(pdf_filename):
+            return {
+                "error": True,
+                "messages": [{"body": "Sorry, the report file could not be found."}]
+            }
+        
+        
+        # Upload to secure S3
+        presigned_url = await s3_bucket.upload_pdf_from_file_secure(
+            file_path=pdf_filename,
+            user_id=user_object.id,
+            report_type="incomes",
+            expiration_hours=24
+        )
+        
+        # Clean up local file
+        if presigned_url:
+            try:
+                os.remove(pdf_filename)
+                print(f"Cleaned up local file: {pdf_filename}")
+            except Exception as e:
+                print(f"Failed to clean up local file: {e}")
+
+        if not presigned_url:
+            return {
+                "error": True,
+                "messages": [{"body": "Sorry, there was an error uploading your report. Please try again."}]
+            }
+        
+        # Build message sequence
+        messages = []
+        
+        # First message: Report ready notification
+        messages.append({"body": "📊 Your income report is ready!"})
+        
+        if ai_insights and not ai_insights.get("error"):
+            ai_message = create_comprehensive_ai_message(ai_insights)
+            if ai_message:
+                messages.append({"body": f"🤖 *AI Analysis:*\n\n{ai_message}"})
+            else:
+                # Fallback if parsing fails - use raw insights
+                print("DEBUG: AI message creation failed, using fallback")
+                if ai_insights.get("actionable_recommendations"):
+                    actions = ai_insights["actionable_recommendations"][:3]
+                    actions_text = "\n".join([f"{i+1}. {action}" for i, action in enumerate(actions)])
+                    messages.append({"body": f"🚀 *Quick Actions:*\n\n{actions_text}"})
+        elif ai_insights and ai_insights.get("error"):
+            print(f"DEBUG: AI insights error: {ai_insights['error']}")
+            # Don't add AI message if there was an error
+
+        messages.append({
+            "body": "📄 Here's your detailed income analysis (link expires in 24 hours):",
+            "media_url": presigned_url
+        })
+
+        return {
+            "error": False,
+            "messages": messages,
+            "stay_on_current": True
+        }
+
+    except Exception as e:
+        print(f"ERROR generating expense report: {str(e)}")
+        return {
+            "error": True,
+            "messages": [{"body": "Sorry, there was an error generating your expense report. Please try again later."}]
+        }
+
+
 
 async def generate_expense_report(report_dispatcher: PersonalizedReportDispatcher, user_object: User) -> Dict[str, Any]:
     """Generate actual expense report using async PersonalizedReportDispatcher"""
