@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 from api.db.models.tables import UnverifiedExpenses, UnverifiedIncomes, FinancialFeelings
+from api.behaviour.income_behaviour_analysis import IncomeBehaviouralInsights
 from api.db.query_manager import AsyncQueries
 from api.db.db_manager import DatabaseManager
 import calendar
@@ -66,6 +67,7 @@ class CategoryReportGenerator:
                 "stability_analysis": await self._income_stability_analysis(incomes),
                 "growth_opportunities": await self._identify_income_opportunities(incomes),
                 "diversification_score": await self._calculate_income_diversification(incomes),
+                "income_behavior_triggers": await self._analyze_income_behavior_triggers(incomes),
                 "recommendations": await self._income_recommendations(incomes)
             }
             
@@ -437,6 +439,12 @@ class CategoryReportGenerator:
                 "regular_percentage": round(((employment_income + grant_income) / total_income) * 100, 1) if total_income > 0 else 0
             }
         }
+    
+    async def _analyze_income_behavior_triggers(self, incomes: List[UnverifiedIncomes]) -> Dict:
+        """Analyze income behavior triggers"""
+        
+        behavioural_insights = IncomeBehaviouralInsights()
+        return behavioural_insights.analyze_behavioral_triggers(incomes)
     
     async def _identify_income_opportunities(self, incomes: List) -> List[Dict[str, Any]]:
         """Identify income growth opportunities"""
