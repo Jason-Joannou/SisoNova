@@ -347,6 +347,233 @@ class FinancialReportPDF:
         canvas.drawRightString(A4[0] - 25*mm, 4*mm, f"Page {canvas.getPageNumber()}")
         
         canvas.restoreState()
+
+    def _build_feelings_pdf_content(self, report_data: Dict[str, Any]) -> list:
+        """Build African-styled feelings/wellness report content with visuals"""
+        story = []
+        
+        # PAGE 1: Wellness Summary with Visual Dashboard
+        story.append(self._create_african_summary_box(report_data.get('summary', {}), 'feelings'))
+        story.append(Spacer(1, 30))
+        
+        # Overview description
+        overview_desc = """
+        This comprehensive wellness analysis provides insights into your financial emotional patterns over the past 6 months. 
+        Understanding how you feel about money is crucial for making better financial decisions and building a healthier 
+        relationship with your finances. Let's explore your emotional financial journey together.
+        """
+        story.append(Paragraph(overview_desc, self.description_style))
+        
+        # PAGE 2: Wellness Metrics with Visuals
+        story.append(PageBreak())
+        story.append(Paragraph("🧠 Your Financial Wellness Metrics", self.heading_style))
+        
+        metrics_desc = """
+        These key metrics reveal your emotional relationship with money. Understanding your stress patterns and wellness 
+        trends helps you identify triggers and develop strategies for better financial mental health.
+        """
+        story.append(Paragraph(metrics_desc, self.description_style))
+        
+        if 'summary' in report_data:
+            summary = report_data['summary']
+            
+            # Wellness status with progress bar
+            stress_level = summary.get('stress_level_percentage', 0)
+            wellness_status = summary.get('wellness_status', 'Unknown')
+            
+            story.append(Paragraph("📊 Current Wellness Status", self.subheading_style))
+            
+            # Create wellness progress bar (inverted - lower stress is better)
+            wellness_score = 100 - stress_level  # Convert stress to wellness score
+            wellness_bar = self._create_progress_bar(
+                wellness_score, 100, 
+                f"Wellness Score: {wellness_score:.0f}% ({wellness_status})"
+            )
+            story.append(wellness_bar)
+            story.append(Spacer(1, 20))
+            
+            # Feeling distribution pie chart
+            feeling_distribution = summary.get('feeling_distribution', {})
+            if feeling_distribution:
+                story.append(Paragraph("🎭 Your Feeling Patterns", self.subheading_style))
+                feelings_pie = self._create_pie_chart(
+                    feeling_distribution,
+                    "Distribution of Financial Feelings"
+                )
+                story.append(feelings_pie)
+                story.append(Spacer(1, 20))
+        
+        # PAGE 3: Stress Analysis with Trends
+        story.append(PageBreak())
+        story.append(Paragraph("📈 Stress Analysis & Trends", self.heading_style))
+        
+        stress_desc = """
+        Your stress patterns over time reveal important insights about your financial emotional health. 
+        Understanding when and why you feel stressed about money helps you develop coping strategies 
+        and make proactive changes to improve your financial wellness.
+        """
+        story.append(Paragraph(stress_desc, self.description_style))
+        
+        if 'stress_analysis' in report_data:
+            stress_analysis = report_data['stress_analysis']
+            
+            # Monthly stress trends line chart
+            monthly_trends = stress_analysis.get('monthly_stress_trends', {})
+            if len(monthly_trends) > 1:
+                story.append(Paragraph("Monthly Stress Trends", self.subheading_style))
+                stress_chart = self._create_line_chart(monthly_trends, "Stress Levels Over Time")
+                story.append(stress_chart)
+                story.append(Spacer(1, 20))
+            
+            # Stress trend analysis
+            trend_direction = stress_analysis.get('stress_trend_direction', 'Unknown')
+            trend_color = AFRICAN_SAGE if 'Decreasing' in trend_direction else AFRICAN_RUST if 'Increasing' in trend_direction else AFRICAN_GOLD
+            
+            trend_text = f"""
+            <b>Stress Trend:</b> <font color="{trend_color}"><b>{trend_direction}</b></font><br/>
+            <b>High Stress Periods:</b> {len(stress_analysis.get('high_stress_periods', []))} months<br/>
+            <b>Low Stress Periods:</b> {len(stress_analysis.get('low_stress_periods', []))} months
+            """
+            story.append(Paragraph(trend_text, self.body_style))
+            story.append(Spacer(1, 20))
+        
+        # PAGE 4: Financial Correlation Analysis
+        story.append(PageBreak())
+        story.append(Paragraph("🔗 Money & Mood Connections", self.heading_style))
+        
+        correlation_desc = """
+        Understanding how your financial activities affect your emotions helps you make more mindful money decisions. 
+        These correlations reveal patterns between your spending, earning, and emotional well-being.
+        """
+        story.append(Paragraph(correlation_desc, self.description_style))
+        
+        if 'correlation_analysis' in report_data:
+            correlation = report_data['correlation_analysis']
+            
+            # High expense day feelings
+            high_expense_feelings = correlation.get('high_expense_day_feelings', [])
+            if high_expense_feelings:
+                story.append(Paragraph("💸 How You Feel on High Spending Days", self.subheading_style))
+                
+                feeling_counts = {}
+                for feeling in high_expense_feelings:
+                    feeling_counts[feeling] = feeling_counts.get(feeling, 0) + 1
+                
+                if feeling_counts:
+                    expense_feelings_chart = self._create_bar_chart(
+                        feeling_counts, 
+                        "Feelings on High Expense Days"
+                    )
+                    story.append(expense_feelings_chart)
+                    story.append(Spacer(1, 15))
+            
+            # Correlation insights
+            insights = correlation.get('correlation_insights', [])
+            if insights:
+                story.append(Paragraph("🔍 Key Insights:", self.subheading_style))
+                for insight in insights:
+                    story.append(Paragraph(f"• {insight}", self.body_style))
+                    story.append(Spacer(1, 5))
+        
+        # PAGE 5: Wellness Trends & Progress
+        story.append(PageBreak())
+        story.append(Paragraph("📊 Your Wellness Journey", self.heading_style))
+        
+        wellness_desc = """
+        Tracking your wellness progress over time shows how your financial emotional health is evolving. 
+        Celebrate improvements and identify areas where you can continue to grow your financial confidence.
+        """
+        story.append(Paragraph(wellness_desc, self.description_style))
+        
+        if 'wellness_trends' in report_data:
+            wellness_trends = report_data['wellness_trends']
+            
+            # Weekly wellness chart
+            weekly_scores = wellness_trends.get('weekly_wellness_scores', {})
+            if len(weekly_scores) > 1:
+                story.append(Paragraph("Weekly Wellness Progress", self.subheading_style))
+                wellness_chart = self._create_line_chart(weekly_scores, "Wellness Scores Over Time")
+                story.append(wellness_chart)
+                story.append(Spacer(1, 20))
+            
+            # Best and worst periods
+            best_week = wellness_trends.get('best_wellness_week', 'No data')
+            worst_week = wellness_trends.get('worst_wellness_week', 'No data')
+            wellness_trend = wellness_trends.get('wellness_trend', 'Unknown')
+            
+            trend_summary = f"""
+            <b>Overall Trend:</b> {wellness_trend}<br/>
+            <b>Best Wellness Period:</b> {best_week}<br/>
+            <b>Most Challenging Period:</b> {worst_week}
+            """
+            story.append(Paragraph(trend_summary, self.body_style))
+            story.append(Spacer(1, 20))
+        
+        # PAGE 6: Mental Health & Support
+        story.append(PageBreak())
+        story.append(Paragraph("🤝 Mental Health & Support", self.heading_style))
+        
+        support_desc = """
+        Your mental health is just as important as your financial health. These insights help identify when you might 
+        benefit from additional support and provide resources to help you maintain good financial emotional wellness.
+        """
+        story.append(Paragraph(support_desc, self.description_style))
+        
+        if 'mental_health_insights' in report_data:
+            mental_health = report_data['mental_health_insights']
+            
+            risk_level = mental_health.get('mental_health_risk_level', 'Unknown')
+            support_needed = mental_health.get('support_needed', False)
+            positive_percentage = mental_health.get('positive_feelings_percentage', 0)
+            
+            # Risk assessment with color coding
+            risk_color = AFRICAN_RUST if risk_level == 'High' else AFRICAN_GOLD if risk_level == 'Medium' else AFRICAN_SAGE
+            
+            mental_health_summary = f"""
+            <b>Mental Health Risk Level:</b> <font color="{risk_color}"><b>{risk_level}</b></font><br/>
+            <b>Positive Feelings:</b> {positive_percentage}% of the time<br/>
+            <b>Support Recommended:</b> {'Yes' if support_needed else 'No'}
+            """
+            story.append(Paragraph(mental_health_summary, self.body_style))
+            story.append(Spacer(1, 15))
+            
+            # Support resources
+            support_resources = mental_health.get('support_resources', [])
+            if support_resources:
+                story.append(Paragraph("📞 Support Resources Available to You:", self.subheading_style))
+                for resource in support_resources:
+                    story.append(Paragraph(f"• {resource}", self.body_style))
+                    story.append(Spacer(1, 5))
+                story.append(Spacer(1, 15))
+        
+        # PAGE 7: Wellness Action Plan
+        story.append(PageBreak())
+        story.append(Paragraph("🎯 Your Wellness Action Plan", self.heading_style))
+        
+        action_desc = """
+        Small, consistent actions can significantly improve your financial emotional health. This personalized 
+        action plan provides specific steps you can take to build a healthier, more confident relationship with money.
+        """
+        story.append(Paragraph(action_desc, self.description_style))
+        
+        if 'support_recommendations' in report_data:
+            story.append(Paragraph("🚀 Immediate Wellness Actions:", self.subheading_style))
+            for i, rec in enumerate(report_data['support_recommendations'], 1):
+                action_text = f"<b>Step {i}:</b> {rec}"
+                story.append(Paragraph(action_text, self.body_style))
+                story.append(Spacer(1, 8))
+        
+        # Motivational closing
+        story.append(Spacer(1, 20))
+        motivation_text = """
+        <b>Remember:</b> Your financial wellness journey is unique and valuable. Every step you take toward understanding 
+        and improving your relationship with money is an investment in your overall well-being. Be patient with yourself, 
+        celebrate small victories, and remember that seeking support is a sign of strength, not weakness. You have the 
+        power to create positive change in your financial emotional health.
+        """
+        story.append(Paragraph(motivation_text, self.highlight_style))
+        
+        return story
     
     def _build_expense_pdf_content(self, report_data: Dict[str, Any]) -> list:
         """Build African-styled expense report content with sections on new pages"""
