@@ -41,11 +41,14 @@ def get_template_validation(template_name: str) -> TemplateValidation:
         "sisonova_personal_record_income_template":{
             "inbound_validator": IncomeExpenseRecordingValidator
         },
-        "sisonova_personal_feeling_template": {
+        "sisonova_personal_financial_feeling_template": {
             "inbound_validator": NumberedMenuValidator
         },
         "sisonova_personal_record_feeling_template": {
             "inbound_validator": FinancialFeelingRecordingValidator
+        },
+        "language_selector_template": {
+            "inbound_validator": NumberedMenuValidator
         }
 
     }
