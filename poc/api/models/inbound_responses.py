@@ -166,7 +166,6 @@ class FinancialFeelingRecordingValidator(BaseValidator):
             parts = [part.strip() for part in lines[0].split('-')]
             
             financial_feeling = parts[0]
-            date_str = parts[1] if len(parts) >= 2 else None
 
             if not financial_feeling:
                 return False
@@ -184,53 +183,45 @@ class FinancialFeelingRecordingValidator(BaseValidator):
             if financial_feeling not in valid_feelings:
                 return False
             
-            if date_str and '/' not in date_str:
-                return False  # Date must use "/" separator
-            
-            if date_str:
-                date_format = '%Y/%m/%d'
-                try:
-                    datetime.strptime(date_str, date_format)
-                except ValueError:
-                    return False  # No valid date format found
+        else:
 
-        # If multiple lines, we have to enforce a date for each line to be able to differentiate.
+            # If multiple lines, we have to enforce a date for each line to be able to differentiate.
 
-        for line in lines:
-            
-            # Check if line has at least the basic format: something - something
-            parts = [part.strip() for part in line.split('-')]
-            if len(parts) == 1:
-                return False  # Invalid format
-            
-            financial_feeling = parts[0]
-            date_str = parts[1]
+            for line in lines:
+                
+                # Check if line has at least the basic format: something - something
+                parts = [part.strip() for part in line.split('-')]
+                if len(parts) == 1:
+                    return False  # Invalid format
+                
+                financial_feeling = parts[0]
+                date_str = parts[1]
 
-            if not financial_feeling:
-                return False
-            
-            valid_feelings = [
-                "Struggling",
-                "Worried",
-                "Coping",
-                "Okay",
-                "Fine",
-                "Good",
-                "Great"
-            ]
-            
-            if financial_feeling not in valid_feelings:
-                return False
-            
-            if '/' not in date_str:
-                return False  # Date must use "/" separator
-            
-            if date_str:
-                date_format = '%Y/%m/%d'
-                try:
-                    datetime.strptime(date_str, date_format)
-                except ValueError:
-                    return False  # No valid date format found
+                if not financial_feeling:
+                    return False
+                
+                valid_feelings = [
+                    "Struggling",
+                    "Worried",
+                    "Coping",
+                    "Okay",
+                    "Fine",
+                    "Good",
+                    "Great"
+                ]
+                
+                if financial_feeling not in valid_feelings:
+                    return False
+                
+                if '/' not in date_str:
+                    return False  # Date must use "/" separator
+                
+                if date_str:
+                    date_format = '%Y/%m/%d'
+                    try:
+                        datetime.strptime(date_str, date_format)
+                    except ValueError:
+                        return False  # No valid date format found
                     
 
         return True 
