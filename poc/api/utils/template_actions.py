@@ -172,6 +172,22 @@ async def create_poc_dummy_data_south_africa(user_object: User) -> List[Tuple[st
     
     return dummy_data
 
+async def update_user_language_preference(query_manager: AsyncQueries, user_object: User, new_language: str) -> Dict:
+    try:
+
+        await query_manager.update_user_language_preference(user_id=user_object.id, new_language=new_language)
+        return {
+            "error": False,
+            "message": "Your language preference has been updated successfully."
+        }
+    
+    except Exception as e:
+        return {
+            "error": True,
+            "message": f"Failed to update language preference: {str(e)}"
+        }
+    
+
 async def generate_comprehensive_report(report_dispatcher: PersonalizedReportDispatcher, user_object: User) -> Dict[str, Any]:
     """Generate actual comprehensive report using async PersonalizedReportDispatcher"""
 
