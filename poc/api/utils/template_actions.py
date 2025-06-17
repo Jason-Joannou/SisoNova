@@ -172,19 +172,34 @@ async def create_poc_dummy_data_south_africa(user_object: User) -> List[Tuple[st
     
     return dummy_data
 
-async def update_user_language_preference(query_manager: AsyncQueries, user_object: User, new_language: str) -> Dict:
+async def update_user_language_preference(query_manager: AsyncQueries, user_object: User, new_language_option: str) -> Dict:
     try:
+
+        language_map = {
+            "1": "English",
+            "2": "Afrikaans",
+            "3": "Zulu"
+        }
+
+
+        if new_language_option not in language_map:
+            return {
+                "error": True,
+                "messages": [{"body": "Invalid language option. Please try again."}]
+            }
+        
+        new_language = language_map[new_language_option]
 
         await query_manager.update_user_language_preference(user_id=user_object.id, new_language=new_language)
         return {
             "error": False,
-            "message": "Your language preference has been updated successfully."
+            "messages": [{"body": "Language preference updated successfully."}]
         }
     
     except Exception as e:
         return {
             "error": True,
-            "message": f"Failed to update language preference: {str(e)}"
+            "messages": [{"body": "Something went wrong updating your language preference. Please try again later."}]
         }
     
 
@@ -206,7 +221,7 @@ async def generate_comprehensive_report(report_dispatcher: PersonalizedReportDis
         if "error" in report_result:
             return {
                 "error": report_result["error"],
-                "message": "Sorry, I couldn't generate your financial profile report right now. Please try again later."
+                "messages": [{"body": "Sorry, I couldn't generate your comprehensive report right now. Please try again later."}]
             }
         
         # Extract results
@@ -300,7 +315,7 @@ async def generate_feelings_report(report_dispatcher: PersonalizedReportDispatch
         if "error" in report_result:
             return {
                 "error": report_result["error"],
-                "message": "Sorry, I couldn't generate your wellness report right now. Please try again later."
+                "messages": [{"body": "Sorry, I couldn't generate your feelings report right now. Please try again later."}]
             }
         
         # Extract results
@@ -394,7 +409,7 @@ async def generate_income_report(report_dispatcher: PersonalizedReportDispatcher
         if "error" in report_result:
             return {
                 "error": report_result["error"],
-                "message": "Sorry, I couldn't generate your income report right now. Please try again later."
+                "messages": [{"body": "Sorry, I couldn't generate your income report right now. Please try again later."}]
             }
         
         # Extract results
@@ -493,7 +508,7 @@ async def generate_expense_report(report_dispatcher: PersonalizedReportDispatche
         if "error" in report_result:
             return {
                 "error": report_result["error"],
-                "message": "Sorry, I couldn't generate your expense report right now. Please try again later."
+                "messages": [{"body": "Sorry, I couldn't generate your expense report right now. Please try again later."}]
             }
         
         # Extract results
