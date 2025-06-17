@@ -9,11 +9,11 @@ unregistered_number_language_selector_template:
     Probeer asseblief weer jou voorkeurtaal invoer.
 
   template_message: |
-    Hallo daar 👋 , en welkom by SisoNova se finansiële bystanddiens.
+    Hallo daar 👋 , en welkom by SisoNova se finansiële bystandsdiens.
 
     Ons glo dat finansiële gesprekke die doeltreffendste is wanneer dit plaasvind in 'n taal waarmee jy gemaklik is.
 
-    Om jou te help om selfversekerd te voel en elke stap van die pad te verstaan, kies asseblief jou voorkeurtaal om voort te gaan.
+    Om jou te help om elke stap van die pad selfversekerd en verstaanbaar te voel, kies asseblief jou voorkeurtaal om voort te gaan.
 
     (Jy kan dit enige tyd later verander.)
 
@@ -33,59 +33,64 @@ unregistered_number_language_selector_template:
 
 unregistered_number_welcome_template:
   template_error_message: |
-    Dit is nie 'n geldige opsie nie.
+    Dit is nie 'n geldige taal nie.
 
-    Die geldige opsies is:
+    Die geldige tale is:
 
     {error_message}
 
-    Probeer asseblief weer die opsie in te voer.
+    Probeer asseblief weer jou voorkeurtaal invoer.
   template_message: |
-    Puik! Jy het jou voorkeurtaal gekies - kom ons begin jou!
+    Wonderlik! Jy het jou voorkeurtaal gekies - kom ons begin!
 
-    Ons het opgemerk dat jy nuut is by SisoNova se finansiële bystanddiens.
+    Ons het opgemerk dat jy nuut is met SisoNova se Finansiële Bystandsdiens.
 
     Wil jy nou registreer?
 
     Deur te registreer:
-    
-    - Ons sal jou WhatsApp-nommer veilig stoor vir toekomstige interaksies.  
-    - 'n Digitale beursie sal vir jou op die Algorand-blokketting geskep word om jou finansiële reis te help bestuur.  
-    - Jy sal toegang hê tot gepersonaliseerde finansiële instrumente, dienste en insigte.  
 
-    Deur "yes" te antwoord, stem jy in tot ons Bepalings en Voorwaardes:  
-    https://sisonova.com/terms-and-conditions
+    - Ons sal jou WhatsApp-nommer veilig stoor vir toekomstige interaksies.
+
+    - 'n Digitale beursie sal vir jou op die Algorand-blokketting geskep word om jou finansiële reis te help bestuur.
+
+    - Jy sal toegang hê tot gepersonaliseerde finansiële gereedskap, dienste en insigte.
+
+    Deur "ja" te antwoord, stem jy in tot ons Bepalings en Voorwaardes:
+
+    https://isonova.com/terms-and-conditions
 
     Antwoord asseblief met "yes" of "no" om voort te gaan.
 
   previous_template: unregistered_number_welcome_template
 
   response_routing:
-    "yes": "registration_yes_template"
+    "yes": "registered_user_template"
     "no": "registration_no_template"
 
   error_message:
-    - Yes
-    - No
+    - "Yes"
+    - "No"
 
 registered_user_template:
   template_error_message: |
-    Dit is nie 'n geldige opsie nie.
+    Dit is nie 'n geldige taal nie.
 
-    Die geldige opsies is:
+    Die geldige tale is:
 
     {error_message}
 
-    Probeer asseblief weer die opsie in te voer.
+    Probeer asseblief weer jou voorkeurtaal invoer.
   template_message: |
-    Dankie dat jy by SisoNova se Finansiële Bystanddiens geregistreer het!
+    Dankie dat u by SisoNova se Finansiële Bystandsdiens geregistreer het!
 
-    Ons het suksesvol 'n veilige digitale beursie vir jou op die Algorand-blokketting geskep om jou finansiële reis te ondersteun.
+    Ons het suksesvol 'n veilige digitale beursie vir u op die Algorand-blokketting geskep om u finansiële reis te ondersteun.
 
-    Jy het nou toegang tot gepersonaliseerde finansiële nutsgoed, dienste en insigte. Kies asseblief een van die volgende opsies om te begin:
+    U het nou toegang tot gepersonaliseerde finansiële gereedskap, dienste en insigte. Kies asseblief een van die volgende opsies om te begin:
 
-    1. SisoNova Personal - Pasgemaakte finansiële bystand en gereedskap vir individuele gebruik.
-    2. SisoNova Public - Toegang tot gedeelde hulpbronne en gemeenskapsgebaseerde finansiële ondersteuning.
+    1. SisoNova Persoonlik - Pasgemaakte finansiële bystand en gereedskap vir individuele gebruik.
+    2. SisoNova Besigheid - Finansiële gereedskap en dienste vir besighede en organisasies.
+    3. SisoNova Publiek - Toegang tot gedeelde hulpbronne, gemeenskapsgebaseerde finansiële ondersteuning en 'n oop mark van finansiële dienste.
+    4. Verander Taal
 
     Om meer uit te vind oor SisoNova se dienste, besoek ons webwerf: https://sisonova.com
 
@@ -93,67 +98,82 @@ registered_user_template:
 
   response_routing:
     "1": "sisonova_personal_template"
-    "2": "sisonova_public_template"
+    "2": "not_yet_implemented_template"
+    "3": "not_yet_implemented_template"
+    "4": "language_selector_template"
 
   error_message:
     - 1
     - 2
+    - 3
+    - 4
 
-registration_no_template:
+language_selector_template:
   template_error_message: |
-    Dit is nie 'n geldige opsie nie.
+    Dit is nie 'n geldige taal nie.
 
-    Die geldige opsies is:
+    Die geldige tale is:
 
     {error_message}
 
-    Probeer asseblief weer die opsie in te voer.
-    
+    Probeer asseblief weer jou voorkeurtaal invoer.
+
   template_message: |
-    Geen probleem nie! As jy later van plan verander, kan jy altyd weer registreer.
+    Kies asseblief u voorkeurtaal. Die beskikbare tale is:
 
-    Om meer uit te vind oor SisoNova se dienste, besoek ons webwerf: https://sisonova.com
-    
-    Wil jy graag:
-    1. Gaan terug na registrasie
+    1. Engels
+    2. Afrikaans
+    3. Zoeloe
+    4. Tuisblad
 
-  previous_template: unregistered_number_welcome_template
+
+  previous_template: registered_user_template
 
   response_routing:
-    "1": "unregistered_number_welcome_template"
+    "4": "registered_user_template"
+
+  actions:
+    "1": "update_user_language_preference"
+    "2": "update_user_language_preference"
+    "3": "update_user_language_preference"
 
   error_message:
-    - "1"
+    - 1
+    - 2
+    - 3
+    - 4
 
 sisonova_personal_template:
   template_error_message: |
-    Dit is nie 'n geldige opsie nie.
+    Dit is nie 'n geldige taal nie.
 
-    Die geldige opsies is:
+    Die geldige tale is:
 
     {error_message}
 
-    Probeer asseblief weer die opsie in te voer.
+    Probeer asseblief weer jou voorkeurtaal invoer.
   template_message: |
-    Welkom by SisoNova Personal - Jou persoonlike finansiële bystanddiens!
+    Welkom by SisoNova Personal - Jou Gepersonaliseerde Finansiële Bystandsdiens!
 
-    SisoNova Personal verskaf persoonlike finansiële bystand en gereedskap vir individuele gebruik.
+    SisoNova Personal bied gepersonaliseerde finansiële bystand en gereedskap vir individuele gebruik.
 
     Om jou finansiële profiel te begin bestuur, kies asseblief een van die volgende opsies:
 
     1. Uitgawes
     2. Inkomste
     3. Finansiële Gevoel
-    4. Finansiële profielverslae
+    4. Finansiële Profielverslag
     5. Terug
 
   previous_template: registered_user_template
+
+  actions:
+    "4": "generate_comprehensive_report"
 
   response_routing:
     "1": "sisonova_personal_expense_template"
     "2": "sisonova_personal_income_template"
     "3": "sisonova_personal_financial_feeling_template"
-    "4": "sisonova_personal_financial_profile_reports_template"
     "5": "registered_user_template"
 
   error_message:
@@ -165,26 +185,27 @@ sisonova_personal_template:
 
 sisonova_personal_expense_template:
   template_error_message: |
-    Dit is nie 'n geldige opsie nie.
+    Dit is nie 'n geldige taal nie.
 
-    Die geldige opsies is:
+    Die geldige tale is:
 
     {error_message}
 
-    Probeer asseblief weer die opsie in te voer.
+    Probeer asseblief weer jou voorkeurtaal invoer.
   template_message: |
-    Uitgawes is 'n belangrike deel van jou finansiële lewe. Om hulle verstandig te verstaan en te bestuur, is noodsaaklik om 'n sterk finansiële profiel te bou.
-    Hoe wil jy met jou uitgawes omgaan?
+    Uitgawes is 'n belangrike deel van jou finansiële lewe. Om dit te verstaan ​​en wys te bestuur, is noodsaaklik om 'n sterk finansiële profiel te bou.
+
+    Hoe wil jy jou uitgawes hanteer?
 
     1. Teken uitgawes aan
-    2. Onkosteverslag
+    2. Uitgaweverslag
     3. Terug
-    4. Tuis
+    4. Tuisblad
 
   previous_template: registered_user_template
 
   response_routing:
-    "1": "record_expenses_template"
+    "1": "sisonova_personal_record_expense_template"
     "3": "sisonova_personal_template"
     "4": "registered_user_template"
 
@@ -196,3 +217,291 @@ sisonova_personal_expense_template:
     - 2
     - 3
     - 4
+
+sisonova_personal_record_expense_template:
+  template_error_message: |
+    Dit is 'n ongeldige uitgaweformaat.
+
+    Gebruik asseblief hierdie formaat:
+    Kategorie - Bedrag - Gevoel - Datum (opsioneel)
+
+    *Geldige Gevoelens:*
+    Sukkelend, Bekommerd, Hantering, Goed, Goed, Uitstekend
+
+    *Voorbeelde:*
+
+    • Huur-1000-Bekommerd-2023/08/01
+    • Kruideniersware-50-Goed
+    • Vervoer-25-Goed
+
+    Vir veelvuldige uitgawes, plaas elkeen op 'n nuwe lyn.
+    Vir datums, gebruik die "/"-skeier (JJJJ/MM/DD)
+
+    *Wanneer klaar, tik:* 1
+
+  template_message: |
+    📝 *Uitgawe-aantekening*
+
+    Teken jou uitgawes aan met behulp van hierdie formaat:
+
+    Kategorie - Bedrag - Gevoel - Datum (opsioneel)
+
+    *Geldige Gevoelens:*
+    Sukkelend, Bekommerd, Hantering, Goed, Goed, Uitstekend
+
+    *Voorbeelde:*
+
+    • Huur-1000-Bekommerd-2023/08/01
+    • Kruideniersware-50-Goed
+    • Vervoer-25-Goed
+
+    Vir veelvuldige uitgawes, plaas elkeen op 'n nuwe lyn.
+    Vir datums, gebruik die "/"-skeier (JJJJ/MM/DD)
+
+    *Wanneer jy klaar is met die aantekening van uitgawes:*
+
+    1. Stop die aantekening van uitgawes
+
+  previous_template: registered_user_template
+  continuous_template: True
+  input_handler: "expense_recording"
+
+  response_routing:
+    "1": "sisonova_personal_template"
+
+  error_message:
+    - "Invalid expense format"
+
+registration_no_template:
+  template_error_message: |
+    Dit is nie 'n geldige taal nie.
+
+    Die geldige tale is:
+
+    {error_message}
+
+    Probeer asseblief weer jou voorkeurtaal invoer.
+    
+  template_message: |
+    Geen probleem nie! Indien jy later van plan verander, kan jy altyd weer registreer.
+
+    Om meer uit te vind oor SisoNova se dienste, besoek ons ​​webwerf: https://isonova.com
+
+    Wil jy: 1. Teruggaan na registrasie
+    
+
+  previous_template: unregistered_number_welcome_template
+
+  response_routing:
+    "1": "unregistered_number_welcome_template"
+
+  error_message:
+    - "1"
+
+sisonova_personal_income_template:
+  template_error_message: |
+    Dit is nie 'n geldige taal nie.
+
+    Die geldige tale is:
+
+    {error_message}
+
+    Probeer asseblief weer om jou voorkeurtaal in te voer.
+    
+  template_message: |
+    Inkomste is die fondament van jou finansiële welstand. Die dophou en optimalisering van jou inkomstebronne is noodsaaklik vir groei en stabiliteit.
+    Hoe wil jy met jou inkomste omgaan?
+
+    1. Rekordeer inkomste
+    2. Inkomsteverslag
+    3. Terug
+    4. Tuisblad
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "sisonova_personal_record_income_template"
+    "3": "sisonova_personal_template"
+    "4": "registered_user_template"
+
+  actions:
+    "2": "generate_income_report"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+
+sisonova_personal_record_income_template:
+  template_error_message: |
+    Dit is 'n ongeldige inkomsteformaat.
+
+    Gebruik asseblief hierdie formaat:
+    Bron - Bedrag - Gevoel - Datum (opsioneel)
+
+    *Geldige Gevoelens:*
+    Sukkelend, Bekommerd, Hantering, Goed, Goed, Uitstekend
+
+    *Voorbeelde:*
+    • Salaris-3000-Uitstekend-2023/08/01
+    • Vryskut-500-Goed
+    • Geskenk-100-Goed
+
+    Vir veelvuldige inkomstes, plaas elkeen op 'n nuwe lyn.
+    Vir datums, gebruik die "/"-skeier (JJJJ/MM/DD)
+
+    *Wanneer klaar, tik:* 1
+
+  template_message: |
+    💰 *Inkomste-aantekening*
+
+    Teken jou inkomste aan met behulp van hierdie formaat:
+
+    Bron - Bedrag - Gevoel - Datum (opsioneel)
+
+    *Geldige Gevoelens:*
+    Sukkelend, Bekommerd, Hantering, Goed, Goed, Uitstekend
+
+    *Voorbeelde:*
+
+    • Salaris-3000-Uitstekend-2023/08/01
+    • Vryskut-500-Goed
+    • Geskenk-100-Goed
+
+    Vir veelvuldige inkomstes, plaas elkeen op 'n nuwe lyn.
+    Vir datums, gebruik die "/"-skeier (JJJJ/MM/DD)
+
+    *Wanneer jy klaar is met die aantekening van inkomste:*
+
+    1. Stop die aantekening van inkomste
+
+  previous_template: registered_user_template
+  continuous_template: True
+  input_handler: "income_recording"
+
+  response_routing:
+    "1": "sisonova_personal_template"
+
+  error_message:
+    - "Invalid income format"
+
+sisonova_personal_financial_feeling_template:
+  template_error_message: |
+    Dit is nie 'n geldige taal nie.
+
+    Die geldige tale is:
+
+    {error_message}
+
+    Probeer asseblief weer jou voorkeurtaal invoer.
+  template_message: |
+    Jou finansiële gevoelens bied belangrike insig in hoe jy jou finansiële reis ervaar. Deur dit oor tyd dop te hou, kan jy patrone identifiseer en beter besluite neem.
+
+    Hoe wil jy met jou finansiële gevoelens omgaan?
+
+    1. Teken Finansiële Gevoelens aan
+    2. Gevoelsverslag
+    3. Terug
+    4. Tuis
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "sisonova_personal_record_feeling_template"
+    "3": "sisonova_personal_template"
+    "4": "registered_user_template"
+
+  actions:
+    "2": "generate_feelings_report"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+
+sisonova_personal_record_feeling_template:
+  template_error_message: |
+    Dit is 'n ongeldige finansiële gevoelformaat.
+
+    Gebruik asseblief hierdie formaat:
+    Gevoel - Datum (opsioneel)
+
+    *Geldige Gevoelens:*
+    Sukkelend, Bekommerd, Hantering, Goed, Goed, Uitstekend
+
+    *Voorbeelde:*
+    • Bekommerd-2023/08/01
+    • Goed
+    • Goed-2025/06/11
+
+    Vir veelvuldige inskrywings:
+    → Plaas elkeen op 'n nuwe reël
+    → Sluit 'n datum vir elkeen in
+
+    Vir datums, gebruik die "/"-skeier (JJJJ/MM/DD)
+
+    *Wanneer klaar, tik:* 1
+
+  template_message: |
+    🧠 *Opname van Finansiële Gevoelens*
+
+    Dink na oor hoe jy oor jou finansies voel en teken dit op met behulp van hierdie formaat:
+
+    Gevoel - Datum (opsioneel)
+
+    *Geldige Gevoelens:*
+    Sukkelend, Bekommerd, Hantering, Goed, Goed, Uitstekend
+
+    *Voorbeelde:*
+
+    • Bekommerd-2023/08/01
+    • Goed
+    • Goed-2025/06/11
+
+    🟡 *As jy meer as een gevoel stuur (veelvuldige reëls), maak seker dat elkeen 'n datum insluit.*
+
+    Vir datums, gebruik 'n "/"-skeier (JJJJ/MM/DD)
+
+    *Wanneer jy klaar is met die opneem van gevoelens:*
+
+    1. Hou op om gevoelens op te neem
+
+  previous_template: registered_user_template
+  continuous_template: True
+  input_handler: "feeling_recording"
+
+  response_routing:
+    "1": "sisonova_personal_template"
+
+  error_message:
+    - "Invalid financial feeling format"
+
+
+not_yet_implemented_template:
+  template_error_message: |
+    Dit is nie 'n geldige taal nie.
+
+    Die geldige tale is:
+
+    {error_message}
+
+    Probeer asseblief weer jou voorkeurtaal invoer.
+
+  template_message: |
+    Ons weet jy is opgewonde om te verken wat SisoNova bied!
+
+    Ons werk tans aan hierdie diens en sal binnekort bekendgestel word.
+
+    Kom asseblief later weer in vir opdaterings.
+
+    1. Tuisblad
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "registered_user_template"
+
+  error_message:
+    - 1

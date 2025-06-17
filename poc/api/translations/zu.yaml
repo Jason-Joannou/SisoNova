@@ -33,13 +33,13 @@ unregistered_number_language_selector_template:
 
 unregistered_number_welcome_template:
   template_error_message: |
-    Lokho akuyona inketho evumelekile.
+    Lolo akulona ulimi oluvumelekile.
 
-    Izinketho ezivumelekile yilezi:
+    Izilimi ezivumelekile yilezi:
 
     {error_message}
 
-    Sicela uzame ukufaka inketho futhi.
+    Sicela uzame ukufaka ulimi oluncamelayo futhi.
   template_message: |
     Kuhle! Ukhethe ulimi oluncamelayo - ake sikuqalise!
 
@@ -48,7 +48,7 @@ unregistered_number_welcome_template:
     Ungathanda ukubhalisa manje?
 
     Ngokubhalisa:
-    
+
     - Sizogcina ngokuphephile inombolo yakho ye-WhatsApp ukuze uthole ukusebenzelana okuzayo.  
     - I-wallet yedijithali izodalelwa wena ku-Algorand blockchain ukusiza ukuphatha uhambo lwakho lwezezimali.  
     - Uzokwazi ukufinyelela amathuluzi ezezimali omuntu siqu, amasevisi, nemininingwane.  
@@ -61,22 +61,22 @@ unregistered_number_welcome_template:
   previous_template: unregistered_number_welcome_template
 
   response_routing:
-    "yes": "registration_yes_template"
+    "yes": "registered_user_template"
     "no": "registration_no_template"
 
   error_message:
-    - Yes
-    - No
+    - "Yes"
+    - "No"
 
 registered_user_template:
   template_error_message: |
-    Lokho akuyona inketho evumelekile.
+    Lolo akulona ulimi oluvumelekile.
 
-    Izinketho ezivumelekile yilezi:
+    Izilimi ezivumelekile yilezi:
 
     {error_message}
 
-    Sicela uzame ukufaka inketho futhi.
+    Sicela uzame ukufaka ulimi oluncamelayo futhi.
   template_message: |
     Siyabonga ngokubhalisa nesevisi yosizo lwezezimali ye-SisoNova!
 
@@ -84,8 +84,10 @@ registered_user_template:
 
     Manje usungakwazi ukufinyelela amathuluzi ezezimali omuntu siqu, amasevisi, nemininingwane. Sicela ukhethe enye yezinketho ezilandelayo ukuze uqalise:
 
-    1. SisoNova Personal - Usizo lwezezimali oluhambisanayo namathuluzi okusetshenziswa komuntu ngamunye.
-    2. SisoNova Public - Ukufinyelela ezinsizeni ezabiwe kanye nokwesekwa kwezezimali okusekelwe emphakathini.
+    1. I-SisoNova Personal - Usizo lwezezimali oluhambisanayo namathuluzi okusetshenziswa komuntu ngamunye.
+    2. Ibhizinisi leSisoNova - Amathuluzi ezezimali kanye nezinsizakalo zamabhizinisi nezinhlangano.
+    3. I-SisoNova Public - Ukufinyelela ezinsizeni ezabiwe, ukwesekwa kwezezimali okusekelwe emphakathini, kanye nemakethe evulekile yezinsizakalo zezezimali.
+    4. Shintsha Ulimi
 
     Ukuze uthole okwengeziwe ngezinkonzo zeSisoNova, vakashela iwebhusayithi yethu: https://sisonova.com
 
@@ -93,21 +95,187 @@ registered_user_template:
 
   response_routing:
     "1": "sisonova_personal_template"
-    "2": "sisonova_public_template"
+    "2": "not_yet_implemented_template"
+    "3": "not_yet_implemented_template"
+    "4": "language_selector_template"
 
   error_message:
     - 1
     - 2
+    - 3
+    - 4
 
-registration_no_template:
+language_selector_template:
   template_error_message: |
-    Lokho akuyona inketho evumelekile.
+    Lolo akulona ulimi oluvumelekile.
 
-    Izinketho ezivumelekile yilezi:
+    Izilimi ezivumelekile yilezi:
 
     {error_message}
 
-    Sicela uzame ukufaka inketho futhi.
+    Sicela uzame ukufaka ulimi oluncamelayo futhi.
+
+  template_message: |
+    Sicela ukhethe ulimi oluncamelayo. Izilimi ezitholakalayo yilezi:
+
+    1. IsiNgisi
+    2. IsiBhunu
+    3. IsiZulu
+    4. Ekhaya
+
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "4": "registered_user_template"
+
+  actions:
+    "1": "update_user_language_preference"
+    "2": "update_user_language_preference"
+    "3": "update_user_language_preference"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+
+sisonova_personal_template:
+  template_error_message: |
+    Lolo akulona ulimi oluvumelekile.
+
+    Izilimi ezivumelekile yilezi:
+
+    {error_message}
+
+    Sicela uzame ukufaka ulimi oluncamelayo futhi.
+  template_message: |
+    Siyakwamukela ku-SisoNova Personal - Isevisi Yakho Yokusiza Ngezezimali!
+
+    I-SisoNova Personal inikeza usizo lwezezimali lomuntu siqu namathuluzi okusetshenziswa komuntu ngamunye.
+
+    Ukuze uqale ukuphatha iphrofayela yakho yezezimali, sicela ukhethe enye yezinketho ezilandelayo:
+
+    1. Izindleko
+    2. Imali engenayo
+    3. Umuzwa Wezezimali
+    4. Umbiko Wephrofayili Yezezimali
+    5. Emuva
+
+  previous_template: registered_user_template
+
+  actions:
+    "4": "generate_comprehensive_report"
+
+  response_routing:
+    "1": "sisonova_personal_expense_template"
+    "2": "sisonova_personal_income_template"
+    "3": "sisonova_personal_financial_feeling_template"
+    "5": "registered_user_template"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+
+sisonova_personal_expense_template:
+  template_error_message: |
+    Lolo akulona ulimi oluvumelekile.
+
+    Izilimi ezivumelekile yilezi:
+
+    {error_message}
+
+    Sicela uzame ukufaka ulimi oluncamelayo futhi.
+  template_message: |
+    Izindleko ziyingxenye ebalulekile yempilo yakho yezezimali. Ukuziqonda nokuyiphatha ngobuhlakani kubalulekile ekwakheni iphrofayili eqinile yezezimali.
+    Ungathanda ukusebenzelana kanjani nezindleko zakho?
+
+    1. Qopha Izindleko
+    2. Umbiko Wezindleko
+    3. Emuva
+    4. Ekhaya
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "sisonova_personal_record_expense_template"
+    "3": "sisonova_personal_template"
+    "4": "registered_user_template"
+
+  actions:
+    "2": "generate_expense_report"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+
+sisonova_personal_record_expense_template:
+  template_error_message: |
+    Leyo yifomethi yezindleko engavumelekile. 
+
+    Sicela usebenzise le fomethi:
+    Isigaba - Inani - Umuzwa - Idethi (kuyakhetheka)
+
+    *Imizwa Evumelekile:*
+    Ukuzabalaza, Ukukhathazeka, Ukubekezela, Kulungile, Kuhle, Kuhle, Kuhle
+
+    *Izibonelo:*
+    • Qasha-1000-Worried-2023/08/01
+    • Igrosa-50-Good
+    • Ezokuthutha-25-Kulungile
+
+    Ngezindleko eziningi, faka ngayinye emugqeni omusha.
+    Ngezinsuku, sebenzisa isihlukanisi "/" (YYYY/MM/DD)
+
+    *Uma usuqedile, thayipha:* 1
+
+  template_message: |
+    📝 *Izindleko Zokurekhoda*
+
+    Rekhoda izindleko zakho usebenzisa le fomethi:
+
+    Isigaba - Inani - Umuzwa - Idethi (kuyakhetheka)
+
+    *Imizwa Evumelekile:*
+    Ukuzabalaza, Ukukhathazeka, Ukubekezela, Kulungile, Kuhle, Kuhle, Kuhle
+
+    *Izibonelo:*
+
+    • Qasha-1000-Worried-2023/08/01
+    • Igrosa-50-Good
+    • Ezokuthutha-25-Kulungile
+
+    Ngezindleko eziningi, faka ngayinye emugqeni omusha.
+    Ngezinsuku, sebenzisa isihlukanisi "/" (YYYY/MM/DD)
+
+    *Uma usuqedile ukurekhoda izindleko:*
+
+    1. Yeka Ukuqopha Izindleko
+
+  previous_template: registered_user_template
+  continuous_template: True
+  input_handler: "expense_recording"
+
+  response_routing:
+    "1": "sisonova_personal_template"
+
+  error_message:
+    - "Invalid expense format"
+
+registration_no_template:
+  template_error_message: |
+    Lolo akulona ulimi oluvumelekile.
+
+    Izilimi ezivumelekile yilezi:
+
+    {error_message}
+
+    Sicela uzame ukufaka ulimi oluncamelayo futhi.
     
   template_message: |
     Ayikho inkinga! Uma ushintsha umqondo wakho ngemva kwesikhathi, ungakwazi ukubhalisa futhi.
@@ -126,71 +294,34 @@ registration_no_template:
   error_message:
     - "1"
 
-sisonova_personal_template:
+sisonova_personal_income_template:
   template_error_message: |
-    Lokho akuyona inketho evumelekile.
+    Lolo akulona ulimi oluvumelekile.
 
-    Izinketho ezivumelekile yilezi:
+    Izilimi ezivumelekile yilezi:
 
     {error_message}
 
-    Sicela uzame ukufaka inketho futhi.
+    Sicela uzame ukufaka ulimi oluncamelayo futhi.
+    
   template_message: |
-    Siyakwamukela ku-SisoNova Personal - Isevisi Yakho Yokusiza Ngezezimali!
+    Imali engenayo iyisisekelo senhlalakahle yakho yezezimali. Ukulandelela kanye nokwenza kahle imithombo yakho yemali engenayo kubalulekile ekukhuleni nasekuzinzeni.
+    Ungathanda ukusebenzelana kanjani nomholo wakho?
 
-    I-SisoNova Personal inikeza usizo lwezezimali lomuntu siqu namathuluzi okusetshenziswa komuntu ngamunye.
-
-    Ukuze uqale ukuphatha iphrofayela yakho yezezimali, sicela ukhethe enye yezinketho ezilandelayo:
-
-    1. Izindleko
-    2. Imali engenayo
-    3. Umuzwa Wezezimali
-    4. Imibiko Yephrofayili Yezezimali
-    5. Emuva
-
-  previous_template: registered_user_template
-
-  response_routing:
-    "1": "sisonova_personal_expense_template"
-    "2": "sisonova_personal_income_template"
-    "3": "sisonova_personal_financial_feeling_template"
-    "4": "sisonova_personal_financial_profile_reports_template"
-    "5": "registered_user_template"
-
-  error_message:
-    - 1
-    - 2
-    - 3
-    - 4
-    - 5
-
-sisonova_personal_expense_template:
-  template_error_message: |
-    Lokho akuyona inketho evumelekile.
-
-    Izinketho ezivumelekile yilezi:
-
-    {error_message}
-
-    Sicela uzame ukufaka inketho futhi.
-  template_message: |
-    Izindleko ziyingxenye ebalulekile yempilo yakho yezezimali. Ukuziqonda nokuyiphatha ngobuhlakani kubalulekile ekwakheni iphrofayili eqinile yezezimali.
-    Ungathanda ukusebenzelana kanjani nezindleko zakho?
-
-    1. Qopha Izindleko
-    2. Umbiko Wezindleko
+    1. Qopha Imali engenayo
+    2. Umbiko Wemali Engenayo
     3. Emuva
     4. Ekhaya
 
   previous_template: registered_user_template
 
   response_routing:
-    "1": "record_expenses_template"
+    "1": "sisonova_personal_record_income_template"
     "3": "sisonova_personal_template"
     "4": "registered_user_template"
 
   actions:
-    "2": "generate_expense_report"
+    "2": "generate_income_report"
 
   error_message:
     - 1
@@ -198,3 +329,174 @@ sisonova_personal_expense_template:
     - 3
     - 4
 
+sisonova_personal_record_income_template:
+  template_error_message: |
+    Leyo yifomethi yemali engenayo engavumelekile. 
+
+    Sicela usebenzise le fomethi:
+    Umthombo - Inani - Umuzwa - Idethi (kuyakhetheka)
+
+    *Imizwa Evumelekile:*
+    Ukuzabalaza, Ukukhathazeka, Ukubekezela, Kulungile, Kuhle, Kuhle, Kuhle
+
+    *Izibonelo:*
+    • Umholo-3000-Great-2023/08/01
+    • I-Freelance-500-Good
+    • Isipho-100-Kulungile
+
+    Ngemiholo eminingi, yibeke emgqeni omusha.
+    Ngezinsuku, sebenzisa isihlukanisi "/" (YYYY/MM/DD)
+
+    *Uma usuqedile, thayipha:* 1
+
+  template_message: |
+    💰 *Ukurekhoda Imali engenayo*
+
+    Qopha imali yakho engenayo usebenzisa le fomethi:
+
+    Umthombo - Inani - Umuzwa - Idethi (kuyakhetheka)
+
+    *Imizwa Evumelekile:*
+    Ukuzabalaza, Ukukhathazeka, Ukubekezela, Kulungile, Kuhle, Kuhle, Kuhle
+
+    *Izibonelo:*
+
+    • Umholo-3000-Great-2023/08/01
+    • I-Freelance-500-Good
+    • Isipho-100-Kulungile
+
+    Ngemiholo eminingi, yibeke emgqeni omusha.
+    Ngezinsuku, sebenzisa isihlukanisi "/" (YYYY/MM/DD)
+
+    *Uma usuqedile ukurekhoda imali engenayo:*
+
+    1. Yeka Ukuqopha Imali Engenayo
+
+  previous_template: registered_user_template
+  continuous_template: True
+  input_handler: "income_recording"
+
+  response_routing:
+    "1": "sisonova_personal_template"
+
+  error_message:
+    - "Invalid income format"
+
+sisonova_personal_financial_feeling_template:
+  template_error_message: |
+    Lolo akulona ulimi oluvumelekile.
+
+    Izilimi ezivumelekile yilezi:
+
+    {error_message}
+
+    Sicela uzame ukufaka ulimi oluncamelayo futhi.
+  template_message: |
+    Imizwa yakho yezezimali ikunikeza ukuqonda okubalulekile kokuthi ubhekana kanjani nohambo lwakho lwezezimali. Ukuwalandela ngokuhamba kwesikhathi kungakusiza ukuthi ubone amaphethini futhi wenze izinqumo ezingcono.
+
+    Ungathanda ukuhlanganyela kanjani nemizwa yakho yezezimali?
+
+    1. Qopha Imizwa Yezezimali
+    2. Umbiko Wemizwa
+    3. Emuva
+    4. Ekhaya
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "sisonova_personal_record_feeling_template"
+    "3": "sisonova_personal_template"
+    "4": "registered_user_template"
+
+  actions:
+    "2": "generate_feelings_report"
+
+  error_message:
+    - 1
+    - 2
+    - 3
+    - 4
+
+sisonova_personal_record_feeling_template:
+  template_error_message: |
+    Leyo ifomethi yomuzwa wezezimali engavumelekile.
+
+    Sicela usebenzise le fomethi:
+    Umuzwa - Idethi (kuyakhetheka)
+
+    *Imizwa Evumelekile:*
+    Ukuzabalaza, Ukukhathazeka, Ukubekezela, Kulungile, Kuhle, Kuhle, Kuhle
+
+    *Izibonelo:*
+    • Okhathazekile-2023/08/01
+    • Kuhle
+    • Kulungile-2025/06/11
+
+    Okufakiwe okuningi:
+    → Beka ngayinye emugqeni omusha  
+    → Faka usuku ngalunye
+
+    Ngezinsuku, sebenzisa isihlukanisi "/" (YYYY/MM/DD)
+
+    *Uma usuqedile, thayipha:* 1
+
+  template_message: |
+    🧠 *Ukuqoshwa Kwezezimali*
+
+    Cabangela indlela ozizwa ngayo ngezimali zakho futhi uziqophe usebenzisa le fomethi:
+
+    Umuzwa - Idethi (kuyakhetheka)
+
+    *Imizwa Evumelekile:*
+    Ukuzabalaza, Ukukhathazeka, Ukubekezela, Kulungile, Kuhle, Kuhle, Kuhle
+
+    *Izibonelo:*
+    • Okhathazekile-2023/08/01
+    • Kuhle
+    • Kulungile-2025/06/11
+
+    🟡 *Uma uthumela umuzwa ongaphezu kowodwa (imigqa eminingi), qiniseka ukuthi ngamunye ufaka idethi.*
+
+    Ngezinsuku, sebenzisa isihlukanisi "/" (YYYY/MM/DD)
+
+    *Uma usuqedile ukurekhoda imizwa:*
+    
+    1. Yeka Ukuqopha Imizwa
+
+  previous_template: registered_user_template
+  continuous_template: True
+  input_handler: "feeling_recording"
+
+  response_routing:
+    "1": "sisonova_personal_template"
+
+  error_message:
+    - "Invalid financial feeling format"
+
+
+not_yet_implemented_template:
+  template_error_message: |
+    Lolo akulona ulimi oluvumelekile.
+
+    Izilimi ezivumelekile yilezi:
+
+    {error_message}
+
+    Sicela uzame ukufaka ulimi oluncamelayo futhi.
+
+  template_message: |
+    Siyazi ukuthi ujabulile ukuhlola ukuthi iSisoNova izokunikeza ini!
+
+    Okwamanje sisebenzela le sevisi futhi sizokwethula maduze.
+
+    Sicela uhlole futhi kamuva ukuze uthole izibuyekezo.
+
+    1. Ekhaya
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "registered_user_template"
+
+  error_message:
+    - 1
