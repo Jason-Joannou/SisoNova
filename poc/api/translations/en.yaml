@@ -118,16 +118,18 @@ sisonova_personal_template:
     1. Expenses
     2. Incomes
     3. Financial Feeling
-    4. Financial Profile Reports
+    4. Financial Profile Report
     5. Back
 
   previous_template: registered_user_template
+
+  actions:
+    "4": "generate_financial_profile_report"
 
   response_routing:
     "1": "sisonova_personal_expense_template"
     "2": "sisonova_personal_income_template"
     "3": "sisonova_personal_financial_feeling_template"
-    "4": "sisonova_personal_financial_profile_reports_template"
     "5": "registered_user_template"
 
   error_message:
