@@ -140,7 +140,7 @@ class TwilioTemplateManager:
             elif action_name == "generate_comprehensive_report":
                 return await generate_comprehensive_report(report_dispatcher=self.report_dispatcher, user_object=self.user_object)
             elif action_name == "update_user_language_preference":
-                return await update_user_language_preference(query_manager=self.query_manager, user_object=self.user_object, new_language=self.selected_option)
+                return await update_user_language_preference(query_manager=self.query_manager, user_object=self.user_object, new_language_option=self.selected_option)
             # elif action_name == "record_expense_action":
             #     return await self._start_expense_recording()
             # elif action_name == "record_income_action":
