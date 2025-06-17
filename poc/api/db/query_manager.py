@@ -121,6 +121,11 @@ class AsyncQueries:
         """Insert unverified incomes for a user."""
         self.session.add_all(incomes)
         await self.session.commit()
+
+    async def insert_user_financial_feelings(self, user_id: int, feelings: list[FinancialFeelings]) -> None:
+        """Insert financial feelings for a user."""
+        self.session.add_all(feelings)
+        await self.session.commit()
     
 
     # Object related methods

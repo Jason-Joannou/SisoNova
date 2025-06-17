@@ -208,7 +208,7 @@ async def generate_comprehensive_report(report_dispatcher: PersonalizedReportDis
         presigned_url = await s3_bucket.upload_pdf_from_file_secure(
             file_path=pdf_filename,
             user_id=user_object.id,
-            report_type="feelings",
+            report_type="comprehensive",
             expiration_hours=24
         )
         
@@ -551,6 +551,42 @@ async def generate_expense_report(report_dispatcher: PersonalizedReportDispatche
             "error": True,
             "messages": [{"body": "Sorry, there was an error generating your expense report. Please try again later."}]
         }
+    
+async def record_feeling_inputs_to_db(user_input: str, user_object: User, query_manager: AsyncQueries) -> Dict[str, Any]:
+    """Record user input to the database for feeling recording"""
+    user_id = user_object.id
+
+    input_text = user_input.strip()
+    feelings = []
+
+    try:
+        input_lines = [line.strip() for line in input_text.split('\n') if line.strip()]
+        for line in input_lines:
+            parts = line.split('-')
+            if len(parts) >= 2:
+                feeling_type = parts[0].strip()
+                feeling_date_str = parts[1].strip() if len(parts) > 1 else datetime.now().strftime("%Y/%m/%d")
+                feeling_date = datetime.strptime(feeling_date_str, "%Y/%m/%d").date()
+
+                feeling = FinancialFeelings(user_id=user_id, feeling=feeling_type, feeling_date=feeling_date)
+                feelings.append(feeling)
+
+        # Record feelings to the database
+        await query_manager.insert_user_financial_feelings(feelings)
+
+        return {
+            "error": False,
+            "messages": [{"body": "📝 Your feelings have been recorded successfully."}]
+        }
+
+    except Exception as e:
+        print(f"ERROR recording feelings: {str(e)}")
+        return {
+            "error": True,
+            "messages": [{"body": "Sorry, there was an error recording your feelings. Please try again later."}]
+        }
+
+
     
 async def record_expense_inputs_to_db(user_input: str, user_object: User, query_manager: AsyncQueries) -> Dict[str, Any]:
     """Record user input to the database for expense recording"""
