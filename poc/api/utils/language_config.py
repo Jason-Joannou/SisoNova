@@ -49,6 +49,9 @@ def get_template_validation(template_name: str) -> TemplateValidation:
         },
         "language_selector_template": {
             "inbound_validator": NumberedMenuValidator
+        },
+        "not_yet_implemented_template": {
+            "inbound_validator": NumberedMenuValidator
         }
 
     }
