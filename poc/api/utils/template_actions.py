@@ -501,7 +501,7 @@ async def generate_expense_report(report_dispatcher: PersonalizedReportDispatche
         report_result = await report_dispatcher.generate_personalized_report(
             report_type="expenses",
             months_back=6,
-            include_ai=True,
+            include_ai=False,
             generate_pdf=True
         )
         
