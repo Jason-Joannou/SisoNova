@@ -5,7 +5,7 @@ from api.db.query_manager import AsyncQueries
 from api.finance.report import PersonalizedReportDispatcher
 from api.utils.language_config import load_language_config, get_template_validation
 from api.utils.twiml_responses import generate_twiml_message
-from api.utils.template_actions import generate_expense_report, record_expense_inputs_to_db, record_income_inputs_to_db, generate_comprehensive_report, generate_feelings_report, generate_income_report, record_feeling_inputs_to_db
+from api.utils.template_actions import generate_expense_report, update_user_language_preference, record_expense_inputs_to_db, record_income_inputs_to_db, generate_comprehensive_report, generate_feelings_report, generate_income_report, record_feeling_inputs_to_db
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -134,11 +134,13 @@ class TwilioTemplateManager:
             if action_name == "generate_expense_report":
                 return await generate_expense_report(report_dispatcher=self.report_dispatcher, user_object=self.user_object)
             elif action_name == "generate_income_report":
-                return await generate_income_report()
+                return await generate_income_report(report_dispatcher=self.report_dispatcher, user_object=self.user_object)
             elif action_name == "generate_feelings_report":
-                return await generate_feelings_report()
+                return await generate_feelings_report(report_dispatcher=self.report_dispatcher, user_object=self.user_object)
             elif action_name == "generate_comprehensive_report":
-                return await generate_comprehensive_report()
+                return await generate_comprehensive_report(report_dispatcher=self.report_dispatcher, user_object=self.user_object)
+            elif action_name == "update_user_language_preference":
+                return await update_user_language_preference(query_manager=self.query_manager, user_object=self.user_object, new_language=self.selected_option)
             # elif action_name == "record_expense_action":
             #     return await self._start_expense_recording()
             # elif action_name == "record_income_action":
@@ -194,6 +196,7 @@ class TwilioTemplateManager:
                 action_result = await self._execute_action()
                 
                 if action_result["error"]:
+                    print(f"ERROR: {action_result['error']}")
                     twiml_message = self._build_twiml_messages(action_result["messages"])
                     return self.current_template_name, None, twiml_message
                 
