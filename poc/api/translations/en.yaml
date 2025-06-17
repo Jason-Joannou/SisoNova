@@ -135,10 +135,10 @@ language_selector_template:
     "3": "update_user_language_preference"
 
   error_message:
-    - English
-    - Afrikaans
-    - Zulu
     - 1
+    - 2
+    - 3
+    - 4
 
 sisonova_personal_template:
   template_error_message: |
