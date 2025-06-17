@@ -85,7 +85,9 @@ registered_user_template:
     You now have access to personalized financial tools, services, and insights. Please choose one of the following options to get started:
 
     1. SisoNova Personal - Tailored financial assistance and tools for individual use.
-    2. SisoNova Public - Access to shared resources and community-based financial support.
+    2. SisoNova Business - Financial tools and services for businesses and organizations.
+    3. SisoNova Public - Access to shared resources, community-based financial support, and an open-market of financial services.
+    4. Change Language
 
     To find out more about SisoNova's services, visit our website: https://sisonova.com
 
@@ -93,11 +95,50 @@ registered_user_template:
 
   response_routing:
     "1": "sisonova_personal_template"
-    "2": "sisonova_public_template"
+    "2": "not_yet_implemented_template"
+    "3": "not_yet_implemented_template"
+    "4": "language_selector_template"
 
   error_message:
     - 1
     - 2
+    - 3
+    - 4
+
+language_selector_template:
+  template_error_message: |
+    That is not a valid language.
+
+    The valid languages are:
+
+    {error_message}
+
+    Please try enter your preferred language again.
+
+  template_message: |
+    Please select your preferred language. The available languages are:
+
+    1. English
+    2. Afrikaans
+    3. Zulu
+    4. Home
+
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "4": "registered_user_template"
+
+  actions:
+    "1": "update_user_language_preference"
+    "2": "update_user_language_preference"
+    "3": "update_user_language_preference"
+
+  error_message:
+    - English
+    - Afrikaans
+    - Zulu
+    - 1
 
 sisonova_personal_template:
   template_error_message: |
@@ -124,7 +165,7 @@ sisonova_personal_template:
   previous_template: registered_user_template
 
   actions:
-    "4": "generate_financial_profile_report"
+    "4": "generate_comprehensive_report"
 
   response_routing:
     "1": "sisonova_personal_expense_template"
@@ -341,7 +382,7 @@ sisonova_personal_record_income_template:
   error_message:
     - "Invalid income format"
 
-sisonova_personal_feeling_template:
+sisonova_personal_financial_feeling_template:
   template_error_message: |
     That is not a valid option.
 
@@ -368,7 +409,7 @@ sisonova_personal_feeling_template:
     "4": "registered_user_template"
 
   actions:
-    "2": "generate_feeling_report"
+    "2": "generate_feelings_report"
 
   error_message:
     - 1
@@ -431,3 +472,31 @@ sisonova_personal_record_feeling_template:
 
   error_message:
     - "Invalid financial feeling format"
+
+
+not_yet_implemented_template:
+  template_error_message: |
+    That is not a valid option.
+
+    The valid options are:
+
+    {error_message}
+
+    Please try enter the option again.
+
+  template_message: |
+    We know you are excited to explore what SisoNova has to offer!
+
+    We are currently working on this service and will be launching soon.
+
+    Please check back later for updates.
+
+    1. Home
+
+  previous_template: registered_user_template
+
+  response_routing:
+    "1": "registered_user_template"
+
+  error_message:
+    - 1
