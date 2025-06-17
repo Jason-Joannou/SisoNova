@@ -601,9 +601,12 @@ async def record_feeling_inputs_to_db(user_input: str, user_object: User, query_
 
                 feeling = FinancialFeelings(user_id=user_id, feeling=feeling_type, feeling_date=feeling_date)
                 feelings.append(feeling)
+            else:
+                feeling = FinancialFeelings(user_id=user_id, feeling=line.strip(), feeling_date=datetime.now().date())
+                feelings.append(feeling)
 
         # Record feelings to the database
-        await query_manager.insert_user_financial_feelings(feelings)
+        await query_manager.insert_user_financial_feelings(user_id=user_id, feelings=feelings)
 
         return {
             "error": False,
