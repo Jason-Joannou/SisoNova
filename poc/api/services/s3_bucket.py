@@ -79,7 +79,7 @@ class SecureS3Service:
         except ClientError as e:
             logger.warning(f"Failed to set public access block: {e}")
     
-    async def upload_pdf_from_file_secure(self, file_path: str, user_id: int, report_type: str, 
+    async def upload_pdf_from_file_secure(self, file_path: str, user_phone_number: str, report_type: str, 
                                          expiration_hours: int = 24) -> Optional[str]:
         """
         Upload PDF file to PRIVATE S3 and return presigned URL
@@ -96,7 +96,7 @@ class SecureS3Service:
         try:
             # Generate unique S3 object name
             timestamp = int(datetime.now().timestamp())
-            object_name = f"reports/{user_id}/{report_type}_report_{timestamp}.pdf"
+            object_name = f"{user_phone_number}/reports/{report_type}_report_{timestamp}.pdf"
             
             # Upload file to PRIVATE bucket (no ACL = private by default)
             self.s3_client.upload_file(
@@ -108,7 +108,7 @@ class SecureS3Service:
                     'ContentDisposition': f'attachment; filename="{report_type}_report.pdf"',
                     # NO ACL = private by default
                     'Metadata': {
-                        'user_id': str(user_id),
+                        'user_phone_number': user_phone_number,
                         'report_type': report_type,
                         'generated_at': datetime.now().isoformat()
                     }

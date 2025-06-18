@@ -238,7 +238,7 @@ async def generate_comprehensive_report(report_dispatcher: PersonalizedReportDis
         # Upload to secure S3
         presigned_url = await s3_bucket.upload_pdf_from_file_secure(
             file_path=pdf_filename,
-            user_id=user_object.id,
+            user_phone_number=user_object.phone_number,
             report_type="comprehensive",
             expiration_hours=24
         )
@@ -332,7 +332,7 @@ async def generate_feelings_report(report_dispatcher: PersonalizedReportDispatch
         # Upload to secure S3
         presigned_url = await s3_bucket.upload_pdf_from_file_secure(
             file_path=pdf_filename,
-            user_id=user_object.id,
+            user_phone_number=user_object.phone_number,
             report_type="feelings",
             expiration_hours=24
         )
@@ -426,7 +426,7 @@ async def generate_income_report(report_dispatcher: PersonalizedReportDispatcher
         # Upload to secure S3
         presigned_url = await s3_bucket.upload_pdf_from_file_secure(
             file_path=pdf_filename,
-            user_id=user_object.id,
+            user_phone_number=user_object.phone_number,
             report_type="incomes",
             expiration_hours=24
         )
@@ -524,7 +524,7 @@ async def generate_expense_report(report_dispatcher: PersonalizedReportDispatche
         # Upload to secure S3
         presigned_url = await s3_bucket.upload_pdf_from_file_secure(
             file_path=pdf_filename,
-            user_id=user_object.id,
+            user_phone_number=user_object.phone_number,
             report_type="expenses",
             expiration_hours=24
         )
