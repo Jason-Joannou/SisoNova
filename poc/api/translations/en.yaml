@@ -56,17 +56,20 @@ unregistered_number_welcome_template:
     By replying "yes", you agree to our Terms and Conditions:  
     https://sisonova.com/terms-and-conditions
 
-    Please reply with "yes" or "no" to continue.
+    Please reply with:
+
+    1. Yes
+    2. No
 
   previous_template: unregistered_number_welcome_template
 
   response_routing:
-    "yes": "registered_user_template"
-    "no": "registration_no_template"
+    "1": "registered_user_template"
+    "2": "registration_no_template"
 
   error_message:
-    - "Yes"
-    - "No"
+    - 1
+    - 2
 
 registered_user_template:
   template_error_message: |

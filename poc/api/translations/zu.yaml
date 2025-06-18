@@ -56,17 +56,20 @@ unregistered_number_welcome_template:
     Ngokuphendula ngokuthi "yes", uyavumelana nemigomo nemibandela yethu:  
     https://sisonova.com/terms-and-conditions
 
-    Sicela uphendule ngokuthi "yes" noma "no" ukuze uqhubeke.
+    Sicela uphendule ngokuthi:
+
+    1. Yebo
+    2. Cha
 
   previous_template: unregistered_number_welcome_template
 
   response_routing:
-    "yes": "registered_user_template"
-    "no": "registration_no_template"
+    "1": "registered_user_template"
+    "2": "registration_no_template"
 
   error_message:
-    - "Yes"
-    - "No"
+    - 1
+    - 2
 
 registered_user_template:
   template_error_message: |

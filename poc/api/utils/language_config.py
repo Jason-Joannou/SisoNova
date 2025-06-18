@@ -15,7 +15,7 @@ def get_template_validation(template_name: str) -> TemplateValidation:
             "inbound_validator": LanguageSelector,
         },
         "unregistered_number_welcome_template": {
-            "inbound_validator": YesNoValidator,
+            "inbound_validator": NumberedMenuValidator,
         },
         "registration_no_template": {
             "inbound_validator": NumberedMenuValidator,
