@@ -69,6 +69,10 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
+    import os
 
-    logger.info("Starting API server")
-    uvicorn.run("api.app:app", host="127.0.0.1", port=3000, reload=True)
+    # logger.info("Starting API server")
+    # uvicorn.run("api.app:app", host="127.0.0.1", port=3000, reload=True)
+
+    port = int(os.environ.get("PORT", 3000))
+    uvicorn.run("api.app:app", host="0.0.0.0", port=port, reload=True)
