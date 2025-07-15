@@ -2,44 +2,67 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Transaction Confirmation</title>
+    <title>Transaction Confirmation - SisoNova</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'terracotta': '#CD853F',
+              'burnt-orange': '#CC5500',
+              'warm-yellow': '#DAA520',
+              'deep-brown': '#654321',
+              'sand': '#F4E4BC'
+            }
+          }
+        }
+      }
+    </script>
   </head>
-  <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="bg-white shadow-md rounded-lg p-6 max-w-md w-full">
-      <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">
+  <body class="bg-gradient-to-br from-sand to-yellow-50 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white shadow-2xl rounded-3xl p-8 max-w-md w-full relative overflow-hidden">
+      <!-- Decorative elements -->
+      <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-terracotta to-burnt-orange rounded-full -translate-y-10 translate-x-10 opacity-20"></div>
+      <div class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-warm-yellow to-terracotta rounded-full translate-y-8 -translate-x-8 opacity-20"></div>
+      
+      <!-- SisoNova Branding -->
+      <div class="text-center mb-6 relative z-10">
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-terracotta to-burnt-orange bg-clip-text text-transparent mb-2">SisoNova</h1>
+        <div class="w-20 h-1 bg-gradient-to-r from-terracotta via-warm-yellow to-burnt-orange mx-auto rounded-full"></div>
+      </div>
+
+      <h2 class="text-xl font-semibold text-deep-brown mb-6 text-center">
         Transaction Confirmation
       </h2>
 
-      <div class="space-y-2">
-        <div>
-          <p class="text-gray-600 text-sm">Transaction ID</p>
-          <p class="font-medium text-gray-900">{{ transaction.id }}</p>
+      <div class="space-y-4">
+        <div class="bg-gradient-to-r from-sand to-yellow-50 p-4 rounded-xl border border-terracotta/20">
+          <p class="text-deep-brown text-sm font-medium mb-1">Transaction ID</p>
+          <p class="font-bold text-gray-800">{{ transaction.id }}</p>
         </div>
 
-        <div>
-          <p class="text-gray-600 text-sm">Requesting Number</p>
-          <p class="font-medium text-gray-900">
-            {{ transaction.requesting_number }}
-          </p>
+        <div class="bg-gradient-to-r from-sand to-yellow-50 p-4 rounded-xl border border-terracotta/20">
+          <p class="text-deep-brown text-sm font-medium mb-1">Requesting Number</p>
+          <p class="font-bold text-gray-800">{{ transaction.requesting_number }}</p>
         </div>
 
-        <div>
-          <p class="text-gray-600 text-sm">Amount</p>
-          <p class="font-medium text-gray-900">{{ transaction.amount }}</p>
+        <div class="bg-gradient-to-r from-sand to-yellow-50 p-4 rounded-xl border border-terracotta/20">
+          <p class="text-deep-brown text-sm font-medium mb-1">Amount</p>
+          <p class="font-bold text-gray-800">{{ transaction.amount }}</p>
         </div>
 
-        <div>
-          <p class="text-gray-600 text-sm">Purpose</p>
-          <p class="font-medium text-gray-900">{{ transaction.purpose }}</p>
+        <div class="bg-gradient-to-r from-sand to-yellow-50 p-4 rounded-xl border border-terracotta/20">
+          <p class="text-deep-brown text-sm font-medium mb-1">Purpose</p>
+          <p class="font-bold text-gray-800">{{ transaction.purpose }}</p>
         </div>
       </div>
 
       <form
         action="/api/v1/transactions/confirm_transaction"
         method="post"
-        class="mt-6 space-y-3"
+        class="mt-8 space-y-4"
       >
         <input type="hidden" name="txn_id" value="{{ transaction.id }}" />
 
@@ -47,20 +70,25 @@
           type="submit"
           name="decision"
           value="accept"
-          class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+          class="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white py-3 rounded-xl hover:from-emerald-700 hover:to-green-700 transition-all duration-300 font-semibold shadow-lg transform hover:scale-105"
         >
-          Accept
+          ✓ Accept Transaction
         </button>
 
         <button
           type="submit"
           name="decision"
           value="reject"
-          class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition"
+          class="w-full bg-gradient-to-r from-burnt-orange to-red-600 text-white py-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 font-semibold shadow-lg transform hover:scale-105"
         >
-          Reject
+          ✗ Reject Transaction
         </button>
       </form>
+
+      <!-- Footer -->
+      <div class="mt-6 text-center">
+        <p class="text-deep-brown text-sm">Powered by <span class="font-bold bg-gradient-to-r from-terracotta to-burnt-orange bg-clip-text text-transparent">SisoNova</span></p>
+      </div>
     </div>
   </body>
 </html>
