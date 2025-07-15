@@ -1,20 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
+    <meta charset="UTF-8" />
     <title>Transaction Confirmation</title>
-    <link rel="stylesheet" type="text/css" href="/static/process-transaction-style.css" />
-</head>
-<body>
-    <h1>Transaction Confirmation</h1>
-    <p><strong>ID:</strong> {{ transaction.id }}</p>
-    <p><strong>Requesting Number:</strong> {{ transaction.requesting_number }}</p>
-    <p><strong>Amount:</strong> {{ transaction.amount }}</p>
-    <p><strong>Purpose:</strong> {{ transaction.purpose }}</p>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white shadow-md rounded-lg p-6 max-w-md w-full">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">
+        Transaction Confirmation
+      </h2>
 
-    <form action="/api/v1/transactions/confirm_transaction" method="post">
+      <div class="space-y-2">
+        <div>
+          <p class="text-gray-600 text-sm">Transaction ID</p>
+          <p class="font-medium text-gray-900">{{ transaction.id }}</p>
+        </div>
+
+        <div>
+          <p class="text-gray-600 text-sm">Requesting Number</p>
+          <p class="font-medium text-gray-900">
+            {{ transaction.requesting_number }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-gray-600 text-sm">Amount</p>
+          <p class="font-medium text-gray-900">{{ transaction.amount }}</p>
+        </div>
+
+        <div>
+          <p class="text-gray-600 text-sm">Purpose</p>
+          <p class="font-medium text-gray-900">{{ transaction.purpose }}</p>
+        </div>
+      </div>
+
+      <form
+        action="/api/v1/transactions/confirm_transaction"
+        method="post"
+        class="mt-6 space-y-3"
+      >
         <input type="hidden" name="txn_id" value="{{ transaction.id }}" />
-        <button type="submit" name="decision" value="accept">Accept</button>
-        <button type="submit" name="decision" value="reject">Reject</button>
-    </form>
-</body>
+
+        <button
+          type="submit"
+          name="decision"
+          value="accept"
+          class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+        >
+          Accept
+        </button>
+
+        <button
+          type="submit"
+          name="decision"
+          value="reject"
+          class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition"
+        >
+          Reject
+        </button>
+      </form>
+    </div>
+  </body>
 </html>
