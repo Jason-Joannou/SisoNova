@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Transaction Confirmation</title>
+    <link rel="stylesheet" type="text/css" href="/static/process-transaction-style.css" />
+</head>
+<body>
+    <h1>Transaction Confirmation</h1>
+    <p><strong>ID:</strong> {{ transaction.id }}</p>
+    <p><strong>Requesting Number:</strong> {{ transaction.requesting_number }}</p>
+    <p><strong>Amount:</strong> {{ transaction.amount }}</p>
+    <p><strong>Purpose:</strong> {{ transaction.purpose }}</p>
+
+    <form action="/api/v1/transactions/confirm_transaction" method="post">
+        <input type="hidden" name="txn_id" value="{{ transaction.id }}" />
+        <button type="submit" name="decision" value="accept">Accept</button>
+        <button type="submit" name="decision" value="reject">Reject</button>
+    </form>
+</body>
+</html>
