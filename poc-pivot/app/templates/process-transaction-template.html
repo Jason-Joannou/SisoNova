@@ -59,6 +59,7 @@
         </div>
       </div>
 
+      <!-- Accept Form -->
       <form
         action="/api/v1/transactions/confirm_transaction"
         method="post"
@@ -76,9 +77,8 @@
         </button>
 
         <button
-          type="submit"
-          name="decision"
-          value="reject"
+          type="button"
+          onclick="showRejectModal()"
           class="w-full bg-gradient-to-r from-burnt-orange to-red-600 text-white py-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 font-semibold shadow-lg transform hover:scale-105"
         >
           ✗ Reject Transaction
@@ -90,5 +90,59 @@
         <p class="text-deep-brown text-sm">Powered by <span class="font-bold bg-gradient-to-r from-terracotta to-burnt-orange bg-clip-text text-transparent">SisoNova</span></p>
       </div>
     </div>
+
+    <!-- Reject Modal -->
+    <div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+      <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+        <h3 class="text-lg font-semibold text-deep-brown mb-4 text-center">Reject Transaction</h3>
+        <p class="text-sm text-gray-600 mb-4">Please provide a reason for rejecting this transaction:</p>
+        
+        <form action="/api/v1/transactions/confirm_transaction" method="post">
+          <input type="hidden" name="txn_id" value="{{ transaction.id }}" />
+          <input type="hidden" name="decision" value="reject" />
+          
+          <textarea
+            name="rejection_reason"
+            placeholder="Enter reason for rejection..."
+            class="w-full p-3 border border-terracotta/30 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent"
+            rows="3"
+            required
+          ></textarea>
+          
+          <div class="flex space-x-3 mt-4">
+            <button
+              type="button"
+              onclick="hideRejectModal()"
+              class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="flex-1 bg-gradient-to-r from-burnt-orange to-red-600 text-white py-2 rounded-lg hover:from-red-600 hover:to-red-700 transition-all font-medium"
+            >
+              Reject
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function showRejectModal() {
+        document.getElementById('rejectModal').classList.remove('hidden');
+      }
+
+      function hideRejectModal() {
+        document.getElementById('rejectModal').classList.add('hidden');
+      }
+
+      // Close modal when clicking outside
+      document.getElementById('rejectModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          hideRejectModal();
+        }
+      });
+    </script>
   </body>
 </html>
