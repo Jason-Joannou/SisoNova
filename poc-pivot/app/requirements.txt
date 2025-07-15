@@ -1,0 +1,12 @@
+fastapi[all]
+dotenv
+sqlalchemy
+twilio
+pyyaml
+sqlalchemy[asyncio]
+aiosqlite 
+asyncpg
+reportlab
+boto3
+pandas
+jinja2
