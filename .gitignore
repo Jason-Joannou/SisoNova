@@ -176,6 +176,7 @@ cython_debug/
 # node related ignores
 
 # Node related ignores
+node_modules/
 
 # dependencies
 sisonova-survey-frontend/node_modules
