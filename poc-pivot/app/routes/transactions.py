@@ -25,4 +25,12 @@ def process_transaction(request: Request, requesting_number: str = "1234", txn_i
     })
     
 
+@router.post("/confirm_transaction")
+async def confirm_transaction():
+    pass
+
+@router.post("/reject_transaction")
+async def reject_transaction():
+    pass
+
 
