@@ -10,7 +10,7 @@ router = APIRouter(
     responses={404: {"description": "Not Found"}})
 
 @router.get("/process_transaction")
-def process_transaction(request: Request, requesting_number: str = "1234", txn_id: str = "2345"):
+async def process_transaction(request: Request, requesting_number: str = "1234", txn_id: str = "2345"):
     
     transaction = {
         "id":txn_id,
