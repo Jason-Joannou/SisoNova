@@ -220,3 +220,4 @@ sisonova-survey-frontend/next-env.d.ts
 
 # Misc
 sisonova-survey-api/sisonova-api-credentials.json
+.next/
