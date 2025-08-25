@@ -36,3 +36,19 @@ class BusinessProfile(BaseModel):
     website: Optional[str] = Field(None, description="Website URL")
     logo_url: Optional[str] = Field(None, description="Logo image URL")
     industry: IndustryType = Field(..., description="Industry type")
+
+
+class ClientDetails(BaseModel):
+    """Client/customer details"""
+
+    company_name: str = Field(..., description="Client company name")
+    contact_person: str = Field(..., description="Contact person name")
+    email: str = Field(..., description="Client email")
+    phone: Optional[str] = Field(None, description="Client phone")
+    address_line_1: Optional[str] = Field(None, description="Client address line 1")
+    address_line_2: Optional[str] = Field(None, description="Client address line 2")
+    city: Optional[str] = Field(None, description="Client city")
+    province: Optional[str] = Field(None, description="Client province")
+    postal_code: Optional[str] = Field(None, description="Client postal code")
+    vat_number: Optional[str] = Field(None, description="Client VAT number")
+    purchase_order_number: Optional[str] = Field(None, description="Client PO number")
