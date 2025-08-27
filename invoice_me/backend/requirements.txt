@@ -10,3 +10,4 @@ boto3
 pandas
 jinja2
 weasyprint
+pymongo[srv]==3.12
