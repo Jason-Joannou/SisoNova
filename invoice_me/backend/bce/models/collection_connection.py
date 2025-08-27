@@ -513,8 +513,11 @@ class CreateCollectionRequest(BaseModel):
     original_amount: Decimal = Field(..., description="Amount to collect")
     currency: str = Field("ZAR", description="Currency")
     due_date: date = Field(..., description="Due date")
+    last_payment_date: Optional[date] = Field(None, description="Last payment received date")
+    total_payments_received: Decimal = Field(Decimal("0.00"), description="Total payments received")
+    payment_breakdown: Dict[PaymentReferenceType, Decimal] = Field(default={}, description="Payments by type")
+    reminder_frequency_days: int = Field(7, description="Days between reminders")
     
-    # UPDATED: Enhanced payment reference
     payment_references: PaymentReference = Field(..., description="Payment reference with multiple options")
     contacts: List[CollectionContact] = Field(..., description="Collection contacts")
     items: List[CollectionItem] = Field(..., description="Items to collect")
