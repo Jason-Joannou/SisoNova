@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse, PlainTextResponse, Response
 from ice.models.invoice_configuration import InvoiceConfiguration
-from utils.invoices import generate_configured_pdf
+from utils.invoices import generate_configured_pdf, process_invoice_config
 
 router = APIRouter(
     prefix="/invoice",
@@ -22,3 +22,28 @@ async def generate_configurable_invoice(config: InvoiceConfiguration):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating invoice: {str(e)}")
+    
+@router.post("/preview-config")
+async def preview_configuration(config: InvoiceConfiguration):
+    """Preview invoice configuration without generating PDF"""
+    try:
+        # Process the configuration and return structured preview
+        processed_config = await process_invoice_config(config)
+        
+        return {
+            "status": "success",
+            "preview": {
+                "business_info": processed_config["business_info"],
+                "client_info": processed_config["client_info"],
+                "items_summary": {
+                    "total_items": len(processed_config["items"]),
+                    "subtotal": processed_config["subtotal"],
+                    "vat_amount": processed_config["vat_amount"],
+                    "total": processed_config["total"]
+                },
+                "payment_terms": processed_config["payment_terms_text"],
+                "payment_reference": processed_config["payment_reference"]
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Configuration error: {str(e)}")
