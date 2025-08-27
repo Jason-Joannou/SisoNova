@@ -33,6 +33,7 @@ class MongoDB:
         return self.db.create_collection(collection_name)
     
     def delete_collection(self, collection_name: str):
+        """Drop collection from database"""
         return self.db.drop_collection(collection_name)
 
     def start_session(self):
