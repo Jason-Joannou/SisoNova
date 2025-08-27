@@ -1,0 +1,1 @@
+"""Buyer collection engine"""
