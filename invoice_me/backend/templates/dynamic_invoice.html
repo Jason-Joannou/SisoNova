@@ -547,13 +547,7 @@
         <h3>📋 Terms & Conditions</h3>
 
         <div class="terms-grid">
-          {% if terms_conditions['include_payment_terms'] %}
-          <div class="term-item">
-            <strong>Payment Terms</strong>
-            {{payment_terms_text}}
-          </div>
-          {% endif %} {% if terms_conditions['include_late_payment'] and
-          credit_terms['late_fee_enabled'] %}
+          {% if credit_terms['late_fee_enabled'] %}
           <div class="term-item">
             <strong>Late Payment</strong>
             Late payments subject to {{credit_terms['late_fee_amount']}}%
@@ -565,50 +559,14 @@
             {{credit_terms['early_discount_percentage']}}% discount if paid
             within {{credit_terms['early_discount_days']}} days
           </div>
-          {% endif %} {% if terms_conditions['include_dispute_resolution'] %}
-          <div class="term-item">
-            <strong>Dispute Resolution</strong>
-            Disputes must be raised within
-            {{credit_terms['dispute_period_days']}} days of invoice date {% if
-            credit_terms.get('dispute_contact_email') %}
-            <br />Contact: {{credit_terms['dispute_contact_email']}} {% endif %}
-          </div>
           {% endif %} {% if credit_terms['retention_enabled'] %}
           <div class="term-item">
             <strong>Retention</strong>
             {{credit_terms['retention_percentage']}}% retention held for
             {{credit_terms['retention_period_days']}} days
           </div>
-          {% endif %} {% if terms_conditions.get('delivery_terms') %}
-          <div class="term-item">
-            <strong>Delivery Terms</strong>
-            {{terms_conditions['delivery_terms']}}
-          </div>
-          {% endif %} {% if terms_conditions.get('warranty_terms') %}
-          <div class="term-item">
-            <strong>Warranty</strong>
-            {{terms_conditions['warranty_terms']}}
-          </div>
-          {% endif %} {% if terms_conditions.get('cancellation_policy') %}
-          <div class="term-item">
-            <strong>Cancellation Policy</strong>
-            {{terms_conditions['cancellation_policy']}}
-          </div>
-          {% endif %} {% if terms_conditions['include_governing_law'] %}
-          <div class="term-item">
-            <strong>Governing Law</strong>
-            This invoice is governed by the laws of South Africa
-          </div>
           {% endif %}
         </div>
-
-        <!-- Custom Clauses -->
-        {% for clause in terms_conditions.get('custom_clauses', []) %}
-        <div class="custom-clause">
-          <h4>{{clause['title']}}</h4>
-          <p>{{clause['content']}}</p>
-        </div>
-        {% endfor %}
       </div>
 
       <!-- Payment Section -->
@@ -681,14 +639,10 @@
           <strong>{{business_info['company_name']}}</strong> • Proudly South
           African
         </p>
-        {% if terms_conditions.get('footer_text') %}
-        <p>{{terms_conditions['footer_text']}}</p>
-        {% else %}
         <p>
           This invoice was generated securely • Questions? Reply to
           {{business_info['email']}}
         </p>
-        {% endif %}
         <p style="font-size: 10px; opacity: 0.8">
           Powered by SisoNova - Get paid faster, grow your business
         </p>
