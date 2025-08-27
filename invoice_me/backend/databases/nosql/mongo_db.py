@@ -31,6 +31,9 @@ class MongoDB:
         if collection_name in self.db.list_collection_names():
             return self.db[collection_name]
         return self.db.create_collection(collection_name)
+    
+    def delete_collection(self, collection_name: str):
+        return self.db.drop_collection(collection_name)
 
     def start_session(self):
         """Start a session for transactions or grouped operations"""
