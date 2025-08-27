@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Optional
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -19,6 +20,7 @@ class IndustryType(str, Enum):
 class BusinessProfile(BaseModel):
     """Business profile configuration"""
 
+    company_id: UUID = Field(default_factory=uuid4, description="Company ID")
     company_name: str = Field(..., description="Company name")
     trading_name: Optional[str] = Field(None, description="Trading name if different")
     address_line_1: str = Field(..., description="Address line 1")
@@ -41,6 +43,7 @@ class BusinessProfile(BaseModel):
 class ClientDetails(BaseModel):
     """Client/customer details"""
 
+    client_id: UUID = Field(default_factory=uuid4, description="Client ID")
     company_name: str = Field(..., description="Client company name")
     contact_person: str = Field(..., description="Contact person name")
     email: str = Field(..., description="Client email")
