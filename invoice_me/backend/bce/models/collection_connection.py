@@ -426,7 +426,6 @@ class CollectionConfiguration(BaseModel):
         description="Enabled QR payment providers"
     )
 
-# UPDATED: Main collection record with enhanced payment support
 class Collection(BaseModel):
     """Main collection record with enhanced payment support"""
     collection_id: UUID = Field(default_factory=uuid4, description="Collection ID")
