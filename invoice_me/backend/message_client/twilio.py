@@ -1,4 +1,3 @@
-import logging
 import os
 from typing import Optional
 
@@ -8,8 +7,6 @@ from twilio.rest import Client
 from utils.messaging import is_e164_format
 
 load_dotenv()
-
-logger = logging.getLogger(__name__)
 
 
 class TwilioClient:
@@ -51,7 +48,7 @@ class TwilioClient:
                     f"The specified Twilio number is not in e164 format: {twilio_number}"
                 )
 
-            logger.info(
+            print(
                 f"Successfully retrieved Twilio number and number is in E164 format"
             )
 
@@ -59,16 +56,10 @@ class TwilioClient:
 
         except ValueError as ve:
             print(f"An Error occured when trying to retrieve the Twilio number: {ve}")
-            logger.error(
-                f"An Error occured when trying to retrieve the Twilio number: {ve}"
-            )
             return None
 
         except Exception as e:
             print(
-                f"An Unexpected error occured while trying to retrieve the Twilio Number: {e}"
-            )
-            logger.error(
                 f"An Unexpected error occured while trying to retrieve the Twilio Number: {e}"
             )
             return None
@@ -97,17 +88,15 @@ class TwilioClient:
                 )
 
             client = Client(account_sid, account_auth_token)
-            logger.info("Successfully created Twilio client.")
+            print("Successfully created Twilio client.")
             return client
 
         except ValueError as ve:
             print(f"Error creating Twilio client: {ve}")
-            logger.error(f"Error creating Twilio client: {ve}")
             return None
 
         except Exception as e:
             print(f"Unexpected error when creating Twilio client: {e}")
-            logger.error(f"Unexpected error when creating Twilio client: {e}")
             return None
 
     def is_client_valid(self) -> bool:
@@ -140,5 +129,4 @@ class TwilioClient:
 
         except ValueError as ve:
             print(f"Error sending message: {ve}")
-            logger.error(f"Error sending message: {ve}")
             return False
