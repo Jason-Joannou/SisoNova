@@ -18,11 +18,11 @@ export default function LandingPage() {
             <div className="flex items-center space-x-4">
               <Button variant="ghost" className="cursor-pointer">How it works</Button>
               <Button variant="ghost" className="cursor-pointer">Pricing</Button>
-              <Link href={"/login"}>
-                <Button className="cursor-pointer">Login</Button>
+              <Link href="/register">
+                <Button variant="outline" className="cursor-pointer">Register</Button>
               </Link>
-              <Link href={"/register"}>
-                <Button className="cursor-pointer">Register</Button>
+              <Link href="/login">
+                <Button variant="outline" className="cursor-pointer">Login</Button>
               </Link>
             </div>
           </div>
