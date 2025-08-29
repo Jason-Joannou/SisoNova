@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { ArrowRight, CheckCircle2, Clock, CreditCard, FileText, Shield, Smartphone, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,7 +18,12 @@ export default function LandingPage() {
             <div className="flex items-center space-x-4">
               <Button variant="ghost" className="cursor-pointer">How it works</Button>
               <Button variant="ghost" className="cursor-pointer">Pricing</Button>
-              <Button className="cursor-pointer">Get Started</Button>
+              <Link href={"/login"}>
+                <Button className="cursor-pointer">Login</Button>
+              </Link>
+              <Link href={"/register"}>
+                <Button className="cursor-pointer">Register</Button>
+              </Link>
             </div>
           </div>
         </div>
