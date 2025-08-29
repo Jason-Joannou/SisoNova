@@ -15,9 +15,9 @@ export default function LandingPage() {
               <span className="text-2xl font-bold text-slate-900">PayFlow</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost">How it works</Button>
-              <Button variant="ghost">Pricing</Button>
-              <Button>Get Started</Button>
+              <Button variant="ghost" className="cursor-pointer">How it works</Button>
+              <Button variant="ghost" className="cursor-pointer">Pricing</Button>
+              <Button className="cursor-pointer">Get Started</Button>
             </div>
           </div>
         </div>
@@ -35,10 +35,10 @@ export default function LandingPage() {
               We handle collections while you focus on growing your business.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
+              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer">
                 Get Paid Now <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" className="cursor-pointer">
                 See How It Works
               </Button>
             </div>
@@ -132,7 +132,7 @@ export default function LandingPage() {
                     <span className="text-sm">We handle collections</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700">
+                <Button className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 cursor-pointer">
                   Get Financing
                 </Button>
               </CardContent>
@@ -163,7 +163,7 @@ export default function LandingPage() {
                     <span className="text-sm">No financing required</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-6" variant="outline">
+                <Button className="w-full mt-6 cursor-pointer" variant="outline">
                   Start Collecting
                 </Button>
               </CardContent>
@@ -194,7 +194,7 @@ export default function LandingPage() {
                     <span className="text-sm">Xero, Sage, QuickBooks sync</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-6" variant="outline">
+                <Button className="w-full mt-6 cursor-pointer" variant="outline">
                   Create Invoice
                 </Button>
               </CardContent>
@@ -321,10 +321,10 @@ export default function LandingPage() {
             Join thousands of SMEs who've taken control of their cashflow
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100">
+            <Button size="lg" className="bg-white text-emerald-600 hover:bg-gray-100 cursor-pointer">
               Get Started Free <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+            <Button size="lg" variant="outline" className="border-white text-emerald-600 hover:bg-white/10 cursor-pointer">
               Talk to Sales
             </Button>
           </div>
