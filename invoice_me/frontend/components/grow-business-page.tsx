@@ -14,7 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { 
   TrendingUp, 
-  FileText, 
+  FileText,
+  RefreshCw,
   Building, 
   CreditCard, 
   Target, 
@@ -63,7 +64,9 @@ import {
   Scale,
   UserCheck,
   Landmark,
-  FileBarChart
+  FileBarChart,
+  AlertTriangle,
+  Upload
 } from "lucide-react"
 
 // Mock user data
@@ -83,147 +86,235 @@ const userData = {
   contact_person: "Jason Joannou"
 }
 
-// Financial TODOs for South African SMEs
-interface FinancialTodo {
+// Document types for different compliance requirements
+interface DocumentRequirement {
+  id: string
+  name: string
+  description: string
+  required: boolean
+  status: 'missing' | 'uploaded' | 'verified' | 'rejected'
+  fileType: string[]
+  maxSize: string
+  example?: string
+  helpText?: string
+}
+
+interface ComplianceService {
   id: string
   title: string
   description: string
   category: string
   priority: 'critical' | 'high' | 'medium' | 'low'
-  status: 'completed' | 'in_progress' | 'not_started'
+  status: 'completed' | 'in_progress' | 'ready_to_submit' | 'collecting_docs' | 'not_started'
   estimatedTime: string
   cost: string
+  payflowFee: string
   authority: string
   icon: any
   color: string
-  requirements: string[]
+  canAutoSubmit: boolean
+  documents: DocumentRequirement[]
+  formFields: ComplianceFormField[]
   benefits: string[]
-  steps: TodoStep[]
-  resources: TodoResource[]
-  deadline?: string
+  nextSteps: string[]
 }
 
-interface TodoStep {
-  step: number
-  title: string
-  description: string
-  completed: boolean
+interface ComplianceFormField {
+  id: string
+  label: string
+  type: 'text' | 'email' | 'tel' | 'select' | 'textarea' | 'number' | 'date' | 'checkbox'
+  required: boolean
+  options?: string[]
+  value?: string
+  helpText?: string
+  validation?: string
 }
 
-interface TodoResource {
-  title: string
-  type: 'website' | 'document' | 'guide' | 'contact'
-  url?: string
-  description: string
-}
-
-const financialTodos: FinancialTodo[] = [
+const complianceServices: ComplianceService[] = [
   {
     id: "company_registration",
     title: "Company Registration (CIPC)",
-    description: "Register your business with the Companies and Intellectual Property Commission",
+    description: "We'll handle your complete company registration with CIPC",
     category: "Business Registration",
     priority: "critical",
-    status: "completed", // User already has this
+    status: "completed",
     estimatedTime: "1-3 business days",
     cost: "R175 - R500",
+    payflowFee: "R299 (includes all CIPC fees)",
     authority: "CIPC",
     icon: Building2,
     color: "emerald",
-    requirements: [
-      "Proposed company name",
-      "Memorandum of Incorporation",
-      "Director details and consent",
-      "Registered office address"
+    canAutoSubmit: true,
+    documents: [
+      {
+        id: "id_documents",
+        name: "Director ID Documents",
+        description: "Clear copies of all directors' South African ID documents",
+        required: true,
+        status: "verified",
+        fileType: ["PDF", "JPG", "PNG"],
+        maxSize: "5MB",
+        helpText: "Ensure ID documents are clear and all corners are visible"
+      },
+      {
+        id: "proof_of_address",
+        name: "Proof of Registered Address",
+        description: "Utility bill or lease agreement for registered office address",
+        required: true,
+        status: "verified",
+        fileType: ["PDF", "JPG", "PNG"],
+        maxSize: "5MB",
+        helpText: "Document must be less than 3 months old"
+      },
+      {
+        id: "moi_draft",
+        name: "Memorandum of Incorporation (Draft)",
+        description: "We'll prepare this for you based on your business details",
+        required: true,
+        status: "verified",
+        fileType: ["PDF"],
+        maxSize: "10MB",
+        helpText: "Our legal team will draft this document"
+      }
+    ],
+    formFields: [
+      { id: "company_name_1", label: "Preferred Company Name (Option 1)", type: "text", required: true, value: userData.company_name, helpText: "Must end with (Pty) Ltd" },
+      { id: "company_name_2", label: "Preferred Company Name (Option 2)", type: "text", required: false, helpText: "Backup option in case first choice is taken" },
+      { id: "company_name_3", label: "Preferred Company Name (Option 3)", type: "text", required: false, helpText: "Second backup option" },
+      { id: "business_activity", label: "Main Business Activity", type: "select", required: true, options: ["Consulting", "Retail", "Manufacturing", "Technology", "Professional Services", "Other"] },
+      { id: "share_capital", label: "Authorized Share Capital", type: "select", required: true, options: ["R100", "R1,000", "R10,000", "R100,000", "Other"], helpText: "Most small businesses choose R100 or R1,000" },
+      { id: "financial_year_end", label: "Financial Year End", type: "select", required: true, options: ["February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] }
     ],
     benefits: [
-      "Legal entity status",
-      "Limited liability protection",
+      "Legal entity status with limited liability",
       "Ability to open business bank accounts",
-      "Professional credibility"
+      "Professional credibility with clients",
+      "Tax advantages and deductions"
     ],
-    steps: [
-      { step: 1, title: "Name Reservation", description: "Reserve your company name with CIPC", completed: true },
-      { step: 2, title: "Prepare Documents", description: "Complete Memorandum of Incorporation", completed: true },
-      { step: 3, title: "Submit Application", description: "Submit registration via CIPC online portal", completed: true },
-      { step: 4, title: "Receive Certificate", description: "Download certificate of incorporation", completed: true }
-    ],
-    resources: [
-      { title: "CIPC Online Portal", type: "website", url: "https://eservices.cipc.co.za", description: "Official CIPC registration portal" },
-      { title: "Company Registration Guide", type: "guide", description: "Step-by-step registration guide" },
-      { title: "MOI Template", type: "document", description: "Standard Memorandum of Incorporation template" }
+    nextSteps: [
+      "We'll reserve your company name with CIPC",
+      "Our legal team prepares your MOI",
+      "We submit your registration application",
+      "You receive your certificate of incorporation"
     ]
   },
   {
     id: "tax_registration",
     title: "SARS Tax Registration",
-    description: "Register for income tax and obtain your tax reference number",
+    description: "Complete tax registration and eFiling setup with SARS",
     category: "Tax Compliance",
     priority: "critical",
     status: "completed",
-    estimatedTime: "Same day online",
+    estimatedTime: "Same day",
     cost: "Free",
+    payflowFee: "R199 (setup and guidance)",
     authority: "SARS",
     icon: Receipt,
     color: "blue",
-    requirements: [
-      "Company registration certificate",
-      "Director ID documents",
-      "Proof of business address",
-      "Banking details"
+    canAutoSubmit: true,
+    documents: [
+      {
+        id: "company_registration_cert",
+        name: "Company Registration Certificate",
+        description: "CIPC certificate of incorporation",
+        required: true,
+        status: "verified",
+        fileType: ["PDF"],
+        maxSize: "5MB",
+        helpText: "Must be the official CIPC certificate"
+      },
+      {
+        id: "director_tax_numbers",
+        name: "Director Tax Numbers",
+        description: "Tax reference numbers for all directors",
+        required: true,
+        status: "verified",
+        fileType: ["PDF", "TXT"],
+        maxSize: "2MB",
+        helpText: "Provide tax numbers for all company directors"
+      },
+      {
+        id: "business_bank_details",
+        name: "Business Banking Details",
+        description: "Bank account details for the business",
+        required: true,
+        status: "verified",
+        fileType: ["PDF", "JPG"],
+        maxSize: "5MB",
+        helpText: "Bank confirmation letter or account opening documents"
+      }
+    ],
+    formFields: [
+      { id: "business_start_date", label: "Business Start Date", type: "date", required: true, helpText: "When did you start trading?" },
+      { id: "main_income_source", label: "Main Source of Income", type: "select", required: true, options: ["Professional Services", "Trading", "Manufacturing", "Rental Income", "Other"] },
+      { id: "expected_annual_income", label: "Expected Annual Income", type: "select", required: true, options: ["R0 - R1m", "R1m - R5m", "R5m - R20m", "R20m+"] },
+      { id: "accounting_period", label: "Accounting Period End", type: "select", required: true, options: ["February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] }
     ],
     benefits: [
-      "Legal tax compliance",
+      "Legal compliance with tax obligations",
       "Ability to claim business expenses",
       "Required for VAT registration",
-      "Professional legitimacy"
+      "Access to SARS eFiling services"
     ],
-    steps: [
-      { step: 1, title: "SARS eFiling Registration", description: "Create SARS eFiling profile", completed: true },
-      { step: 2, title: "Tax Registration", description: "Complete tax registration online", completed: true },
-      { step: 3, title: "Receive Tax Number", description: "Obtain tax reference number", completed: true },
-      { step: 4, title: "Set Up Returns", description: "Configure tax return submissions", completed: true }
-    ],
-    resources: [
-      { title: "SARS eFiling", type: "website", url: "https://www.sarsefiling.co.za", description: "SARS online tax portal" },
-      { title: "Tax Registration Guide", type: "guide", description: "Complete tax registration walkthrough" },
-      { title: "SARS Contact Centre", type: "contact", description: "0800 00 7277 for assistance" }
+    nextSteps: [
+      "We create your SARS eFiling profile",
+      "Complete tax registration application",
+      "Set up your tax return schedule",
+      "Provide ongoing tax compliance support"
     ]
   },
   {
     id: "vat_registration",
     title: "VAT Registration",
-    description: "Register for Value Added Tax if turnover exceeds R1 million annually",
+    description: "Register for VAT if your turnover exceeds R1 million annually",
     category: "Tax Compliance",
     priority: "high",
     status: "completed",
     estimatedTime: "1-2 business days",
     cost: "Free",
+    payflowFee: "R299 (includes compliance setup)",
     authority: "SARS",
     icon: FileBarChart,
     color: "purple",
-    requirements: [
-      "Tax reference number",
-      "Proof of turnover exceeding R1m",
-      "Business bank statements",
-      "Lease agreement or proof of address"
+    canAutoSubmit: true,
+    documents: [
+      {
+        id: "financial_records",
+        name: "Financial Records",
+        description: "Bank statements or financial records showing turnover",
+        required: true,
+        status: "verified",
+        fileType: ["PDF", "XLS", "XLSX"],
+        maxSize: "10MB",
+        helpText: "Must show turnover exceeding R1 million annually"
+      },
+      {
+        id: "lease_agreement",
+        name: "Lease Agreement or Property Ownership",
+        description: "Proof of business premises",
+        required: true,
+        status: "verified",
+        fileType: ["PDF"],
+        maxSize: "10MB",
+        helpText: "Lease agreement or title deed for business address"
+      }
+    ],
+    formFields: [
+      { id: "vat_start_date", label: "Requested VAT Start Date", type: "date", required: true, helpText: "When should VAT registration begin?" },
+      { id: "business_type", label: "Type of Business", type: "select", required: true, options: ["Standard VAT", "Cash Basis VAT", "Other"] },
+      { id: "annual_turnover", label: "Current Annual Turnover", type: "select", required: true, options: ["R1m - R2m", "R2m - R5m", "R5m - R20m", "R20m+"] }
     ],
     benefits: [
       "Claim VAT on business purchases",
       "Professional credibility with suppliers",
       "Required for many B2B transactions",
-      "Compliance with tax law"
+      "Compliance with tax legislation"
     ],
-    steps: [
-      { step: 1, title: "Check Eligibility", description: "Confirm annual turnover exceeds R1 million", completed: true },
-      { step: 2, title: "Gather Documents", description: "Collect required supporting documents", completed: true },
-      { step: 3, title: "Submit Application", description: "Apply via SARS eFiling", completed: true },
-      { step: 4, title: "Receive VAT Number", description: "Obtain VAT registration number", completed: true }
-    ],
-    resources: [
-      { title: "VAT Registration Guide", type: "guide", description: "SARS VAT registration requirements" },
-      { title: "VAT Calculator", type: "document", description: "Calculate VAT obligations" },
-      { title: "SARS Branch Locator", type: "website", description: "Find nearest SARS office" }
+    nextSteps: [
+      "We verify your turnover eligibility",
+      "Prepare and submit VAT registration",
+      "Set up VAT return schedule",
+      "Provide ongoing VAT compliance support"
     ]
   },
   {
@@ -232,34 +323,62 @@ const financialTodos: FinancialTodo[] = [
     description: "Register with Unemployment Insurance Fund for employee benefits",
     category: "Employment Compliance",
     priority: "high",
-    status: "not_started",
+    status: "collecting_docs",
     estimatedTime: "1 business day",
     cost: "Free",
+    payflowFee: "R199 (registration and setup)",
     authority: "Department of Labour",
     icon: UserCheck,
     color: "orange",
-    requirements: [
-      "Company registration certificate",
-      "Tax clearance certificate",
-      "Employee details",
-      "Proof of business address"
+    canAutoSubmit: true,
+    documents: [
+      {
+        id: "employee_details",
+        name: "Employee Information",
+        description: "Details of all employees including ID numbers and salaries",
+        required: true,
+        status: "missing",
+        fileType: ["PDF", "XLS", "XLSX"],
+        maxSize: "5MB",
+        helpText: "We'll provide a template to complete"
+      },
+      {
+        id: "employment_contracts",
+        name: "Employment Contracts",
+        description: "Signed employment contracts for all staff",
+        required: true,
+        status: "missing",
+        fileType: ["PDF"],
+        maxSize: "20MB",
+        helpText: "All employment contracts must be signed"
+      },
+      {
+        id: "payroll_records",
+        name: "Payroll Records",
+        description: "Recent payroll records showing employee salaries",
+        required: false,
+        status: "missing",
+        fileType: ["PDF", "XLS", "XLSX"],
+        maxSize: "10MB",
+        helpText: "Last 3 months of payroll if available"
+      }
+    ],
+    formFields: [
+      { id: "number_of_employees", label: "Number of Employees", type: "number", required: true, helpText: "Total number of current employees" },
+      { id: "payroll_frequency", label: "Payroll Frequency", type: "select", required: true, options: ["Weekly", "Bi-weekly", "Monthly"] },
+      { id: "total_monthly_payroll", label: "Total Monthly Payroll", type: "select", required: true, options: ["R0 - R50k", "R50k - R100k", "R100k - R500k", "R500k+"] }
     ],
     benefits: [
-      "Legal compliance for employees",
-      "Employee unemployment benefits",
-      "Maternity/illness benefits",
-      "Avoid penalties and fines"
+      "Legal compliance for employee benefits",
+      "Unemployment benefits for employees",
+      "Maternity and illness benefits",
+      "Avoid penalties and legal issues"
     ],
-    steps: [
-      { step: 1, title: "Prepare Documents", description: "Gather required company and employee documents", completed: false },
-      { step: 2, title: "Complete Application", description: "Submit UIF registration form", completed: false },
-      { step: 3, title: "Receive Reference", description: "Obtain UIF reference number", completed: false },
-      { step: 4, title: "Set Up Contributions", description: "Configure monthly UIF contributions", completed: false }
-    ],
-    resources: [
-      { title: "UIF Online Portal", type: "website", url: "https://www.labour.gov.za", description: "Department of Labour services" },
-      { title: "UIF Registration Form", type: "document", description: "UI-19 registration form" },
-      { title: "Labour Relations Guide", type: "guide", description: "Employment law compliance guide" }
+    nextSteps: [
+      "Complete employee information template",
+      "We prepare UIF registration documents",
+      "Submit registration to Department of Labour",
+      "Set up monthly UIF contribution system"
     ]
   },
   {
@@ -271,176 +390,123 @@ const financialTodos: FinancialTodo[] = [
     status: "not_started",
     estimatedTime: "2-3 business days",
     cost: "Based on payroll",
+    payflowFee: "R299 (registration and assessment)",
     authority: "Compensation Commissioner",
     icon: Shield,
     color: "red",
-    requirements: [
-      "Company registration details",
-      "Employee information",
-      "Business activity classification",
-      "Payroll information"
+    canAutoSubmit: true,
+    documents: [
+      {
+        id: "business_activity_details",
+        name: "Business Activity Classification",
+        description: "Detailed description of business activities and risk factors",
+        required: true,
+        status: "missing",
+        fileType: ["PDF", "DOC", "DOCX"],
+        maxSize: "5MB",
+        helpText: "We'll help classify your business risk category"
+      },
+      {
+        id: "employee_job_descriptions",
+        name: "Employee Job Descriptions",
+        description: "Job descriptions for all employee positions",
+        required: true,
+        status: "missing",
+        fileType: ["PDF", "DOC", "DOCX"],
+        maxSize: "10MB",
+        helpText: "Detailed job descriptions help determine risk classification"
+      },
+      {
+        id: "workplace_safety_measures",
+        name: "Workplace Safety Measures",
+        description: "Documentation of current safety measures and policies",
+        required: false,
+        status: "missing",
+        fileType: ["PDF", "DOC", "DOCX"],
+        maxSize: "10MB",
+        helpText: "Safety policies can help reduce assessment rates"
+      }
+    ],
+    formFields: [
+      { id: "primary_business_activity", label: "Primary Business Activity", type: "textarea", required: true, helpText: "Describe your main business activities in detail" },
+      { id: "workplace_hazards", label: "Workplace Hazards", type: "select", required: true, options: ["Low Risk (Office work)", "Medium Risk (Light machinery)", "High Risk (Heavy machinery/construction)", "Very High Risk (Mining/chemicals)"] },
+      { id: "safety_training", label: "Safety Training Provided", type: "checkbox", required: false, helpText: "Do you provide safety training to employees?" }
     ],
     benefits: [
       "Legal compliance requirement",
-      "Employee injury protection",
-      "Avoid prosecution and fines",
+      "Employee injury protection coverage",
+      "Avoid prosecution and heavy fines",
       "Professional business operation"
     ],
-    steps: [
-      { step: 1, title: "Determine Classification", description: "Identify your business risk classification", completed: false },
-      { step: 2, title: "Complete Registration", description: "Submit W.As.2 registration form", completed: false },
-      { step: 3, title: "Pay Assessment", description: "Pay initial assessment fee", completed: false },
-      { step: 4, title: "Receive Certificate", description: "Obtain Letter of Good Standing", completed: false }
-    ],
-    resources: [
-      { title: "Compensation Fund", type: "website", url: "https://www.labour.gov.za", description: "Official compensation fund portal" },
-      { title: "Risk Classification Guide", type: "guide", description: "Determine your business risk category" },
-      { title: "Assessment Calculator", type: "document", description: "Calculate compensation contributions" }
-    ]
-  },
-  {
-    id: "business_bank_account",
-    title: "Business Bank Account",
-    description: "Open a dedicated business bank account for financial separation",
-    category: "Banking & Finance",
-    priority: "critical",
-    status: "completed",
-    estimatedTime: "1-2 hours",
-    cost: "Monthly fees vary",
-    authority: "Commercial Banks",
-    icon: Landmark,
-    color: "blue",
-    requirements: [
-      "Company registration certificate",
-      "Tax clearance certificate",
-      "Director ID documents",
-      "Proof of business address",
-      "CIPC certificate"
-    ],
-    benefits: [
-      "Professional business image",
-      "Separate personal and business finances",
-      "Required for business loans",
-      "Easier accounting and tax compliance"
-    ],
-    steps: [
-      { step: 1, title: "Choose Bank", description: "Compare business banking options", completed: true },
-      { step: 2, title: "Gather Documents", description: "Collect all required documentation", completed: true },
-      { step: 3, title: "Schedule Appointment", description: "Book meeting with business banker", completed: true },
-      { step: 4, title: "Open Account", description: "Complete account opening process", completed: true }
-    ],
-    resources: [
-      { title: "Bank Comparison Tool", type: "document", description: "Compare business banking fees" },
-      { title: "Required Documents Checklist", type: "guide", description: "Complete documentation list" },
-      { title: "Business Banking Guide", type: "guide", description: "Choosing the right business account" }
+    nextSteps: [
+      "We assess your business risk classification",
+      "Prepare W.As.2 registration form",
+      "Calculate and pay initial assessment",
+      "Obtain Letter of Good Standing"
     ]
   },
   {
     id: "popia_compliance",
-    title: "POPIA Compliance",
-    description: "Ensure compliance with Protection of Personal Information Act",
+    title: "POPIA Compliance Package",
+    description: "Complete POPIA compliance setup including policies and procedures",
     category: "Data Protection",
     priority: "medium",
     status: "in_progress",
     estimatedTime: "2-4 weeks",
     cost: "R5,000 - R50,000",
+    payflowFee: "R2,999 (complete compliance package)",
     authority: "Information Regulator",
     icon: Lock,
     color: "slate",
-    requirements: [
-      "Data processing assessment",
-      "Privacy policy development",
-      "Consent management system",
-      "Data security measures"
+    canAutoSubmit: false,
+    documents: [
+      {
+        id: "current_privacy_policy",
+        name: "Current Privacy Policy",
+        description: "Your existing privacy policy (if any)",
+        required: false,
+        status: "missing",
+        fileType: ["PDF", "DOC", "DOCX"],
+        maxSize: "5MB",
+        helpText: "Upload current policy for review and updating"
+      },
+      {
+        id: "data_processing_activities",
+        name: "Data Processing Activities",
+        description: "List of all personal data you collect and process",
+        required: true,
+        status: "uploaded",
+        fileType: ["PDF", "XLS", "XLSX"],
+        maxSize: "10MB",
+        helpText: "We'll provide a template to complete"
+      },
+      {
+        id: "consent_forms",
+        name: "Current Consent Forms",
+        description: "Any consent forms you currently use",
+        required: false,
+        status: "missing",
+        fileType: ["PDF", "DOC", "DOCX"],
+        maxSize: "10MB",
+        helpText: "Upload existing consent forms for review"
+      }
+    ],
+    formFields: [
+      { id: "data_types_collected", label: "Types of Personal Data Collected", type: "select", required: true, options: ["Basic contact info only", "Financial information", "Health information", "Biometric data", "All of the above"] },
+      { id: "data_sharing", label: "Do you share data with third parties?", type: "select", required: true, options: ["No", "Yes - with service providers", "Yes - with marketing partners", "Yes - other"] },
+      { id: "data_storage_location", label: "Where is data stored?", type: "select", required: true, options: ["South Africa only", "Cloud services (international)", "Both local and international", "Not sure"] }
     ],
     benefits: [
-      "Legal compliance with data laws",
+      "Full legal compliance with POPIA",
       "Customer trust and confidence",
-      "Avoid hefty fines and penalties",
-      "Competitive advantage"
+      "Avoid fines up to R10 million",
+      "Competitive advantage in tenders"
     ],
-    steps: [
-      { step: 1, title: "Data Audit", description: "Assess current data processing activities", completed: true },
-      { step: 2, title: "Privacy Policy", description: "Develop comprehensive privacy policy", completed: true },
-      { step: 3, title: "Security Measures", description: "Implement data security controls", completed: false },
-      { step: 4, title: "Staff Training", description: "Train staff on POPIA requirements", completed: false }
-    ],
-    resources: [
-      { title: "Information Regulator", type: "website", url: "https://www.justice.gov.za/inforeg/", description: "Official POPIA guidance" },
-      { title: "POPIA Compliance Checklist", type: "document", description: "Complete compliance checklist" },
-      { title: "Privacy Policy Template", type: "document", description: "Standard privacy policy template" }
-    ]
-  },
-  {
-    id: "bbbee_certificate",
-    title: "B-BBEE Certificate",
-    description: "Obtain Broad-Based Black Economic Empowerment certificate",
-    category: "Empowerment & Compliance",
-    priority: "medium",
-    status: "not_started",
-    estimatedTime: "4-8 weeks",
-    cost: "R15,000 - R100,000",
-    authority: "SANAS Accredited Agencies",
-    icon: Award,
-    color: "yellow",
-    requirements: [
-      "Annual financial statements",
-      "Employment equity data",
-      "Procurement records",
-      "Skills development information"
-    ],
-    benefits: [
-      "Access to government tenders",
-      "Corporate procurement opportunities",
-      "Competitive advantage",
-      "Compliance with transformation laws"
-    ],
-    steps: [
-      { step: 1, title: "Choose Verification Agency", description: "Select SANAS accredited agency", completed: false },
-      { step: 2, title: "Prepare Documentation", description: "Gather required financial and HR data", completed: false },
-      { step: 3, title: "Verification Process", description: "Complete B-BBEE verification", completed: false },
-      { step: 4, title: "Receive Certificate", description: "Obtain B-BBEE certificate", completed: false }
-    ],
-    resources: [
-      { title: "B-BBEE Commission", type: "website", url: "https://www.bbbeecommission.co.za", description: "Official B-BBEE information" },
-      { title: "Verification Agency List", type: "document", description: "SANAS accredited agencies" },
-      { title: "B-BBEE Scorecard Guide", type: "guide", description: "Understanding the scorecard" }
-    ]
-  },
-  {
-    id: "professional_indemnity",
-    title: "Professional Indemnity Insurance",
-    description: "Obtain professional indemnity insurance for service-based businesses",
-    category: "Insurance & Risk",
-    priority: "medium",
-    status: "not_started",
-    estimatedTime: "1-2 weeks",
-    cost: "R2,000 - R20,000 annually",
-    authority: "Insurance Companies",
-    icon: Shield,
-    color: "indigo",
-    requirements: [
-      "Business registration details",
-      "Professional qualifications",
-      "Revenue information",
-      "Risk assessment"
-    ],
-    benefits: [
-      "Protection against professional claims",
-      "Client confidence and trust",
-      "Required for many contracts",
-      "Financial risk mitigation"
-    ],
-    steps: [
-      { step: 1, title: "Assess Coverage Needs", description: "Determine appropriate coverage amount", completed: false },
-      { step: 2, title: "Get Quotes", description: "Obtain quotes from multiple insurers", completed: false },
-      { step: 3, title: "Choose Policy", description: "Select appropriate insurance policy", completed: false },
-      { step: 4, title: "Activate Coverage", description: "Complete policy activation", completed: false }
-    ],
-    resources: [
-      { title: "Insurance Comparison", type: "document", description: "Compare professional indemnity options" },
-      { title: "Coverage Calculator", type: "document", description: "Determine appropriate coverage" },
-      { title: "Insurance Brokers List", type: "guide", description: "Recommended insurance brokers" }
+    nextSteps: [
+      "Complete data processing assessment",
+      "Draft comprehensive privacy policy",
+      "Implement data security measures",
+      "Provide staff training on POPIA"
     ]
   }
 ]
@@ -456,10 +522,10 @@ interface FormTemplate {
   lastUpdated: string
   completionStatus: 'complete' | 'incomplete' | 'needs_update'
   applicableLenders: string[]
-  fields: FormField[]
+  fields: TemplateFormField[]
 }
 
-interface FormField {
+interface TemplateFormField {
   name: string
   label: string
   type: 'text' | 'email' | 'tel' | 'select' | 'textarea' | 'number' | 'radio' | 'date'
@@ -706,6 +772,9 @@ export function GrowBusinessPage() {
   const [selectedForm, setSelectedForm] = useState<string | null>(null)
   const [editingForm, setEditingForm] = useState<string | null>(null)
   const [selectedTodo, setSelectedTodo] = useState<string | null>(null)
+  const [selectedService, setSelectedService] = useState<string | null>(null)
+  const [currentStep, setCurrentStep] = useState<'overview' | 'documents' | 'forms' | 'review' | 'payment'>('overview')
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, File[]>>({})
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [selectedLenders, setSelectedLenders] = useState<string[]>([])
 
@@ -714,12 +783,24 @@ export function GrowBusinessPage() {
     setFormData(prev => ({ ...prev, [fieldName]: value }))
   }
 
+  // Handle file upload
+  const handleFileUpload = (documentId: string, files: FileList | null) => {
+    if (files) {
+      setUploadedFiles(prev => ({
+        ...prev,
+        [documentId]: Array.from(files)
+      }))
+    }
+  }
+
   // Get color classes for different statuses and colors
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'complete': return 'bg-emerald-100 text-emerald-800 border-emerald-200'
-      case 'incomplete': return 'bg-red-100 text-red-800 border-red-200'
-      case 'needs_update': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'completed': return 'bg-emerald-100 text-emerald-800 border-emerald-200'
+      case 'ready_to_submit': return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'in_progress': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'collecting_docs': return 'bg-orange-100 text-orange-800 border-orange-200'
+      case 'not_started': return 'bg-slate-100 text-slate-800 border-slate-200'
       default: return 'bg-slate-100 text-slate-800 border-slate-200'
     }
   }
@@ -731,6 +812,26 @@ export function GrowBusinessPage() {
       case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
       case 'low': return 'bg-green-100 text-green-800 border-green-200'
       default: return 'bg-slate-100 text-slate-800 border-slate-200'
+    }
+  }
+
+  const getDocumentStatusColor = (status: string) => {
+    switch (status) {
+      case 'verified': return 'text-emerald-600'
+      case 'uploaded': return 'text-blue-600'
+      case 'rejected': return 'text-red-600'
+      case 'missing': return 'text-slate-400'
+      default: return 'text-slate-400'
+    }
+  }
+
+  const getDocumentStatusIcon = (status: string) => {
+    switch (status) {
+      case 'verified': return CheckCircle2
+      case 'uploaded': return FileCheck
+      case 'rejected': return AlertTriangle
+      case 'missing': return Upload
+      default: return Upload
     }
   }
 
@@ -781,13 +882,20 @@ export function GrowBusinessPage() {
 
   // Calculate completion percentage for todos
   const getCompletionStats = () => {
-    const total = financialTodos.length
-    const completed = financialTodos.filter(todo => todo.status === 'completed').length
-    const inProgress = financialTodos.filter(todo => todo.status === 'in_progress').length
+    const total = complianceServices.length
+    const completed = complianceServices.filter(service => service.status === 'completed').length
+    const inProgress = complianceServices.filter(service => service.status === 'in_progress' || service.status === 'collecting_docs' || service.status === 'ready_to_submit').length
     return { total, completed, inProgress, percentage: Math.round((completed / total) * 100) }
   }
 
   const completionStats = getCompletionStats()
+
+  const submitService = (serviceId: string) => {
+    console.log(`Submitting service ${serviceId} for processing`)
+    alert("Service submitted! Our team will begin processing your application within 24 hours.")
+    setSelectedService(null)
+    setCurrentStep('overview')
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white p-6">
@@ -816,17 +924,17 @@ export function GrowBusinessPage() {
           </TabsList>
 
           <TabsContent value="financial-todos" className="space-y-6">
-            {!selectedTodo ? (
+            {!selectedService ? (
               <>
-                {/* Financial TODOs Overview */}
+                {/* Compliance Services Overview */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-slate-900">
                       <ClipboardList className="h-5 w-5 text-emerald-600" />
-                      Financial Compliance TODOs
+                      PayFlow Compliance Services
                     </CardTitle>
                     <CardDescription>
-                      Essential tasks to ensure your business is properly registered and compliant with South African financial authorities
+                      We handle all your business compliance needs - from document preparation to official submissions
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -850,60 +958,67 @@ export function GrowBusinessPage() {
                       <div className="flex gap-6 mt-3 text-sm">
                         <span className="text-emerald-600">✓ {completionStats.completed} Completed</span>
                         <span className="text-blue-600">⏳ {completionStats.inProgress} In Progress</span>
-                        <span className="text-slate-600">○ {completionStats.total - completionStats.completed - completionStats.inProgress} Not Started</span>
+                        <span className="text-slate-600">○ {completionStats.total - completionStats.completed - completionStats.inProgress} Available</span>
                       </div>
                     </div>
 
-                    {/* TODOs List */}
+                    {/* Services List */}
                     <div className="space-y-4">
-                      {financialTodos.map((todo) => (
-                        <div key={todo.id} className="p-6 border border-slate-200 rounded-lg hover:shadow-md transition-shadow">
+                      {complianceServices.map((service) => (
+                        <div key={service.id} className="p-6 border border-slate-200 rounded-lg hover:shadow-md transition-shadow">
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-start gap-4">
-                              <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getColorClasses(todo.color)}`}>
-                                <todo.icon className="h-6 w-6" />
+                              <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getColorClasses(service.color)}`}>
+                                <service.icon className="h-6 w-6" />
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="text-lg font-semibold text-slate-900">{todo.title}</h3>
-                                  <Badge className={getPriorityColor(todo.priority)}>
-                                    {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
+                                  <h3 className="text-lg font-semibold text-slate-900">{service.title}</h3>
+                                  <Badge className={getPriorityColor(service.priority)}>
+                                    {service.priority.charAt(0).toUpperCase() + service.priority.slice(1)}
                                   </Badge>
-                                  <Badge className={getTodoStatusColor(todo.status)}>
-                                    {todo.status === 'completed' ? 'Completed' : 
-                                     todo.status === 'in_progress' ? 'In Progress' : 'Not Started'}
+                                  <Badge className={getStatusColor(service.status)}>
+                                    {service.status === 'completed' ? 'Completed' : 
+                                     service.status === 'ready_to_submit' ? 'Ready to Submit' :
+                                     service.status === 'in_progress' ? 'In Progress' : 
+                                     service.status === 'collecting_docs' ? 'Collecting Documents' : 'Available'}
                                   </Badge>
+                                  {service.canAutoSubmit && (
+                                    <Badge variant="outline" className="border-emerald-200 text-emerald-700">
+                                      Auto-Submit Available
+                                    </Badge>
+                                  )}
                                 </div>
-                                <p className="text-sm text-slate-600 mb-3">{todo.description}</p>
+                                <p className="text-sm text-slate-600 mb-3">{service.description}</p>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-slate-500">
                                   <div>
                                     <span className="font-medium">Authority:</span>
-                                    <div>{todo.authority}</div>
+                                    <div>{service.authority}</div>
                                   </div>
                                   <div>
                                     <span className="font-medium">Time:</span>
-                                    <div>{todo.estimatedTime}</div>
+                                    <div>{service.estimatedTime}</div>
                                   </div>
                                   <div>
-                                    <span className="font-medium">Cost:</span>
-                                    <div>{todo.cost}</div>
+                                    <span className="font-medium">PayFlow Fee:</span>
+                                    <div className="text-emerald-600 font-medium">{service.payflowFee}</div>
                                   </div>
                                   <div>
-                                    <span className="font-medium">Category:</span>
-                                    <div>{todo.category}</div>
+                                    <span className="font-medium">Documents:</span>
+                                    <div>{service.documents.length} required</div>
                                   </div>
                                 </div>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              {todo.status === 'completed' && (
+                              {service.status === 'completed' && (
                                 <CheckCircle2 className="h-6 w-6 text-emerald-600" />
                               )}
-                              {todo.status === 'in_progress' && (
-                                <Clock className="h-6 w-6 text-blue-600" />
+                              {service.status === 'in_progress' && (
+                                <RefreshCw className="h-6 w-6 text-blue-600 animate-spin" />
                               )}
-                              {todo.status === 'not_started' && (
-                                <XCircle className="h-6 w-6 text-slate-400" />
+                              {service.status === 'collecting_docs' && (
+                                <Upload className="h-6 w-6 text-orange-600" />
                               )}
                             </div>
                           </div>
@@ -912,18 +1027,24 @@ export function GrowBusinessPage() {
                             <Button 
                               size="sm"
                               variant="outline"
-                              onClick={() => setSelectedTodo(todo.id)}
+                              onClick={() => setSelectedService(service.id)}
                             >
                               <Info className="h-3 w-3 mr-1" />
                               View Details
                             </Button>
-                            {todo.status !== 'completed' && (
+                            {service.status !== 'completed' && (
                               <Button 
                                 size="sm"
                                 className="bg-emerald-600 hover:bg-emerald-700"
+                                onClick={() => {
+                                  setSelectedService(service.id)
+                                  setCurrentStep(service.status === 'not_started' ? 'documents' : 'review')
+                                }}
                               >
                                 <ArrowRight className="h-3 w-3 mr-1" />
-                                {todo.status === 'not_started' ? 'Get Started' : 'Continue'}
+                                {service.status === 'not_started' ? 'Get Started' : 
+                                 service.status === 'collecting_docs' ? 'Continue Setup' :
+                                 service.status === 'ready_to_submit' ? 'Review & Submit' : 'Continue'}
                               </Button>
                             )}
                           </div>
@@ -934,11 +1055,11 @@ export function GrowBusinessPage() {
                 </Card>
               </>
             ) : (
-              // TODO Detail View
+              // Service Detail View
               <>
                 {(() => {
-                  const todo = financialTodos.find(t => t.id === selectedTodo)
-                  if (!todo) return null
+                  const service = complianceServices.find(s => s.id === selectedService)
+                  if (!service) return null
 
                   return (
                     <Card>
@@ -946,164 +1067,447 @@ export function GrowBusinessPage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <CardTitle className="flex items-center gap-2 text-slate-900">
-                              <todo.icon className="h-5 w-5 text-emerald-600" />
-                              {todo.title}
+                              <service.icon className="h-5 w-5 text-emerald-600" />
+                              {service.title}
                             </CardTitle>
                             <CardDescription>
-                              {todo.description}
+                              {service.description}
                             </CardDescription>
                           </div>
                           <Button 
                             variant="outline" 
-                            onClick={() => setSelectedTodo(null)}
+                            onClick={() => {
+                              setSelectedService(null)
+                              setCurrentStep('overview')
+                            }}
                           >
-                            Back to TODOs
+                            Back to Services
                           </Button>
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <div className="space-y-8">
-                          {/* Overview */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                              <h3 className="font-semibold text-slate-900 mb-3">Overview</h3>
-                              <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                  <span className="text-slate-600">Authority:</span>
-                                  <span className="font-medium">{todo.authority}</span>
+                        {/* Step Navigation */}
+                        <div className="mb-8">
+                          <div className="flex items-center justify-between">
+                            {['overview', 'documents', 'forms', 'review', 'payment'].map((step, index) => (
+                              <div key={step} className="flex items-center">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                                  currentStep === step 
+                                    ? 'bg-emerald-500 text-white' 
+                                    : index < ['overview', 'documents', 'forms', 'review', 'payment'].indexOf(currentStep)
+                                    ? 'bg-emerald-200 text-emerald-800'
+                                    : 'bg-slate-200 text-slate-600'
+                                }`}>
+                                  {index + 1}
                                 </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-600">Estimated Time:</span>
-                                  <span className="font-medium">{todo.estimatedTime}</span>
+                                <div className="ml-2 text-sm font-medium capitalize">
+                                  {step === 'overview' ? 'Overview' :
+                                   step === 'documents' ? 'Documents' :
+                                   step === 'forms' ? 'Information' :
+                                   step === 'review' ? 'Review' : 'Payment'}
                                 </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-600">Cost:</span>
-                                  <span className="font-medium">{todo.cost}</span>
+                                {index < 4 && (
+                                  <div className={`w-12 h-0.5 mx-4 ${
+                                    index < ['overview', 'documents', 'forms', 'review', 'payment'].indexOf(currentStep)
+                                      ? 'bg-emerald-200'
+                                      : 'bg-slate-200'
+                                  }`} />
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Step Content */}
+                        {currentStep === 'overview' && (
+                          <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div>
+                                <h3 className="font-semibold text-slate-900 mb-3">Service Details</h3>
+                                <div className="space-y-2 text-sm">
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-600">Authority:</span>
+                                    <span className="font-medium">{service.authority}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-600">Processing Time:</span>
+                                    <span className="font-medium">{service.estimatedTime}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-600">Government Fees:</span>
+                                    <span className="font-medium">{service.cost}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-600">PayFlow Service Fee:</span>
+                                    <span className="font-medium text-emerald-600">{service.payflowFee}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-600">Auto-Submit:</span>
+                                    <span className={`font-medium ${service.canAutoSubmit ? 'text-emerald-600' : 'text-slate-600'}`}>
+                                      {service.canAutoSubmit ? 'Available' : 'Manual Process'}
+                                    </span>
+                                  </div>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-600">Priority:</span>
-                                  <Badge className={getPriorityColor(todo.priority)}>
-                                    {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
-                                  </Badge>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-600">Status:</span>
-                                  <Badge className={getTodoStatusColor(todo.status)}>
-                                    {todo.status === 'completed' ? 'Completed' : 
-                                     todo.status === 'in_progress' ? 'In Progress' : 'Not Started'}
-                                  </Badge>
+                              </div>
+
+                              <div>
+                                <h3 className="font-semibold text-slate-900 mb-3">What's Included</h3>
+                                <div className="space-y-2">
+                                  {service.nextSteps.map((step, index) => (
+                                    <div key={index} className="flex items-start gap-2 text-sm">
+                                      <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                                      {step}
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
                             </div>
 
                             <div>
-                              <h3 className="font-semibold text-slate-900 mb-3">Progress</h3>
-                              <div className="space-y-3">
-                                {todo.steps.map((step, index) => (
-                                  <div key={index} className="flex items-center gap-3">
-                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                                      step.completed 
-                                        ? 'bg-emerald-500 text-white' 
-                                        : 'bg-slate-200 text-slate-600'
-                                    }`}>
-                                      {step.completed ? '✓' : step.step}
-                                    </div>
-                                    <div className="flex-1">
-                                      <div className={`font-medium ${step.completed ? 'text-emerald-700' : 'text-slate-900'}`}>
-                                        {step.title}
+                              <h3 className="font-semibold text-slate-900 mb-3">Benefits</h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {service.benefits.map((benefit, index) => (
+                                  <div key={index} className="flex items-center gap-2 text-sm">
+                                    <Star className="h-4 w-4 text-emerald-500" />
+                                    {benefit}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="flex justify-end gap-3">
+                              <Button 
+                                onClick={() => setCurrentStep('documents')}
+                                className="bg-emerald-600 hover:bg-emerald-700"
+                              >
+                                <ArrowRight className="h-4 w-4 mr-2" />
+                                Get Started
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
+                        {currentStep === 'documents' && (
+                          <div className="space-y-6">
+                            <div>
+                              <h3 className="font-semibold text-slate-900 mb-4">Required Documents</h3>
+                              <p className="text-sm text-slate-600 mb-6">
+                                Upload the required documents below. Our team will review and verify each document.
+                              </p>
+                              
+                              <div className="space-y-4">
+                                {service.documents.map((doc) => {
+                                  const StatusIcon = getDocumentStatusIcon(doc.status)
+                                  return (
+                                    <div key={doc.id} className="p-4 border border-slate-200 rounded-lg">
+                                      <div className="flex items-start justify-between mb-3">
+                                        <div className="flex items-start gap-3">
+                                          <StatusIcon className={`h-5 w-5 mt-0.5 ${getDocumentStatusColor(doc.status)}`} />
+                                          <div>
+                                            <h4 className="font-medium text-slate-900">
+                                              {doc.name}
+                                              {doc.required && <span className="text-red-500 ml-1">*</span>}
+                                            </h4>
+                                            <p className="text-sm text-slate-600">{doc.description}</p>
+                                            {doc.helpText && (
+                                              <p className="text-xs text-slate-500 mt-1">{doc.helpText}</p>
+                                            )}
+                                          </div>
+                                        </div>
+                                        <Badge className={getStatusColor(doc.status)}>
+                                          {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                                        </Badge>
                                       </div>
-                                      <div className="text-xs text-slate-600">{step.description}</div>
+                                      
+                                      <div className="flex items-center gap-4">
+                                        <div className="flex-1">
+                                          <input
+                                            type="file"
+                                            accept={doc.fileType.map(type => `.${type.toLowerCase()}`).join(',')}
+                                            onChange={(e) => handleFileUpload(doc.id, e.target.files)}
+                                            className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                                          />
+                                          <p className="text-xs text-slate-500 mt-1">
+                                            Accepted: {doc.fileType.join(', ')} • Max size: {doc.maxSize}
+                                          </p>
+                                        </div>
+                                        {uploadedFiles[doc.id] && (
+                                          <div className="flex items-center gap-2">
+                                            <FileCheck className="h-4 w-4 text-emerald-600" />
+                                            <span className="text-sm text-emerald-600">
+                                              {uploadedFiles[doc.id].length} file(s) uploaded
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
                                     </div>
-                                    {!step.completed && todo.status !== 'completed' && (
-                                      <Button 
-                                        size="sm" 
-                                        variant="outline"
-                                        onClick={() => markStepComplete(todo.id, index)}
+                                  )
+                                })}
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between">
+                              <Button 
+                                variant="outline"
+                                onClick={() => setCurrentStep('overview')}
+                              >
+                                Back
+                              </Button>
+                              <Button 
+                                onClick={() => setCurrentStep('forms')}
+                                className="bg-emerald-600 hover:bg-emerald-700"
+                              >
+                                Continue
+                                <ArrowRight className="h-4 w-4 ml-2" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
+                        {currentStep === 'forms' && (
+                          <div className="space-y-6">
+                            <div>
+                              <h3 className="font-semibold text-slate-900 mb-4">Business Information</h3>
+                              <p className="text-sm text-slate-600 mb-6">
+                                Please provide the required information for your {service.title.toLowerCase()}.
+                              </p>
+                              
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {service.formFields.map((field) => (
+                                  <div key={field.id} className="space-y-2">
+                                    <Label className="flex items-center gap-2">
+                                      {field.label}
+                                      {field.required && <span className="text-red-500">*</span>}
+                                    </Label>
+                                    
+                                    {field.type === 'select' ? (
+                                      <Select 
+                                        value={formData[field.id] || field.value || ''} 
+                                        onValueChange={(value) => handleFieldChange(field.id, value)}
                                       >
-                                        Mark Complete
-                                      </Button>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {field.options?.map((option) => (
+                                            <SelectItem key={option} value={option.toLowerCase()}>
+                                              {option}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    ) : field.type === 'textarea' ? (
+                                      <Textarea
+                                        value={formData[field.id] || field.value || ''}
+                                        onChange={(e) => handleFieldChange(field.id, e.target.value)}
+                                        required={field.required}
+                                        rows={3}
+                                      />
+                                    ) : field.type === 'checkbox' ? (
+                                      <div className="flex items-center space-x-2">
+                                        <input
+                                          type="checkbox"
+                                          id={field.id}
+                                          checked={formData[field.id] === 'true'}
+                                          onChange={(e) => handleFieldChange(field.id, e.target.checked.toString())}
+                                          className="rounded border-slate-300"
+                                        />
+                                        <label htmlFor={field.id} className="text-sm">
+                                          Yes
+                                        </label>
+                                      </div>
+                                    ) : (
+                                      <Input
+                                        type={field.type}
+                                        value={formData[field.id] || field.value || ''}
+                                        onChange={(e) => handleFieldChange(field.id, e.target.value)}
+                                        required={field.required}
+                                      />
+                                    )}
+                                    
+                                    {field.helpText && (
+                                      <p className="text-xs text-slate-500">{field.helpText}</p>
                                     )}
                                   </div>
                                 ))}
                               </div>
                             </div>
-                          </div>
 
-                          {/* Requirements */}
-                          <div>
-                            <h3 className="font-semibold text-slate-900 mb-3">Requirements</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {todo.requirements.map((req, index) => (
-                                <div key={index} className="flex items-center gap-2 text-sm">
-                                  <CheckSquare className="h-4 w-4 text-slate-400" />
-                                  {req}
-                                </div>
-                              ))}
+                            <div className="flex justify-between">
+                              <Button 
+                                variant="outline"
+                                onClick={() => setCurrentStep('documents')}
+                              >
+                                Back
+                              </Button>
+                              <Button 
+                                onClick={() => setCurrentStep('review')}
+                                className="bg-emerald-600 hover:bg-emerald-700"
+                              >
+                                Continue
+                                <ArrowRight className="h-4 w-4 ml-2" />
+                              </Button>
                             </div>
                           </div>
+                        )}
 
-                          {/* Benefits */}
-                          <div>
-                            <h3 className="font-semibold text-slate-900 mb-3">Benefits</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {todo.benefits.map((benefit, index) => (
-                                <div key={index} className="flex items-center gap-2 text-sm">
-                                  <Star className="h-4 w-4 text-emerald-500" />
-                                  {benefit}
+                        {currentStep === 'review' && (
+                          <div className="space-y-6">
+                            <div>
+                              <h3 className="font-semibold text-slate-900 mb-4">Review Your Application</h3>
+                              <p className="text-sm text-slate-600 mb-6">
+                                Please review all information before submitting your application.
+                              </p>
+                              
+                              {/* Service Summary */}
+                              <div className="p-4 bg-slate-50 rounded-lg mb-6">
+                                <h4 className="font-medium text-slate-900 mb-2">Service Summary</h4>
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                  <div>
+                                    <span className="text-slate-600">Service:</span>
+                                    <div className="font-medium">{service.title}</div>
+                                  </div>
+                                  <div>
+                                    <span className="text-slate-600">Processing Time:</span>
+                                    <div className="font-medium">{service.estimatedTime}</div>
+                                  </div>
+                                  <div>
+                                    <span className="text-slate-600">Government Fees:</span>
+                                    <div className="font-medium">{service.cost}</div>
+                                  </div>
+                                  <div>
+                                    <span className="text-slate-600">PayFlow Service Fee:</span>
+                                    <div className="font-medium text-emerald-600">{service.payflowFee}</div>
+                                  </div>
                                 </div>
-                              ))}
-                            </div>
-                          </div>
+                              </div>
 
-                          {/* Resources */}
-                          <div>
-                            <h3 className="font-semibold text-slate-900 mb-3">Helpful Resources</h3>
-                            <div className="grid gap-3">
-                              {todo.resources.map((resource, index) => (
-                                <div key={index} className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
-                                      {resource.type === 'website' && <Globe className="h-4 w-4 text-slate-600" />}
-                                      {resource.type === 'document' && <FileText className="h-4 w-4 text-slate-600" />}
-                                      {resource.type === 'guide' && <BookOpen className="h-4 w-4 text-slate-600" />}
-                                      {resource.type === 'contact' && <Phone className="h-4 w-4 text-slate-600" />}
+                              {/* Documents Status */}
+                              <div className="mb-6">
+                                <h4 className="font-medium text-slate-900 mb-3">Documents Status</h4>
+                                <div className="space-y-2">
+                                  {service.documents.map((doc) => (
+                                    <div key={doc.id} className="flex items-center justify-between p-2 bg-slate-50 rounded">
+                                      <span className="text-sm">{doc.name}</span>
+                                      <Badge className={getStatusColor(doc.status)}>
+                                        {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                                      </Badge>
                                     </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Terms and Conditions */}
+                              <div className="p-4 border border-slate-200 rounded-lg">
+                                <div className="flex items-start gap-3">
+                                  <input type="checkbox" className="mt-1" />
+                                  <div className="text-sm">
+                                    <p className="font-medium text-slate-900 mb-1">Terms and Conditions</p>
+                                    <p className="text-slate-600">
+                                      I authorize PayFlow to act on my behalf for this compliance service. I understand that 
+                                      government fees are non-refundable and processing times may vary. PayFlow will keep me 
+                                      updated throughout the process.
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between">
+                              <Button 
+                                variant="outline"
+                                onClick={() => setCurrentStep('forms')}
+                              >
+                                Back
+                              </Button>
+                              <Button 
+                                onClick={() => setCurrentStep('payment')}
+                                className="bg-emerald-600 hover:bg-emerald-700"
+                              >
+                                Proceed to Payment
+                                <ArrowRight className="h-4 w-4 ml-2" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
+                        {currentStep === 'payment' && (
+                          <div className="space-y-6">
+                            <div>
+                              <h3 className="font-semibold text-slate-900 mb-4">Payment & Submission</h3>
+                              <p className="text-sm text-slate-600 mb-6">
+                                Complete your payment to begin processing your {service.title.toLowerCase()}.
+                              </p>
+                              
+                              {/* Payment Summary */}
+                              <div className="p-6 border border-slate-200 rounded-lg mb-6">
+                                <h4 className="font-medium text-slate-900 mb-4">Payment Summary</h4>
+                                <div className="space-y-3">
+                                  <div className="flex justify-between">
+                                    <span>PayFlow Service Fee</span>
+                                    <span className="font-medium">{service.payflowFee}</span>
+                                  </div>
+                                  <div className="flex justify-between text-sm text-slate-600">
+                                    <span>Government Fees</span>
+                                    <span>{service.cost}</span>
+                                  </div>
+                                  <Separator />
+                                  <div className="flex justify-between font-semibold">
+                                    <span>Total</span>
+                                    <span className="text-emerald-600">{service.payflowFee}</span>
+                                  </div>
+                                  <p className="text-xs text-slate-500">
+                                    Government fees will be paid directly by PayFlow on your behalf
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Payment Method */}
+                              <div className="p-4 border border-slate-200 rounded-lg">
+                                <h4 className="font-medium text-slate-900 mb-3">Payment Method</h4>
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-3">
+                                    <input type="radio" name="payment" defaultChecked />
                                     <div>
-                                      <div className="font-medium text-slate-900">{resource.title}</div>
-                                      <div className="text-sm text-slate-600">{resource.description}</div>
+                                      <div className="font-medium">PayFlow Wallet</div>
+                                      <div className="text-sm text-slate-600">Pay from your PayFlow account balance</div>
                                     </div>
                                   </div>
-                                  <Button size="sm" variant="outline">
-                                    {resource.type === 'website' ? (
-                                      <>
-                                        <ExternalLink className="h-3 w-3 mr-1" />
-                                        Visit
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Download className="h-3 w-3 mr-1" />
-                                        Download
-                                      </>
-                                    )}
-                                  </Button>
+                                  <div className="flex items-center gap-3">
+                                    <input type="radio" name="payment" />
+                                    <div>
+                                      <div className="font-medium">Credit/Debit Card</div>
+                                      <div className="text-sm text-slate-600">Pay with your business card</div>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <input type="radio" name="payment" />
+                                    <div>
+                                      <div className="font-medium">EFT/Bank Transfer</div>
+                                      <div className="text-sm text-slate-600">Direct bank transfer</div>
+                                    </div>
+                                  </div>
                                 </div>
-                              ))}
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between">
+                              <Button 
+                                variant="outline"
+                                onClick={() => setCurrentStep('review')}
+                              >
+                                Back
+                              </Button>
+                              <Button 
+                                onClick={() => submitService(service.id)}
+                                className="bg-emerald-600 hover:bg-emerald-700"
+                              >
+                                <Send className="h-4 w-4 mr-2" />
+                                Submit & Pay
+                              </Button>
                             </div>
                           </div>
-
-                          {/* Action Buttons */}
-                          <div className="flex justify-end gap-3">
-                            <Button variant="outline" onClick={() => setSelectedTodo(null)}>
-                              Back to List
-                            </Button>
-                            {todo.status !== 'completed' && (
-                              <Button className="bg-emerald-600 hover:bg-emerald-700">
-                                <ArrowRight className="h-4 w-4 mr-2" />
-                                {todo.status === 'not_started' ? 'Get Started' : 'Continue Progress'}
-                              </Button>
-                            )}
-                          </div>
-                        </div>
+                        )}
                       </CardContent>
                     </Card>
                   )
