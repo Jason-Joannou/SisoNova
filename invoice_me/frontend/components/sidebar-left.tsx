@@ -55,6 +55,12 @@ const navigationItems = [
     icon: Calendar,
     color: "text-slate-600"
   },
+  {
+    title: "Grow Your Business", // New section
+    url: "/dashboard/grow",
+    icon: TrendingUp,
+    color: "text-emerald-600"
+  },
 ]
 
 const settingsItems = [
