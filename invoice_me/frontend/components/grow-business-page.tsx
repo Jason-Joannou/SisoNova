@@ -1605,11 +1605,315 @@ export function GrowBusinessPage() {
                 </Card>
               </>
             ) : editingForm ? (
-              // Form Editing View - keeping existing implementation
-              <div>Form editing view would go here...</div>
+              // Form Editing View
+              <>
+                {(() => {
+                  const form = formTemplates.find(f => f.id === editingForm)
+                  if (!form) return null
+
+                  return (
+                    <Card>
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <CardTitle className="flex items-center gap-2 text-slate-900">
+                              <Edit3 className="h-5 w-5 text-blue-600" />
+                              Edit {form.title}
+                            </CardTitle>
+                            <CardDescription>
+                              Update your form information. Changes will apply to all future applications.
+                            </CardDescription>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            onClick={() => setEditingForm(null)}
+                          >
+                            Back to Forms
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <form onSubmit={(e) => { e.preventDefault(); saveFormUpdates(form.id); }}>
+                          <div className="space-y-8">
+                            {/* Business Information Section */}
+                            <div>
+                              <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                                <Building className="h-5 w-5 text-slate-600" />
+                                Business Information
+                              </h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {form.fields.filter(field => field.category === 'business_info').map((field) => (
+                                  <div key={field.name} className="space-y-2">
+                                    <Label className="flex items-center gap-2">
+                                      {field.label}
+                                      {field.required && <span className="text-red-500">*</span>}
+                                    </Label>
+                                    
+                                    {field.type === 'select' ? (
+                                      <Select 
+                                        value={formData[field.name] || field.value || ''} 
+                                        onValueChange={(value) => handleFieldChange(field.name, value)}
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {field.options?.map((option) => (
+                                            <SelectItem key={option} value={option.toLowerCase()}>
+                                              {option}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    ) : field.type === 'textarea' ? (
+                                      <Textarea
+                                        value={formData[field.name] || field.value || ''}
+                                        onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                                        required={field.required}
+                                        rows={3}
+                                      />
+                                    ) : (
+                                      <Input
+                                        type={field.type}
+                                        value={formData[field.name] || field.value || ''}
+                                        onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                                        required={field.required}
+                                      />
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Financial Information Section */}
+                            {form.fields.some(field => field.category === 'financial_info') && (
+                              <div>
+                                <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                                  <BarChart3 className="h-5 w-5 text-slate-600" />
+                                  Financial Information
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {form.fields.filter(field => field.category === 'financial_info').map((field) => (
+                                    <div key={field.name} className="space-y-2">
+                                      <Label className="flex items-center gap-2">
+                                        {field.label}
+                                        {field.required && <span className="text-red-500">*</span>}
+                                      </Label>
+                                      
+                                      {field.type === 'select' ? (
+                                        <Select 
+                                          value={formData[field.name] || field.value || ''} 
+                                          onValueChange={(value) => handleFieldChange(field.name, value)}
+                                        >
+                                          <SelectTrigger>
+                                            <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {field.options?.map((option) => (
+                                              <SelectItem key={option} value={option.toLowerCase()}>
+                                                {option}
+                                              </SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      ) : (
+                                        <Input
+                                          type={field.type}
+                                          value={formData[field.name] || field.value || ''}
+                                          onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                                          required={field.required}
+                                        />
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Specific Requirements Section */}
+                            {form.fields.some(field => field.category === 'specific_requirements') && (
+                              <div>
+                                <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                                  <Target className="h-5 w-5 text-slate-600" />
+                                  Specific Requirements
+                                </h3>
+                                <div className="space-y-4">
+                                  {form.fields.filter(field => field.category === 'specific_requirements').map((field) => (
+                                    <div key={field.name} className="space-y-2">
+                                      <Label className="flex items-center gap-2">
+                                        {field.label}
+                                        {field.required && <span className="text-red-500">*</span>}
+                                      </Label>
+                                      
+                                      {field.type === 'select' ? (
+                                        <Select 
+                                          value={formData[field.name] || field.value || ''} 
+                                          onValueChange={(value) => handleFieldChange(field.name, value)}
+                                        >
+                                          <SelectTrigger>
+                                            <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {field.options?.map((option) => (
+                                              <SelectItem key={option} value={option.toLowerCase()}>
+                                                {option}
+                                              </SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      ) : field.type === 'radio' ? (
+                                        <div className="flex gap-4">
+                                          {field.options?.map((option) => (
+                                            <label key={option} className="flex items-center gap-2">
+                                              <input
+                                                type="radio"
+                                                name={field.name}
+                                                value={option.toLowerCase()}
+                                                checked={formData[field.name] === option.toLowerCase()}
+                                                onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                                                required={field.required}
+                                              />
+                                              {option}
+                                            </label>
+                                          ))}
+                                        </div>
+                                      ) : (
+                                        <Input
+                                          type={field.type}
+                                          value={formData[field.name] || field.value || ''}
+                                          onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                                          required={field.required}
+                                        />
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="flex justify-end gap-3">
+                              <Button type="button" variant="outline" onClick={() => setEditingForm(null)}>
+                                Cancel
+                              </Button>
+                              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                                <CheckCircle2 className="h-4 w-4 mr-2" />
+                                Save Changes
+                              </Button>
+                            </div>
+                          </div>
+                        </form>
+                      </CardContent>
+                    </Card>
+                  )
+                })()}
+              </>
             ) : (
-              // Lender Selection View - keeping existing implementation  
-              <div>Lender selection view would go here...</div>
+              // Lender Selection and Application View
+              <>
+                {(() => {
+                  const form = formTemplates.find(f => f.id === selectedForm)
+                  if (!form) return null
+
+                  return (
+                    <Card>
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <CardTitle className="flex items-center gap-2 text-slate-900">
+                              <Send className="h-5 w-5 text-emerald-600" />
+                              Apply with {form.title}
+                            </CardTitle>
+                            <CardDescription>
+                              Select which lenders you'd like to apply to with your {form.title.toLowerCase()}.
+                            </CardDescription>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            onClick={() => setSelectedForm(null)}
+                          >
+                            Back to Forms
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-6">
+                          <div>
+                            <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Lenders</h3>
+                            <div className="grid gap-3">
+                              {form.applicableLenders.map((lender) => (
+                                <div 
+                                  key={lender}
+                                  className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                                    selectedLenders.includes(lender) 
+                                      ? 'border-emerald-500 bg-emerald-50' 
+                                      : 'border-slate-200 hover:border-slate-300'
+                                  }`}
+                                  onClick={() => {
+                                    setSelectedLenders(prev => 
+                                      prev.includes(lender) 
+                                        ? prev.filter(l => l !== lender)
+                                        : [...prev, lender]
+                                    )
+                                  }}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                                        <Building className="h-5 w-5 text-slate-600" />
+                                      </div>
+                                      <div>
+                                        <h4 className="font-medium text-slate-900">{lender}</h4>
+                                        <p className="text-sm text-slate-600">Business Finance Division</p>
+                                      </div>
+                                    </div>
+                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                                      selectedLenders.includes(lender)
+                                        ? 'border-emerald-500 bg-emerald-500'
+                                        : 'border-slate-300'
+                                    }`}>
+                                      {selectedLenders.includes(lender) && (
+                                        <CheckCircle2 className="h-3 w-3 text-white" />
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div className="flex items-start gap-3">
+                              <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                              <div>
+                                <h4 className="font-medium text-blue-900">Data Privacy Notice</h4>
+                                <p className="text-sm text-blue-800 mt-1">
+                                  By submitting this form, you acknowledge that your information will be shared with the selected lenders 
+                                  for the purpose of processing your finance application. Your data will be handled according to 
+                                  their privacy policies and applicable data protection laws.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-between items-center">
+                            <p className="text-sm text-slate-600">
+                              {selectedLenders.length} lender{selectedLenders.length !== 1 ? 's' : ''} selected
+                            </p>
+                            <Button 
+                              onClick={() => submitFormToLenders(form.id)}
+                              disabled={selectedLenders.length === 0}
+                              className="bg-emerald-600 hover:bg-emerald-700"
+                            >
+                              <Send className="h-4 w-4 mr-2" />
+                              Submit to {selectedLenders.length} Lender{selectedLenders.length !== 1 ? 's' : ''}
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })()}
+              </>
             )}
           </TabsContent>
 
