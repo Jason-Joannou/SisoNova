@@ -29,7 +29,7 @@ export function Navigation() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link href="/dashboard">
-              <span className="text-2xl font-bold text-slate-900 cursor-pointer">PayFlow</span>
+              <span className="text-2xl font-bold text-slate-900 cursor-pointer">SisoNova</span>
             </Link>
           </div>
           

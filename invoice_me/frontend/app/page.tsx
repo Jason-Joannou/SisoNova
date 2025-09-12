@@ -13,7 +13,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <span className="text-2xl font-bold text-slate-900">PayFlow</span>
+              <span className="text-2xl font-bold text-slate-900">SisoNova</span>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" className="cursor-pointer">How it works</Button>
@@ -89,7 +89,7 @@ export default function LandingPage() {
             </div>
             <div className="bg-white p-8 rounded-xl shadow-lg">
               <div className="text-center">
-                <div className="text-6xl font-bold text-red-500 mb-2">R2.3T</div>
+                <div className="text-6xl font-bold text-red-500 mb-2">R30.5B</div>
                 <p className="text-slate-600 mb-4">Outstanding invoices in SA</p>
                 <div className="text-4xl font-bold text-slate-900 mb-2">42 days</div>
                 <p className="text-slate-600">Average payment delay</p>
@@ -345,7 +345,7 @@ export default function LandingPage() {
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-white font-bold text-lg mb-4">PayFlow</h3>
+              <h3 className="text-white font-bold text-lg mb-4">SisoNova</h3>
               <p className="text-sm">The ooba of receivables. Get paid now, grow faster.</p>
             </div>
             <div>
@@ -377,7 +377,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm">
-            <p>&copy; 2024 PayFlow. All rights reserved. Licensed credit provider.</p>
+            <p>&copy; 2024 SisoNova. All rights reserved. Licensed credit provider.</p>
           </div>
         </div>
       </footer>

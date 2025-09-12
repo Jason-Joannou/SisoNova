@@ -549,7 +549,7 @@ export function FinancingPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-slate-900">
                   <BarChart3 className="h-5 w-5 text-emerald-600" />
-                  How PayFlow Financing Works
+                  How SisoNova Financing Works
                 </CardTitle>
                 <CardDescription>
                   We find you the best funding offer from our partner network
@@ -889,7 +889,7 @@ export function FinancingPage() {
                           <div>
                             <p className="font-medium text-slate-900">{request.invoice_number}</p>
                             <p className="text-sm text-slate-600">{request.buyer_name}</p>
-                            <p className="text-xs text-slate-500">PayFlow Financing</p>
+                            <p className="text-xs text-slate-500">SisoNova Financing</p>
                           </div>
                         </div>
                         <Badge className={getStatusColor(request.status)}>

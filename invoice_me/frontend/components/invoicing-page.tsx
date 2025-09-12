@@ -139,8 +139,8 @@ interface InvoiceConfiguration {
 
 // Enhanced dummy data
 const defaultBusinessProfile: BusinessProfile = {
-  company_name: "PayFlow Solutions (Pty) Ltd",
-  trading_name: "PayFlow",
+  company_name: "SisoNova Solutions (Pty) Ltd",
+  trading_name: "SisoNova",
   address_line_1: "123 Business Park Drive",
   address_line_2: "Suite 456",
   city: "Cape Town",
@@ -148,9 +148,9 @@ const defaultBusinessProfile: BusinessProfile = {
   postal_code: "8001",
   vat_number: "4123456789",
   company_registration: "2023/123456/07",
-  email: "billing@payflow.co.za",
+  email: "billing@SisoNova.co.za",
   phone: "+27 21 123 4567",
-  website: "www.payflow.co.za",
+  website: "www.SisoNova.co.za",
   industry: "consulting"
 }
 
@@ -183,7 +183,7 @@ const defaultCreditTerms: CreditTerms = {
 
 const defaultPaymentConfig: PaymentConfiguration = {
   bank_name: "First National Bank",
-  account_holder: "PayFlow Solutions (Pty) Ltd",
+  account_holder: "SisoNova Solutions (Pty) Ltd",
   account_number: "62123456789",
   branch_code: "250655",
   swift_code: "FIRNZAJJ",

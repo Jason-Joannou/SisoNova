@@ -306,7 +306,7 @@ export function RegisterForm() {
               </div>
               <CardTitle className="text-2xl text-slate-900">Create Your Account</CardTitle>
               <CardDescription className="text-slate-600">
-                Set up your login credentials to access your PayFlow dashboard
+                Set up your login credentials to access your SisoNova dashboard
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -96,7 +96,7 @@ export function SidebarLeft() {
             <span className="text-sm font-bold text-white">P</span>
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">PayFlow</h2>
+            <h2 className="text-lg font-bold text-slate-900">SisoNova</h2>
             <p className="text-xs text-slate-500">Receivables Platform</p>
           </div>
         </div>

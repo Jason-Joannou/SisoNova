@@ -71,8 +71,8 @@ import {
 
 // Mock user data
 const userData = {
-  company_name: "PayFlow Solutions (Pty) Ltd",
-  trading_name: "PayFlow",
+  company_name: "SisoNova Solutions (Pty) Ltd",
+  trading_name: "SisoNova",
   address_line_1: "123 Business Park Drive",
   address_line_2: "Suite 456",
   city: "Cape Town",
@@ -108,7 +108,7 @@ interface ComplianceService {
   status: 'completed' | 'in_progress' | 'ready_to_submit' | 'collecting_docs' | 'not_started'
   estimatedTime: string
   cost: string
-  payflowFee: string
+  SisoNovaFee: string
   authority: string
   icon: any
   color: string
@@ -140,7 +140,7 @@ const complianceServices: ComplianceService[] = [
     status: "completed",
     estimatedTime: "1-3 business days",
     cost: "R175 - R500",
-    payflowFee: "R299 (includes all CIPC fees)",
+    SisoNovaFee: "R299 (includes all CIPC fees)",
     authority: "CIPC",
     icon: Building2,
     color: "emerald",
@@ -207,7 +207,7 @@ const complianceServices: ComplianceService[] = [
     status: "completed",
     estimatedTime: "Same day",
     cost: "Free",
-    payflowFee: "R199 (setup and guidance)",
+    SisoNovaFee: "R199 (setup and guidance)",
     authority: "SARS",
     icon: Receipt,
     color: "blue",
@@ -272,7 +272,7 @@ const complianceServices: ComplianceService[] = [
     status: "completed",
     estimatedTime: "1-2 business days",
     cost: "Free",
-    payflowFee: "R299 (includes compliance setup)",
+    SisoNovaFee: "R299 (includes compliance setup)",
     authority: "SARS",
     icon: FileBarChart,
     color: "purple",
@@ -326,7 +326,7 @@ const complianceServices: ComplianceService[] = [
     status: "collecting_docs",
     estimatedTime: "1 business day",
     cost: "Free",
-    payflowFee: "R199 (registration and setup)",
+    SisoNovaFee: "R199 (registration and setup)",
     authority: "Department of Labour",
     icon: UserCheck,
     color: "orange",
@@ -390,7 +390,7 @@ const complianceServices: ComplianceService[] = [
     status: "not_started",
     estimatedTime: "2-3 business days",
     cost: "Based on payroll",
-    payflowFee: "R299 (registration and assessment)",
+    SisoNovaFee: "R299 (registration and assessment)",
     authority: "Compensation Commissioner",
     icon: Shield,
     color: "red",
@@ -454,7 +454,7 @@ const complianceServices: ComplianceService[] = [
     status: "in_progress",
     estimatedTime: "2-4 weeks",
     cost: "R5,000 - R50,000",
-    payflowFee: "R2,999 (complete compliance package)",
+    SisoNovaFee: "R2,999 (complete compliance package)",
     authority: "Information Regulator",
     icon: Lock,
     color: "slate",
@@ -931,7 +931,7 @@ export function GrowBusinessPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-slate-900">
                       <ClipboardList className="h-5 w-5 text-emerald-600" />
-                      PayFlow Compliance Services
+                      SisoNova Compliance Services
                     </CardTitle>
                     <CardDescription>
                       We handle all your business compliance needs - from document preparation to official submissions
@@ -1000,8 +1000,8 @@ export function GrowBusinessPage() {
                                     <div>{service.estimatedTime}</div>
                                   </div>
                                   <div>
-                                    <span className="font-medium">PayFlow Fee:</span>
-                                    <div className="text-emerald-600 font-medium">{service.payflowFee}</div>
+                                    <span className="font-medium">SisoNova Fee:</span>
+                                    <div className="text-emerald-600 font-medium">{service.SisoNovaFee}</div>
                                   </div>
                                   <div>
                                     <span className="font-medium">Documents:</span>
@@ -1138,8 +1138,8 @@ export function GrowBusinessPage() {
                                     <span className="font-medium">{service.cost}</span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-slate-600">PayFlow Service Fee:</span>
-                                    <span className="font-medium text-emerald-600">{service.payflowFee}</span>
+                                    <span className="text-slate-600">SisoNova Service Fee:</span>
+                                    <span className="font-medium text-emerald-600">{service.SisoNovaFee}</span>
                                   </div>
                                   <div className="flex justify-between">
                                     <span className="text-slate-600">Auto-Submit:</span>
@@ -1376,8 +1376,8 @@ export function GrowBusinessPage() {
                                     <div className="font-medium">{service.cost}</div>
                                   </div>
                                   <div>
-                                    <span className="text-slate-600">PayFlow Service Fee:</span>
-                                    <div className="font-medium text-emerald-600">{service.payflowFee}</div>
+                                    <span className="text-slate-600">SisoNova Service Fee:</span>
+                                    <div className="font-medium text-emerald-600">{service.SisoNovaFee}</div>
                                   </div>
                                 </div>
                               </div>
@@ -1404,8 +1404,8 @@ export function GrowBusinessPage() {
                                   <div className="text-sm">
                                     <p className="font-medium text-slate-900 mb-1">Terms and Conditions</p>
                                     <p className="text-slate-600">
-                                      I authorize PayFlow to act on my behalf for this compliance service. I understand that 
-                                      government fees are non-refundable and processing times may vary. PayFlow will keep me 
+                                      I authorize SisoNova to act on my behalf for this compliance service. I understand that 
+                                      government fees are non-refundable and processing times may vary. SisoNova will keep me 
                                       updated throughout the process.
                                     </p>
                                   </div>
@@ -1444,8 +1444,8 @@ export function GrowBusinessPage() {
                                 <h4 className="font-medium text-slate-900 mb-4">Payment Summary</h4>
                                 <div className="space-y-3">
                                   <div className="flex justify-between">
-                                    <span>PayFlow Service Fee</span>
-                                    <span className="font-medium">{service.payflowFee}</span>
+                                    <span>SisoNova Service Fee</span>
+                                    <span className="font-medium">{service.SisoNovaFee}</span>
                                   </div>
                                   <div className="flex justify-between text-sm text-slate-600">
                                     <span>Government Fees</span>
@@ -1454,10 +1454,10 @@ export function GrowBusinessPage() {
                                   <Separator />
                                   <div className="flex justify-between font-semibold">
                                     <span>Total</span>
-                                    <span className="text-emerald-600">{service.payflowFee}</span>
+                                    <span className="text-emerald-600">{service.SisoNovaFee}</span>
                                   </div>
                                   <p className="text-xs text-slate-500">
-                                    Government fees will be paid directly by PayFlow on your behalf
+                                    Government fees will be paid directly by SisoNova on your behalf
                                   </p>
                                 </div>
                               </div>
@@ -1469,8 +1469,8 @@ export function GrowBusinessPage() {
                                   <div className="flex items-center gap-3">
                                     <input type="radio" name="payment" defaultChecked />
                                     <div>
-                                      <div className="font-medium">PayFlow Wallet</div>
-                                      <div className="text-sm text-slate-600">Pay from your PayFlow account balance</div>
+                                      <div className="font-medium">SisoNova Wallet</div>
+                                      <div className="text-sm text-slate-600">Pay from your SisoNova account balance</div>
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-3">
@@ -2055,7 +2055,7 @@ export function GrowBusinessPage() {
                   Your Business Health Score
                 </CardTitle>
                 <CardDescription>
-                  Based on your PayFlow activity and industry benchmarks
+                  Based on your SisoNova activity and industry benchmarks
                 </CardDescription>
               </CardHeader>
               <CardContent>

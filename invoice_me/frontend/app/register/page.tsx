@@ -13,7 +13,7 @@ export default function page() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <Link href="/">
-                <span className="text-2xl font-bold text-slate-900 cursor-pointer">PayFlow</span>
+                <span className="text-2xl font-bold text-slate-900 cursor-pointer">SisoNova</span>
               </Link>
             </div>
             <div className="flex items-center space-x-4">
@@ -33,7 +33,7 @@ export default function page() {
           <div className="w-full max-w-2xl">
             {/* Header */}
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">Join PayFlow</h1>
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">Join SisoNova</h1>
               <p className="text-slate-600">Get your business paid faster in just 2 steps</p>
             </div>
             
@@ -48,7 +48,7 @@ export default function page() {
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-white font-bold text-lg mb-4">PayFlow</h3>
+              <h3 className="text-white font-bold text-lg mb-4">SisoNova</h3>
               <p className="text-sm">The ooba of receivables. Get paid now, grow faster.</p>
             </div>
             <div>
@@ -80,7 +80,7 @@ export default function page() {
             </div>
           </div>
           <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm">
-            <p>&copy; 2024 PayFlow. All rights reserved. Licensed credit provider.</p>
+            <p>&copy; 2024 SisoNova. All rights reserved. Licensed credit provider.</p>
           </div>
         </div>
       </footer>

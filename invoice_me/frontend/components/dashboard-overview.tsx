@@ -73,7 +73,7 @@ export function DashboardOverview() {
       <div className="space-y-6 p-6">
         {/* Welcome Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome back to PayFlow</h1>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome back to SisoNova</h1>
           <p className="text-slate-600">Manage your receivables and track your cashflow</p>
         </div>
 
