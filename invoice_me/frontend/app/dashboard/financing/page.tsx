@@ -1,6 +1,6 @@
 // app/dashboard/financing/page.tsx
-import { SidebarLeft } from "@/components/sidebar-left"
-import { FinancingPage } from "@/components/financing-page"
+import { SidebarLeft } from "@/components/dashboard/sidebar-left"
+import { FinancingPage } from "@/components/dashboard/financing-page"
 import {
   Breadcrumb,
   BreadcrumbItem,

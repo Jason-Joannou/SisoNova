@@ -1,6 +1,6 @@
 // app/dashboard/grow/page.tsx
-import { SidebarLeft } from "@/components/sidebar-left"
-import { GrowBusinessPage } from "@/components/grow-business-page"
+import { SidebarLeft } from "@/components/dashboard/sidebar-left"
+import { GrowBusinessPage } from "@/components/dashboard/grow-business-page"
 import {
   Breadcrumb,
   BreadcrumbItem,

@@ -1,6 +1,6 @@
 // app/dashboard/collections/page.tsx
-import { SidebarLeft } from "@/components/sidebar-left"
-import { CollectionsPage } from "@/components/collections-page"
+import { SidebarLeft } from "@/components/dashboard/sidebar-left"
+import { CollectionsPage } from "@/components/dashboard/collections-page"
 import {
   Breadcrumb,
   BreadcrumbItem,

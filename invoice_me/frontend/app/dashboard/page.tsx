@@ -1,5 +1,5 @@
-import { SidebarLeft } from "@/components/sidebar-left"
-import { DashboardOverview } from "@/components/dashboard-overview"
+import { SidebarLeft } from "@/components/dashboard/sidebar-left"
+import { DashboardOverview } from "@/components/dashboard/dashboard-overview"
 import {
   Breadcrumb,
   BreadcrumbItem,

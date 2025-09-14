@@ -1,5 +1,5 @@
-import { SidebarLeft } from "@/components/sidebar-left"
-import { InvoicingPage } from "@/components/invoicing-page"
+import { SidebarLeft } from "@/components/dashboard/sidebar-left"
+import { InvoicingPage } from "@/components/dashboard/invoicing-page"
 import {
   Breadcrumb,
   BreadcrumbItem,
