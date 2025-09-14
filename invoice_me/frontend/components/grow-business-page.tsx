@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
+import { ComplianceService, FormTemplate, FinancialLiteracyModule, DigitalLiteracyModule } from "@/lib/types/documentation-and-compliance"
 import { 
   TrendingUp, 
   FileText,
@@ -84,50 +85,6 @@ const userData = {
   email: "jjoannou@bscglobal.com",
   phone_number: "+27 21 123 4567",
   contact_person: "Jason Joannou"
-}
-
-// Document types for different compliance requirements
-interface DocumentRequirement {
-  id: string
-  name: string
-  description: string
-  required: boolean
-  status: 'missing' | 'uploaded' | 'verified' | 'rejected'
-  fileType: string[]
-  maxSize: string
-  example?: string
-  helpText?: string
-}
-
-interface ComplianceService {
-  id: string
-  title: string
-  description: string
-  category: string
-  priority: 'critical' | 'high' | 'medium' | 'low'
-  status: 'completed' | 'in_progress' | 'ready_to_submit' | 'collecting_docs' | 'not_started'
-  estimatedTime: string
-  cost: string
-  SisoNovaFee: string
-  authority: string
-  icon: any
-  color: string
-  canAutoSubmit: boolean
-  documents: DocumentRequirement[]
-  formFields: ComplianceFormField[]
-  benefits: string[]
-  nextSteps: string[]
-}
-
-interface ComplianceFormField {
-  id: string
-  label: string
-  type: 'text' | 'email' | 'tel' | 'select' | 'textarea' | 'number' | 'date' | 'checkbox'
-  required: boolean
-  options?: string[]
-  value?: string
-  helpText?: string
-  validation?: string
 }
 
 const complianceServices: ComplianceService[] = [
@@ -512,28 +469,6 @@ const complianceServices: ComplianceService[] = [
 ]
 
 // Form Templates for Different Financial Services (keeping existing)
-interface FormTemplate {
-  id: string
-  title: string
-  description: string
-  category: string
-  icon: any
-  color: string
-  lastUpdated: string
-  completionStatus: 'complete' | 'incomplete' | 'needs_update'
-  applicableLenders: string[]
-  fields: TemplateFormField[]
-}
-
-interface TemplateFormField {
-  name: string
-  label: string
-  type: 'text' | 'email' | 'tel' | 'select' | 'textarea' | 'number' | 'radio' | 'date'
-  required: boolean
-  options?: string[]
-  value?: string
-  category: 'business_info' | 'financial_info' | 'specific_requirements'
-}
 
 const formTemplates: FormTemplate[] = [
   {
@@ -670,7 +605,7 @@ const formTemplates: FormTemplate[] = [
 ]
 
 // Financial Literacy Content (keeping existing)
-const financialLiteracyModules = [
+const financialLiteracyModules: FinancialLiteracyModule[] = [
   {
     id: "cash_flow_basics",
     title: "Cash Flow Management Fundamentals",
@@ -728,7 +663,7 @@ const financialLiteracyModules = [
 ]
 
 // Digital Literacy Content (keeping existing)
-const digitalLiteracyModules = [
+const digitalLiteracyModules: DigitalLiteracyModule[] = [
   {
     id: "digital_presence",
     title: "Building Your Digital Presence",
