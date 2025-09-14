@@ -1,3 +1,4 @@
+import { FinancingKPIs, InvoicingKPIs, CollectionKPIs } from "./kpis";
 export interface Invoice {
   id: string;
   invoiceNumber: string;
@@ -36,4 +37,10 @@ export interface DashboardStats {
   totalCollected: number;
   pendingAmount: number;
   monthlyGrowth: number;
+}
+
+export interface DashboardKPIs {
+  financing: FinancingKPIs;
+  collections: CollectionKPIs;
+  invoicing: InvoicingKPIs;
 }

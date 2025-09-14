@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 import { CalendarDays, CreditCard, FileText, TrendingUp, Plus, Eye, Zap, Smartphone, ArrowUpRight } from "lucide-react"
-import { DashboardStats, Invoice } from "@/lib/types/dashboard"
+import { DashboardStats, Invoice, DashboardKPIs } from "@/lib/types/dashboard"
 
 // Dummy data
 const dashboardStats: DashboardStats = {
@@ -49,7 +49,7 @@ const recentInvoices: Invoice[] = [
 ]
 
 // Quick stats for each service
-const serviceStats = {
+const serviceStats: DashboardKPIs = {
   financing: {
     active: 12,
     totalAdvanced: 145000,
