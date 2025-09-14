@@ -1,4 +1,4 @@
-interface FinancingRequest {
+export interface FinancingRequest {
   id: string
   invoice_number: string
   buyer_name: string
@@ -26,7 +26,7 @@ interface FinancingRequest {
   expected_collection_date?: string
 }
 
-interface FinancingStats {
+export interface FinancingStats {
   total_financed: number
   total_advanced: number
   active_requests: number
