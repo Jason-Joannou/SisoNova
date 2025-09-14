@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 import { CalendarDays, CreditCard, FileText, TrendingUp, Plus, Eye, Zap, Smartphone, ArrowUpRight } from "lucide-react"
-import { DashboardStats, Invoice, DashboardKPIs } from "@/lib/types/dashboard"
+import { DashboardStats, DashboardKPIs } from "@/lib/types/dashboard"
+import { Invoice } from "@/lib/types/invoicing"
 
 // Dummy data
 const dashboardStats: DashboardStats = {

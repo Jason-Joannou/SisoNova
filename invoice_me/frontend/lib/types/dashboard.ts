@@ -1,17 +1,4 @@
 import { FinancingKPIs, InvoicingKPIs, CollectionKPIs } from "./kpis";
-export interface Invoice {
-  id: string;
-  invoiceNumber: string;
-  buyerName: string;
-  amount: number;
-  dueDate: string;
-  status: 'pending' | 'paid' | 'overdue' | 'financed';
-  service: 'financing' | 'collections' | 'invoicing';
-  createdAt: string;
-  proofOfWork?: string;
-  dedicatedAccount?: string;
-  reserveAmount?: number;
-}
 
 export interface FinancingOffer {
   id: string;

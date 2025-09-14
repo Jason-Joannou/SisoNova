@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Eye, CalendarDays, Clock, AlertTriangle, CheckCircle2 } from "lucide-react"
-import { Invoice } from "@/lib/types/dashboard"
+import { Invoice } from "@/lib/types/invoicing"
 
 // More realistic calendar data with various dates
 const calendarInvoices: Invoice[] = [
