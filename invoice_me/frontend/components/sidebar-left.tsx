@@ -23,8 +23,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { NavigationItem, UserData } from "@/lib/types/user-interface"
 
-const navigationItems = [
+const navigationItems: NavigationItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
@@ -63,7 +64,7 @@ const navigationItems = [
   },
 ]
 
-const settingsItems = [
+const settingsItems: NavigationItem[] = [
   {
     title: "Settings",
     url: "/dashboard/settings",
@@ -73,7 +74,7 @@ const settingsItems = [
 ]
 
 // Mock user data - replace with actual user data from your auth system
-const userData = {
+const userData: UserData = {
   name: "Jason Joannou",
   email: "jjoannou@bscglobal.com",
   avatar: "", // Add avatar URL if available
