@@ -1,4 +1,4 @@
-// Can expand upon KPIs
+// Can expand upon KPIs in the future
 
 export interface FinancingKPIs {
     active: number;
