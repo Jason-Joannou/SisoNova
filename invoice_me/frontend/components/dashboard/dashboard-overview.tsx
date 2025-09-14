@@ -3,8 +3,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
+import { StatsGrid } from "../ui/stats-cards"
 import { CalendarDays, CreditCard, FileText, TrendingUp, Plus, Eye, Zap, Smartphone, ArrowUpRight } from "lucide-react"
 import { DashboardStats, DashboardKPIs } from "@/lib/types/dashboard"
+import { StatsCardData } from "@/lib/types/user-interface"
 import { Invoice } from "@/lib/types/invoicing"
 
 // Dummy data
@@ -68,6 +70,43 @@ const serviceStats: DashboardKPIs = {
   }
 }
 
+const dashboardStatsData: StatsCardData[] = [
+  {
+    title: "Total Invoices",
+    value: dashboardStats.totalInvoices,
+    subtitle: `+${dashboardStats.monthlyGrowth}% from last month`,
+    icon: FileText,
+    iconColor: "text-slate-500",
+    subtitleColor: "text-emerald-600 font-medium"
+  },
+  {
+    title: "Financed",
+    value: dashboardStats.totalFinanced,
+    subtitle: "Active financing agreements",
+    icon: CreditCard,
+    iconColor: "text-emerald-600",
+    subtitleColor: "text-slate-500"
+  },
+  {
+    title: "Collected",
+    value: dashboardStats.totalCollected.toLocaleString(),
+    subtitle: "Total collected this month",
+    icon: TrendingUp,
+    iconColor: "text-emerald-600",
+    subtitleColor: "text-emerald-600 font-medium",
+    valuePrefix: "R"
+  },
+  {
+    title: "Pending",
+    value: dashboardStats.pendingAmount.toLocaleString(),
+    subtitle: "Awaiting payment",
+    icon: CalendarDays,
+    iconColor: "text-slate-500",
+    subtitleColor: "text-slate-500",
+    valuePrefix: "R"
+  }
+];
+
 export function DashboardOverview() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -79,59 +118,11 @@ export function DashboardOverview() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Total Invoices</CardTitle>
-              <FileText className="h-4 w-4 text-slate-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{dashboardStats.totalInvoices}</div>
-              <p className="text-xs text-emerald-600 font-medium">
-                +{dashboardStats.monthlyGrowth}% from last month
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Financed</CardTitle>
-              <CreditCard className="h-4 w-4 text-emerald-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{dashboardStats.totalFinanced}</div>
-              <p className="text-xs text-slate-500">
-                Active financing agreements
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Collected</CardTitle>
-              <TrendingUp className="h-4 w-4 text-emerald-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">R{dashboardStats.totalCollected.toLocaleString()}</div>
-              <p className="text-xs text-emerald-600 font-medium">
-                Total collected this month
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Pending</CardTitle>
-              <CalendarDays className="h-4 w-4 text-slate-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">R{dashboardStats.pendingAmount.toLocaleString()}</div>
-              <p className="text-xs text-slate-500">
-                Awaiting payment
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        <StatsGrid 
+          cards={dashboardStatsData} 
+          columns={{ md: 2, lg: 4 }}
+          className="mb-8"
+        />
 
         {/* Service Cards */}
         <div className="grid gap-6 md:grid-cols-3">

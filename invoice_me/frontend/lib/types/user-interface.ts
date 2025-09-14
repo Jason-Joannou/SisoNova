@@ -11,3 +11,14 @@ export interface UserData {
   avatar: string;
   initials: string;
 }
+
+export interface StatsCardData {
+  title: string;
+  value: string | number;
+  subtitle: string;
+  icon: any;
+  iconColor?: string;
+  subtitleColor?: string;
+  valuePrefix?: string;
+  valueSuffix?: string;
+}

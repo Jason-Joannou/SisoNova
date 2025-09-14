@@ -13,6 +13,8 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
+import { StatsCardData } from "@/lib/types/user-interface"
+import { StatsGrid } from "../ui/stats-cards"
 import { FinancingRequest, FinancingStats } from "@/lib/types/financing"
 import { 
   Plus, 
@@ -156,6 +158,70 @@ const financingRequests: FinancingRequest[] = [
   }
 ]
 
+const financingStatsData: StatsCardData[] = [
+  {
+    title: "Total Financed",
+    value: financingStats.total_financed,
+    subtitle: "Invoices",
+    icon: FileText,
+    iconColor: "text-slate-500",
+    subtitleColor: "text-slate-500"
+  },
+  {
+    title: "Advanced",
+    value: `${(financingStats.total_advanced / 1000000).toFixed(1)}M`,
+    subtitle: "Total funded",
+    icon: DollarSign,
+    iconColor: "text-emerald-600",
+    subtitleColor: "text-emerald-600 font-medium",
+    valuePrefix: "R"
+  },
+  {
+    title: "Active",
+    value: financingStats.active_requests,
+    subtitle: "Requests",
+    icon: Clock,
+    iconColor: "text-blue-600",
+    subtitleColor: "text-slate-500"
+  },
+  {
+    title: "Avg Rate",
+    value: financingStats.average_advance_rate,
+    subtitle: "Advance",
+    icon: Percent,
+    iconColor: "text-emerald-600",
+    subtitleColor: "text-slate-500",
+    valueSuffix: "%"
+  },
+  {
+    title: "Avg Time",
+    value: financingStats.average_processing_time,
+    subtitle: "Processing",
+    icon: Timer,
+    iconColor: "text-blue-600",
+    subtitleColor: "text-slate-500",
+    valueSuffix: "h"
+  },
+  {
+    title: "Success Rate",
+    value: financingStats.success_rate,
+    subtitle: "Approval",
+    icon: Target,
+    iconColor: "text-emerald-600",
+    subtitleColor: "text-emerald-600 font-medium",
+    valueSuffix: "%"
+  },
+  {
+    title: "Fees Paid",
+    value: `${(financingStats.total_fees_paid / 1000).toFixed(0)}K`,
+    subtitle: "Total",
+    icon: CreditCard,
+    iconColor: "text-slate-500",
+    subtitleColor: "text-slate-500",
+    valuePrefix: "R"
+  }
+];
+
 export function FinancingPage() {
   const [activeTab, setActiveTab] = useState("overview")
   const [selectedRequest, setSelectedRequest] = useState<FinancingRequest | null>(null)
@@ -274,84 +340,11 @@ export function FinancingPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mb-8">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Total Financed</CardTitle>
-              <FileText className="h-4 w-4 text-slate-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{financingStats.total_financed}</div>
-              <p className="text-xs text-slate-500">Invoices</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Advanced</CardTitle>
-              <DollarSign className="h-4 w-4 text-emerald-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">R{(financingStats.total_advanced / 1000000).toFixed(1)}M</div>
-              <p className="text-xs text-emerald-600 font-medium">Total funded</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Active</CardTitle>
-              <Clock className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{financingStats.active_requests}</div>
-              <p className="text-xs text-slate-500">Requests</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Avg Rate</CardTitle>
-              <Percent className="h-4 w-4 text-emerald-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{financingStats.average_advance_rate}%</div>
-              <p className="text-xs text-slate-500">Advance</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Avg Time</CardTitle>
-              <Timer className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{financingStats.average_processing_time}h</div>
-              <p className="text-xs text-slate-500">Processing</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Success Rate</CardTitle>
-              <Target className="h-4 w-4 text-emerald-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{financingStats.success_rate}%</div>
-              <p className="text-xs text-emerald-600 font-medium">Approval</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Fees Paid</CardTitle>
-              <CreditCard className="h-4 w-4 text-slate-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">R{(financingStats.total_fees_paid / 1000).toFixed(0)}K</div>
-              <p className="text-xs text-slate-500">Total</p>
-            </CardContent>
-          </Card>
-        </div>
+        <StatsGrid 
+          cards={financingStatsData} 
+          columns={{ md: 2, lg: 7 }}
+          className="mb-8"
+        />
 
         {/* New Request Modal/Form */}
         {showNewRequestForm && (

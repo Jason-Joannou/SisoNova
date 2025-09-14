@@ -12,6 +12,8 @@ import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { StatsCardData } from "@/lib/types/user-interface"
+import { StatsGrid } from "../ui/stats-cards"
 import { ReminderSettings, CollectionItem, CollectionStats } from "@/lib/types/collections"
 import { 
   Plus, 
@@ -119,6 +121,61 @@ const defaultReminderSettings: ReminderSettings = {
   custom_message: "Hi {buyer_name}, this is a friendly reminder that invoice {invoice_number} for R{amount} is due on {due_date}. Please use reference {payment_reference} when making payment. Thank you!"
 }
 
+const collectionsStatsData: StatsCardData[] = [
+  {
+    title: "Outstanding",
+    value: collectionStats.total_outstanding.toLocaleString(),
+    subtitle: "Total pending",
+    icon: DollarSign,
+    iconColor: "text-slate-500",
+    subtitleColor: "text-slate-500",
+    valuePrefix: "R"
+  },
+  {
+    title: "Collected",
+    value: collectionStats.total_collected_this_month.toLocaleString(),
+    subtitle: "This month",
+    icon: TrendingUp,
+    iconColor: "text-emerald-600",
+    subtitleColor: "text-emerald-600 font-medium",
+    valuePrefix: "R"
+  },
+  {
+    title: "Avg Days",
+    value: collectionStats.average_collection_days,
+    subtitle: "To collect",
+    icon: Calendar,
+    iconColor: "text-blue-600",
+    subtitleColor: "text-slate-500"
+  },
+  {
+    title: "Success Rate",
+    value: collectionStats.collection_success_rate,
+    subtitle: "Collection rate",
+    icon: Target,
+    iconColor: "text-emerald-600",
+    subtitleColor: "text-emerald-600 font-medium",
+    valueSuffix: "%"
+  },
+  {
+    title: "Overdue",
+    value: collectionStats.overdue_amount.toLocaleString(),
+    subtitle: "Needs attention",
+    icon: AlertTriangle,
+    iconColor: "text-red-500",
+    subtitleColor: "text-red-600 font-medium",
+    valuePrefix: "R"
+  },
+  {
+    title: "Active",
+    value: collectionStats.active_collections,
+    subtitle: "Collections",
+    icon: BarChart3,
+    iconColor: "text-blue-600",
+    subtitleColor: "text-slate-500"
+  }
+];
+
 export function CollectionsPage() {
   const [activeTab, setActiveTab] = useState("overview")
   const [selectedItems, setSelectedItems] = useState<string[]>([])
@@ -195,73 +252,11 @@ export function CollectionsPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6 mb-8">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Outstanding</CardTitle>
-              <DollarSign className="h-4 w-4 text-slate-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">R{collectionStats.total_outstanding.toLocaleString()}</div>
-              <p className="text-xs text-slate-500">Total pending</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Collected</CardTitle>
-              <TrendingUp className="h-4 w-4 text-emerald-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">R{collectionStats.total_collected_this_month.toLocaleString()}</div>
-              <p className="text-xs text-emerald-600 font-medium">This month</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Avg Days</CardTitle>
-              <Calendar className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{collectionStats.average_collection_days}</div>
-              <p className="text-xs text-slate-500">To collect</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Success Rate</CardTitle>
-              <Target className="h-4 w-4 text-emerald-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{collectionStats.collection_success_rate}%</div>
-              <p className="text-xs text-emerald-600 font-medium">Collection rate</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Overdue</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">R{collectionStats.overdue_amount.toLocaleString()}</div>
-              <p className="text-xs text-red-600 font-medium">Needs attention</p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-700">Active</CardTitle>
-              <BarChart3 className="h-4 w-4 text-blue-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{collectionStats.active_collections}</div>
-              <p className="text-xs text-slate-500">Collections</p>
-            </CardContent>
-          </Card>
-        </div>
+        <StatsGrid 
+          cards={collectionsStatsData} 
+          columns={{ md: 2, lg: 6 }}
+          className="mb-8"
+        />
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
