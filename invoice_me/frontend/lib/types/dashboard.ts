@@ -31,3 +31,10 @@ export interface DashboardKPIs {
   collections: CollectionKPIs;
   invoicing: InvoicingKPIs;
 }
+
+export interface ServiceQuickStats {
+  serviceTilte: string;
+  serviceValue: number;
+  serviceValueAffix?: string;
+  affixPosition?: string; 
+}

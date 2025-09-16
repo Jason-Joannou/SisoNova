@@ -1,3 +1,14 @@
+import { ServiceQuickStats } from "./dashboard";
+
+export interface buttonWithIconInformation {
+  buttonText: string;
+  buttonIcon: any;
+  buttonVariant: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
+  buttonSize: "icon" | "default" | "sm" | "lg" | null | undefined;
+  buttonColor?: string;
+  buttonTextColor?: string;
+  buttonHoverColor?: string;
+}
 export interface NavigationItem {
   title: string;
   url: string;
@@ -21,4 +32,16 @@ export interface StatsCardData {
   subtitleColor?: string;
   valuePrefix?: string;
   valueSuffix?: string;
+}
+
+export interface ServiceCardData {
+  title: string;
+  description: string;
+  serviceClassColor: string;
+  quickStatsColor: string;
+  icon: any;
+  inconColor?: string;
+  subtitleColor?: string;
+  buttonInformation: buttonWithIconInformation[];
+  serviceStats: ServiceQuickStats[];
 }
