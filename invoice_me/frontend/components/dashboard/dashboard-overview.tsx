@@ -120,7 +120,7 @@ export function DashboardOverview() {
         {/* Stats Cards */}
         <StatsGrid 
           cards={dashboardStatsData} 
-          columns={{ md: 2, lg: 4 }}
+          columns={{ md: 4, lg: 4 }}
           className="mb-8"
         />
 

@@ -254,7 +254,7 @@ export function CollectionsPage() {
         {/* Stats Cards */}
         <StatsGrid 
           cards={collectionsStatsData} 
-          columns={{ md: 2, lg: 6 }}
+          columns={{ md: 6, lg: 6 }}
           className="mb-8"
         />
 

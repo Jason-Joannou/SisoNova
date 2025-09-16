@@ -53,7 +53,42 @@ export function StatsGrid({
   columns = { md: 2, lg: 4 },
   className = ""
 }: StatsGridProps) {
-  const gridClasses = `grid gap-4 md:grid-cols-${columns.md} lg:grid-cols-${columns.lg}`;
+  // Create a mapping for grid classes to ensure they're not purged
+  const getGridClasses = (md: number, lg: number) => {
+    const mdClasses = {
+      1: 'md:grid-cols-1',
+      2: 'md:grid-cols-2',
+      3: 'md:grid-cols-3',
+      4: 'md:grid-cols-4',
+      5: 'md:grid-cols-5',
+      6: 'md:grid-cols-6',
+      7: 'md:grid-cols-7',
+      8: 'md:grid-cols-8',
+      9: 'md:grid-cols-9',
+      10: 'md:grid-cols-10',
+      11: 'md:grid-cols-11',
+      12: 'md:grid-cols-12'
+    };
+    
+    const lgClasses = {
+      1: 'lg:grid-cols-1',
+      2: 'lg:grid-cols-2',
+      3: 'lg:grid-cols-3',
+      4: 'lg:grid-cols-4',
+      5: 'lg:grid-cols-5',
+      6: 'lg:grid-cols-6',
+      7: 'lg:grid-cols-7',
+      8: 'lg:grid-cols-8',
+      9: 'lg:grid-cols-9',
+      10: 'lg:grid-cols-10',
+      11: 'lg:grid-cols-11',
+      12: 'lg:grid-cols-12'
+    };
+
+    return `grid gap-4 ${mdClasses[md as keyof typeof mdClasses] || 'md:grid-cols-2'} ${lgClasses[lg as keyof typeof lgClasses] || 'lg:grid-cols-4'}`;
+  };
+
+  const gridClasses = getGridClasses(columns.md || 2, columns.lg || 4);
 
   return (
     <div className={`${gridClasses} ${className}`}>

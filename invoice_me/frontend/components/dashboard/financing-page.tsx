@@ -342,7 +342,7 @@ export function FinancingPage() {
         {/* Stats Cards */}
         <StatsGrid 
           cards={financingStatsData} 
-          columns={{ md: 2, lg: 7 }}
+          columns={{ md: 7, lg: 7 }}
           className="mb-8"
         />
 
