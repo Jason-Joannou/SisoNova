@@ -1,25 +1,43 @@
 // components/dashboard/invoicing-page.tsx
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BusinessProfile, ClientDetails, InvoiceItem, CreditTerms, PaymentConfiguration, InvoiceConfiguration } from "@/lib/types/invoicing"
-import { 
-  Plus, 
-  Trash2, 
-  Eye, 
-  Download, 
-  Send, 
-  FileText, 
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  BusinessProfile,
+  ClientDetails,
+  InvoiceItem,
+  CreditTerms,
+  PaymentConfiguration,
+  InvoiceConfiguration,
+} from "@/lib/types/invoicing";
+import {
+  Plus,
+  Trash2,
+  Eye,
+  Download,
+  Send,
+  FileText,
   Calculator,
   Building,
   User,
@@ -32,10 +50,21 @@ import {
   DollarSign,
   Calendar,
   Phone,
-  Mail
-} from "lucide-react"
+  Mail,
+  Edit,
+  Save,
+  X,
+  MoreHorizontal,
+  PlusCircle,
+  FileX,
+  Banknote,
+  Receipt,
+  MessageSquare,
+  Shield,
+  Zap,
+} from "lucide-react";
 
-// Enhanced dummy data
+// Enhanced dummy data (same as before)
 const defaultBusinessProfile: BusinessProfile = {
   company_name: "SisoNova Solutions (Pty) Ltd",
   trading_name: "SisoNova",
@@ -49,8 +78,8 @@ const defaultBusinessProfile: BusinessProfile = {
   email: "billing@SisoNova.co.za",
   phone: "+27 21 123 4567",
   website: "www.SisoNova.co.za",
-  industry: "consulting"
-}
+  industry: "consulting",
+};
 
 const defaultClientDetails: ClientDetails = {
   company_name: "Ridgeway Butchery",
@@ -61,23 +90,23 @@ const defaultClientDetails: ClientDetails = {
   city: "Johannesburg",
   province: "Gauteng",
   postal_code: "2000",
-  vat_number: "4987654321"
-}
+  vat_number: "4987654321",
+};
 
 const defaultCreditTerms: CreditTerms = {
-  payment_terms_type: 'net_30',
+  payment_terms_type: "net_30",
   payment_due_days: 30,
-  late_fee_enabled: true,
-  late_fee_type: 'percentage',
+  late_fee_enabled: false,
+  late_fee_type: "percentage",
   late_fee_amount: 2.0,
-  late_fee_frequency: 'monthly',
+  late_fee_frequency: "monthly",
   early_discount_enabled: false,
   early_discount_days: 10,
   early_discount_percentage: 2.0,
   credit_limit_enabled: false,
   dispute_period_days: 7,
-  retention_enabled: false
-}
+  retention_enabled: false,
+};
 
 const defaultPaymentConfig: PaymentConfiguration = {
   bank_name: "First National Bank",
@@ -94,23 +123,24 @@ const defaultPaymentConfig: PaymentConfiguration = {
   enable_card_payments: false,
   reference_prefix: "INV",
   include_company_code: true,
-  include_date: false
-}
+  include_date: false,
+};
 
 export function InvoicingPage() {
-    const generateInvoiceNumber = () => {
-  const today = new Date()
-  const year = today.getFullYear().toString().slice(-2) // Last 2 digits of year
-  const month = (today.getMonth() + 1).toString().padStart(2, '0')
-  const day = today.getDate().toString().padStart(2, '0')
-  
-  // This will be the same for the entire day on both server and client
-  return `INV-${year}${month}${day}-001`
-}
+  const generateInvoiceNumber = () => {
+    const today = new Date();
+    const year = today.getFullYear().toString().slice(-2);
+    const month = (today.getMonth() + 1).toString().padStart(2, "0");
+    const day = today.getDate().toString().padStart(2, "0");
+    return `INV-${year}${month}${day}-001`;
+  };
+
   const [config, setConfig] = useState<InvoiceConfiguration>({
     invoice_number: generateInvoiceNumber(),
-    invoice_date: new Date().toISOString().split('T')[0],
-    due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    invoice_date: new Date().toISOString().split("T")[0],
+    due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0],
     business_profile: defaultBusinessProfile,
     client_details: defaultClientDetails,
     items: [
@@ -123,8 +153,8 @@ export function InvoicingPage() {
         quantity: 10,
         unit: "hours",
         unit_price: 1500,
-        discount_percentage: 0
-      }
+        discount_percentage: 0,
+      },
     ],
     include_vat: true,
     vat_rate: 0.15,
@@ -133,118 +163,409 @@ export function InvoicingPage() {
     credit_terms: defaultCreditTerms,
     payment_config: defaultPaymentConfig,
     currency: "ZAR",
-    notes: "Thank you for your business!"
-  })
+    notes: "",
+  });
 
-  const [activeTab, setActiveTab] = useState("form")
-  const [isGenerating, setIsGenerating] = useState(false)
+  // Component visibility states
+  const [showComponents, setShowComponents] = useState({
+    paymentTerms: false,
+    paymentMethods: false,
+    notes: false,
+    lateFees: false,
+    earlyDiscount: false,
+    clientAddress: false,
+    businessDetails: false,
+    vatSettings: true, // VAT is common enough to show by default
+  });
 
-  // Calculate totals
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [tempValue, setTempValue] = useState<any>("");
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Calculate totals (same as before)
   const calculateTotals = () => {
     const subtotal = config.items.reduce((sum, item) => {
-      const lineTotal = item.quantity * item.unit_price
-      const discountAmount = lineTotal * (item.discount_percentage / 100)
-      return sum + (lineTotal - discountAmount)
-    }, 0)
+      const lineTotal = item.quantity * item.unit_price;
+      const discountAmount = lineTotal * (item.discount_percentage / 100);
+      return sum + (lineTotal - discountAmount);
+    }, 0);
 
-    const globalDiscountAmount = config.global_discount_enabled 
-      ? subtotal * (config.global_discount_percentage / 100) 
-      : 0
+    const globalDiscountAmount = config.global_discount_enabled
+      ? subtotal * (config.global_discount_percentage / 100)
+      : 0;
 
-    const taxableAmount = subtotal - globalDiscountAmount
-    const vatAmount = config.include_vat ? taxableAmount * config.vat_rate : 0
-    const total = taxableAmount + vatAmount
+    const taxableAmount = subtotal - globalDiscountAmount;
+    const vatAmount = config.include_vat ? taxableAmount * config.vat_rate : 0;
+    const total = taxableAmount + vatAmount;
 
-    return { subtotal, globalDiscountAmount, vatAmount, total }
-  }
+    return { subtotal, globalDiscountAmount, vatAmount, total };
+  };
 
-  const { subtotal, globalDiscountAmount, vatAmount, total } = calculateTotals()
+  const { subtotal, globalDiscountAmount, vatAmount, total } =
+    calculateTotals();
 
-  // Generate payment reference
-  const generatePaymentReference = () => {
-    const companyCode = config.payment_config.include_company_code 
-      ? config.client_details.company_name.slice(0, 3).toUpperCase() 
-      : ""
-    const dateCode = config.payment_config.include_date 
-      ? new Date().toISOString().slice(5, 10).replace('-', '') 
-      : ""
-    return `${config.payment_config.reference_prefix}-${config.invoice_number}-${companyCode}${dateCode}`.replace(/--+/g, '-')
-  }
+  // Toggle component visibility
+  const toggleComponent = (component: keyof typeof showComponents) => {
+    setShowComponents((prev) => ({
+      ...prev,
+      [component]: !prev[component],
+    }));
+  };
+
+  // Inline editing functions (same as before)
+  const startEditing = (field: string, currentValue: any) => {
+    setEditingField(field);
+    setTempValue(currentValue);
+  };
+
+  const saveEdit = (field: string, value: any) => {
+    const fieldParts = field.split(".");
+
+    if (fieldParts.length === 2) {
+      const [section, key] = fieldParts;
+
+      switch (section) {
+        case "business_profile":
+          setConfig((prev) => ({
+            ...prev,
+            business_profile: {
+              ...prev.business_profile,
+              [key]: value,
+            },
+          }));
+          break;
+
+        case "client_details":
+          setConfig((prev) => ({
+            ...prev,
+            client_details: {
+              ...prev.client_details,
+              [key]: value,
+            },
+          }));
+          break;
+
+        case "credit_terms":
+          setConfig((prev) => ({
+            ...prev,
+            credit_terms: {
+              ...prev.credit_terms,
+              [key]: value,
+            },
+          }));
+          break;
+
+        case "payment_config":
+          setConfig((prev) => ({
+            ...prev,
+            payment_config: {
+              ...prev.payment_config,
+              [key]: value,
+            },
+          }));
+          break;
+
+        default:
+          setConfig((prev) => ({ ...prev, [field]: value }));
+      }
+    } else if (fieldParts.length === 3 && fieldParts[0] === "items") {
+      const [, itemId, key] = fieldParts;
+      setConfig((prev) => ({
+        ...prev,
+        items: prev.items.map((item) =>
+          item.id === itemId ? { ...item, [key]: value } : item
+        ),
+      }));
+    } else {
+      setConfig((prev) => ({ ...prev, [field]: value }));
+    }
+
+    setEditingField(null);
+    setTempValue("");
+  };
+
+  const cancelEdit = () => {
+    setEditingField(null);
+    setTempValue("");
+  };
 
   // Add new item
   const addItem = () => {
     const newItem: InvoiceItem = {
       id: Date.now().toString(),
-      title: "",
+      title: "New Item",
       description: "",
       quantity: 1,
       unit: "each",
       unit_price: 0,
-      discount_percentage: 0
-    }
-    setConfig(prev => ({
+      discount_percentage: 0,
+    };
+    setConfig((prev) => ({
       ...prev,
-      items: [...prev.items, newItem]
-    }))
-  }
+      items: [...prev.items, newItem],
+    }));
+  };
 
   // Remove item
   const removeItem = (id: string) => {
-    setConfig(prev => ({
+    setConfig((prev) => ({
       ...prev,
-      items: prev.items.filter(item => item.id !== id)
-    }))
-  }
+      items: prev.items.filter((item) => item.id !== id),
+    }));
+  };
 
-  // Update item
-  const updateItem = (id: string, field: keyof InvoiceItem, value: any) => {
-    setConfig(prev => ({
-      ...prev,
-      items: prev.items.map(item => 
-        item.id === id ? { ...item, [field]: value } : item
-      )
-    }))
-  }
-
-  // Generate PDF (placeholder)
+  // Generate PDF
   const generatePDF = async () => {
-    setIsGenerating(true)
+    setIsGenerating(true);
     try {
-      console.log("Generating PDF with config:", config)
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      alert("PDF generated successfully!")
+      console.log("Generating PDF with config:", config);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      alert("PDF generated successfully!");
     } catch (error) {
-      console.error("Error generating PDF:", error)
+      console.error("Error generating PDF:", error);
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
+  };
+
+  // Editable field component (same as before but simplified)
+  const EditableField = ({
+    field,
+    value,
+    type = "text",
+    className = "",
+    placeholder = "Click to edit",
+    multiline = false,
+    selectOptions = null,
+    displayValue = null,
+  }: {
+    field: string;
+    value: any;
+    type?: string;
+    className?: string;
+    placeholder?: string;
+    multiline?: boolean;
+    selectOptions?: string[] | null;
+    displayValue?: string | null;
+  }) => {
+    const isEditing = editingField === field;
+    const displayText = displayValue || value;
+
+    if (isEditing) {
+      return (
+        <div className="flex items-center gap-2 min-w-0">
+          {selectOptions ? (
+            <Select value={tempValue} onValueChange={setTempValue}>
+              <SelectTrigger className={`${className} min-w-[120px]`}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {selectOptions.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : multiline ? (
+            <Textarea
+              value={tempValue}
+              onChange={(e) => setTempValue(e.target.value)}
+              className={`${className} min-h-[60px] resize-none`}
+              placeholder={placeholder}
+              autoFocus
+            />
+          ) : (
+            <Input
+              type={type}
+              value={tempValue}
+              onChange={(e) =>
+                setTempValue(
+                  type === "number"
+                    ? parseFloat(e.target.value) || 0
+                    : e.target.value
+                )
+              }
+              className={`${className} min-w-0`}
+              placeholder={placeholder}
+              autoFocus
+            />
+          )}
+          <div className="flex gap-1 flex-shrink-0">
+            <Button
+              size="sm"
+              onClick={() => saveEdit(field, tempValue)}
+              className="h-8 w-8 p-0"
+            >
+              <Save className="h-3 w-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={cancelEdit}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className={`${className} cursor-pointer hover:bg-blue-50 hover:border-blue-200 border border-transparent rounded px-2 py-1 transition-colors group inline-flex items-center gap-1 min-w-0`}
+        onClick={() => startEditing(field, value)}
+        title="Click to edit"
+      >
+        <span className="truncate">
+          {displayText || (
+            <span className="text-slate-400 italic">{placeholder}</span>
+          )}
+        </span>
+        <Edit className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+      </div>
+    );
+  };
+
+  // Component add buttons
+  const AddComponentButtons = () => (
+    <div className="flex flex-wrap gap-2 p-4 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
+      <p className="w-full text-sm text-slate-600 mb-2">
+        Add optional components to your invoice:
+      </p>
+
+      {!showComponents.paymentTerms && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => toggleComponent("paymentTerms")}
+          className="text-blue-600 border-blue-200 hover:bg-blue-50"
+        >
+          <Clock className="h-4 w-4 mr-2" />
+          Payment Terms
+        </Button>
+      )}
+
+      {!showComponents.paymentMethods && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => toggleComponent("paymentMethods")}
+          className="text-green-600 border-green-200 hover:bg-green-50"
+        >
+          <CreditCard className="h-4 w-4 mr-2" />
+          Payment Methods
+        </Button>
+      )}
+
+      {!showComponents.notes && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => toggleComponent("notes")}
+          className="text-purple-600 border-purple-200 hover:bg-purple-50"
+        >
+          <MessageSquare className="h-4 w-4 mr-2" />
+          Notes
+        </Button>
+      )}
+
+      {!showComponents.lateFees && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            toggleComponent("lateFees");
+            setConfig((prev) => ({
+              ...prev,
+              credit_terms: { ...prev.credit_terms, late_fee_enabled: true },
+            }));
+          }}
+          className="text-red-600 border-red-200 hover:bg-red-50"
+        >
+          <AlertTriangle className="h-4 w-4 mr-2" />
+          Late Fees
+        </Button>
+      )}
+
+      {!showComponents.earlyDiscount && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            toggleComponent("earlyDiscount");
+            setConfig((prev) => ({
+              ...prev,
+              credit_terms: {
+                ...prev.credit_terms,
+                early_discount_enabled: true,
+              },
+            }));
+          }}
+          className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+        >
+          <Percent className="h-4 w-4 mr-2" />
+          Early Discount
+        </Button>
+      )}
+
+      {!showComponents.clientAddress && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => toggleComponent("clientAddress")}
+          className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+        >
+          <Building className="h-4 w-4 mr-2" />
+          Client Address
+        </Button>
+      )}
+
+      {!showComponents.businessDetails && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => toggleComponent("businessDetails")}
+          className="text-slate-600 border-slate-200 hover:bg-slate-50"
+        >
+          <FileText className="h-4 w-4 mr-2" />
+          Business Details
+        </Button>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <Smartphone className="h-8 w-8 text-purple-600" />
-                Mobile Invoicing
+                <Zap className="h-8 w-8 text-purple-600" />
+                Smart Invoice Builder
               </h1>
-              <p className="text-slate-600">Create professional invoices with live preview</p>
+              <p className="text-slate-600">
+                Start with the basics, add what you need
+              </p>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" className="border-purple-200 text-purple-700 hover:bg-purple-50">
+              <Button
+                variant="outline"
+                className="border-purple-200 text-purple-700 hover:bg-purple-50"
+              >
                 <Eye className="h-4 w-4 mr-2" />
                 Preview
               </Button>
-              <Button 
+              <Button
                 onClick={generatePDF}
                 disabled={isGenerating}
                 className="bg-purple-600 hover:bg-purple-700"
               >
                 {isGenerating ? (
-                  <>Generating...</>
+                  "Generating..."
                 ) : (
                   <>
                     <Download className="h-4 w-4 mr-2" />
@@ -256,1423 +577,702 @@ export function InvoicingPage() {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Form Section */}
-          <div className="space-y-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="form" className="text-xs">Invoice</TabsTrigger>
-                <TabsTrigger value="business" className="text-xs">Business</TabsTrigger>
-                <TabsTrigger value="client" className="text-xs">Client</TabsTrigger>
-                <TabsTrigger value="credit" className="text-xs">Terms</TabsTrigger>
-                <TabsTrigger value="payment" className="text-xs">Payment</TabsTrigger>
-                <TabsTrigger value="settings" className="text-xs">Settings</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="form" className="space-y-4">
-                {/* Invoice Details */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-slate-900">
-                      <FileText className="h-5 w-5 text-purple-600" />
-                      Invoice Details
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="invoice_number">Invoice Number</Label>
-                        <Input
-                          id="invoice_number"
-                          value={config.invoice_number}
-                          onChange={(e) => setConfig(prev => ({ ...prev, invoice_number: e.target.value }))}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="invoice_date">Invoice Date</Label>
-                        <Input
-                          id="invoice_date"
-                          type="date"
-                          value={config.invoice_date}
-                          onChange={(e) => setConfig(prev => ({ ...prev, invoice_date: e.target.value }))}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="due_date">Due Date</Label>
-                      <Input
-                        id="due_date"
-                        type="date"
-                        value={config.due_date}
-                        onChange={(e) => setConfig(prev => ({ ...prev, due_date: e.target.value }))}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Items - Same as before */}
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-2 text-slate-900">
-                        <Calculator className="h-5 w-5 text-purple-600" />
-                        Invoice Items
-                      </CardTitle>
-                      <Button onClick={addItem} size="sm" className="bg-purple-600 hover:bg-purple-700">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Item
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {config.items.map((item, index) => (
-                      <div key={item.id} className="p-4 border border-slate-200 rounded-lg space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium text-slate-900">Item {index + 1}</span>
-                          {config.items.length > 1 && (
-                            <Button
-                              onClick={() => removeItem(item.id)}
-                              variant="ghost"
-                              size="sm"
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="col-span-2">
-                            <Label>Title</Label>
-                            <Input
-                              value={item.title}
-                              onChange={(e) => updateItem(item.id, 'title', e.target.value)}
-                              placeholder="Service or product name"
-                            />
-                          </div>
-                          <div className="col-span-2">
-                            <Label>Description</Label>
-                            <Textarea
-                              value={item.description || ''}
-                              onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                              placeholder="Detailed description"
-                              rows={2}
-                            />
-                          </div>
-                          <div>
-                            <Label>Category</Label>
-                            <Input
-                              value={item.category || ''}
-                              onChange={(e) => updateItem(item.id, 'category', e.target.value)}
-                              placeholder="e.g., Consulting"
-                            />
-                          </div>
-                          <div>
-                            <Label>SKU</Label>
-                            <Input
-                              value={item.sku || ''}
-                              onChange={(e) => updateItem(item.id, 'sku', e.target.value)}
-                              placeholder="Product code"
-                            />
-                          </div>
-                          <div>
-                            <Label>Quantity</Label>
-                            <Input
-                              type="number"
-                              value={item.quantity}
-                              onChange={(e) => updateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
-                              min="0"
-                              step="0.01"
-                            />
-                          </div>
-                          <div>
-                            <Label>Unit</Label>
-                            <Select value={item.unit} onValueChange={(value) => updateItem(item.id, 'unit', value)}>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="each">Each</SelectItem>
-                                <SelectItem value="hours">Hours</SelectItem>
-                                <SelectItem value="days">Days</SelectItem>
-                                <SelectItem value="kg">Kg</SelectItem>
-                                <SelectItem value="m">Meters</SelectItem>
-                                <SelectItem value="m2">Square Meters</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <Label>Unit Price (R)</Label>
-                            <Input
-                              type="number"
-                              value={item.unit_price}
-                              onChange={(e) => updateItem(item.id, 'unit_price', parseFloat(e.target.value) || 0)}
-                              min="0"
-                              step="0.01"
-                            />
-                          </div>
-                          <div>
-                            <Label>Discount (%)</Label>
-                            <Input
-                              type="number"
-                              value={item.discount_percentage}
-                              onChange={(e) => updateItem(item.id, 'discount_percentage', parseFloat(e.target.value) || 0)}
-                              min="0"
-                              max="100"
-                              step="0.01"
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="text-right">
-                          <span className="text-sm text-slate-600">Line Total: </span>
-                          <span className="font-medium text-slate-900">
-                            R{((item.quantity * item.unit_price) * (1 - item.discount_percentage / 100)).toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-
-                {/* Totals Summary */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-slate-900">Invoice Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+        {/* Interactive Invoice */}
+        <Card className="shadow-lg">
+          <CardContent className="p-8">
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex justify-between items-start border-b-2 border-blue-600 pb-4">
+                <div>
+                  <h1 className="text-3xl font-bold text-blue-600 mb-2">
+                    INVOICE
+                  </h1>
+                  <EditableField
+                    field="business_profile.company_name"
+                    value={config.business_profile.company_name}
+                    className="text-lg font-semibold"
+                    placeholder="Your Company Name"
+                  />
+                </div>
+                <div className="text-right">
+                  <div className="bg-slate-50 p-4 rounded border-l-4 border-blue-600">
                     <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Subtotal:</span>
-                        <span className="font-medium">R{subtotal.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      {globalDiscountAmount > 0 && (
-                        <div className="flex justify-between text-red-600">
-                          <span>Discount:</span>
-                          <span>-R{globalDiscountAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                      )}
-                      {config.include_vat && (
-                        <div className="flex justify-between">
-                          <span className="text-slate-600">VAT (15%):</span>
-                          <span className="font-medium">R{vatAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                      )}
-                      <Separator />
-                      <div className="flex justify-between text-lg font-bold text-slate-900">
-                        <span>Total:</span>
-                        <span>R{total.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Business Tab - Same as before */}
-              <TabsContent value="business" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-slate-900">
-                      <Building className="h-5 w-5 text-purple-600" />
-                      Business Information
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="col-span-2">
-                        <Label>Company Name</Label>
-                        <Input
-                          value={config.business_profile.company_name}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, company_name: e.target.value }
-                          }))}
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">Invoice #:</span>
+                        <EditableField
+                          field="invoice_number"
+                          value={config.invoice_number}
+                          className="font-mono"
+                          placeholder="INV-001"
                         />
                       </div>
-                      <div className="col-span-2">
-                        <Label>Trading Name (if different)</Label>
-                        <Input
-                          value={config.business_profile.trading_name || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, trading_name: e.target.value }
-                          }))}
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">Date:</span>
+                        <EditableField
+                          field="invoice_date"
+                          value={config.invoice_date}
+                          type="date"
                         />
                       </div>
-                      <div>
-                        <Label>Email</Label>
-                        <Input
-                          type="email"
-                          value={config.business_profile.email}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, email: e.target.value }
-                          }))}
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">Due:</span>
+                        <EditableField
+                          field="due_date"
+                          value={config.due_date}
+                          type="date"
                         />
                       </div>
-                      <div>
-                        <Label>Phone</Label>
-                        <Input
-                          value={config.business_profile.phone}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, phone: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <Label>Address Line 1</Label>
-                        <Input
-                          value={config.business_profile.address_line_1}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, address_line_1: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <Label>Address Line 2</Label>
-                        <Input
-                          value={config.business_profile.address_line_2 || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, address_line_2: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>City</Label>
-                        <Input
-                          value={config.business_profile.city}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, city: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>Province</Label>
-                        <Select 
-                          value={config.business_profile.province} 
-                          onValueChange={(value) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, province: value }
-                          }))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Western Cape">Western Cape</SelectItem>
-                            <SelectItem value="Gauteng">Gauteng</SelectItem>
-                            <SelectItem value="KwaZulu-Natal">KwaZulu-Natal</SelectItem>
-                            <SelectItem value="Eastern Cape">Eastern Cape</SelectItem>
-                            <SelectItem value="Free State">Free State</SelectItem>
-                            <SelectItem value="Limpopo">Limpopo</SelectItem>
-                            <SelectItem value="Mpumalanga">Mpumalanga</SelectItem>
-                            <SelectItem value="Northern Cape">Northern Cape</SelectItem>
-                            <SelectItem value="North West">North West</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label>Postal Code</Label>
-                        <Input
-                          value={config.business_profile.postal_code}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, postal_code: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>VAT Number</Label>
-                        <Input
-                          value={config.business_profile.vat_number || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, vat_number: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>Company Registration</Label>
-                        <Input
-                          value={config.business_profile.company_registration || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, company_registration: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>Website</Label>
-                        <Input
-                          value={config.business_profile.website || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, website: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>Industry</Label>
-                        <Select 
-                          value={config.business_profile.industry} 
-                          onValueChange={(value) => setConfig(prev => ({
-                            ...prev,
-                            business_profile: { ...prev.business_profile, industry: value }
-                          }))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="retail">Retail</SelectItem>
-                            <SelectItem value="legal">Legal</SelectItem>
-                            <SelectItem value="entertainment">Entertainment</SelectItem>
-                            <SelectItem value="construction">Construction</SelectItem>
-                            <SelectItem value="consulting">Consulting</SelectItem>
-                            <SelectItem value="manufacturing">Manufacturing</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Client Tab - Enhanced */}
-              <TabsContent value="client" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-slate-900">
-                      <User className="h-5 w-5 text-purple-600" />
-                      Client Information
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="col-span-2">
-                        <Label>Company Name</Label>
-                        <Input
-                          value={config.client_details.company_name}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            client_details: { ...prev.client_details, company_name: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>Contact Person</Label>
-                        <Input
-                          value={config.client_details.contact_person}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            client_details: { ...prev.client_details, contact_person: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>Email</Label>
-                        <Input
-                          type="email"
-                          value={config.client_details.email}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            client_details: { ...prev.client_details, email: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>Phone</Label>
-                        <Input
-                          value={config.client_details.phone || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            client_details: { ...prev.client_details, phone: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>VAT Number</Label>
-                        <Input
-                          value={config.client_details.vat_number || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            client_details: { ...prev.client_details, vat_number: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <Label>Purchase Order Number</Label>
-                        <Input
-                          value={config.client_details.purchase_order_number || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            client_details: { ...prev.client_details, purchase_order_number: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <Label>Address Line 1</Label>
-                        <Input
-                          value={config.client_details.address_line_1 || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            client_details: { ...prev.client_details, address_line_1: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <Label>Address Line 2</Label>
-                        <Input
-                          value={config.client_details.address_line_2 || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            client_details: { ...prev.client_details, address_line_2: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>City</Label>
-                        <Input
-                          value={config.client_details.city || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            client_details: { ...prev.client_details, city: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>Province</Label>
-                        <Input
-                          value={config.client_details.province || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            client_details: { ...prev.client_details, province: e.target.value }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label>Postal Code</Label>
-                        <Input
-                          value={config.client_details.postal_code || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            client_details: { ...prev.client_details, postal_code: e.target.value }
-                          }))}
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* NEW: Credit Terms Tab */}
-              <TabsContent value="credit" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-slate-900">
-                      <Clock className="h-5 w-5 text-purple-600" />
-                      Payment Terms
-                    </CardTitle>
-                    <CardDescription>
-                      Configure payment terms and credit conditions
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="col-span-2">
-                        <Label>Payment Terms</Label>
-                        <Select 
-                          value={config.credit_terms.payment_terms_type} 
-                          onValueChange={(value: any) => setConfig(prev => ({
-                            ...prev,
-                            credit_terms: { ...prev.credit_terms, payment_terms_type: value }
-                          }))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="due_on_receipt">Due on Receipt</SelectItem>
-                            <SelectItem value="net_15">Net 15 Days</SelectItem>
-                            <SelectItem value="net_30">Net 30 Days</SelectItem>
-                            <SelectItem value="net_60">Net 60 Days</SelectItem>
-                            <SelectItem value="custom">Custom Terms</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {config.credit_terms.payment_terms_type === 'custom' && (
-                        <div className="col-span-2">
-                          <Label>Custom Payment Terms</Label>
-                          <Textarea
-                            value={config.credit_terms.custom_payment_terms || ''}
-                            onChange={(e) => setConfig(prev => ({
-                              ...prev,
-                              credit_terms: { ...prev.credit_terms, custom_payment_terms: e.target.value }
-                            }))}
-                            placeholder="Enter custom payment terms..."
-                            rows={2}
-                          />
-                        </div>
-                      )}
-
-                      <div>
-                        <Label>Payment Due Days</Label>
-                        <Input
-                          type="number"
-                          value={config.credit_terms.payment_due_days || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            credit_terms: { ...prev.credit_terms, payment_due_days: parseInt(e.target.value) || undefined }
-                          }))}
-                          min="0"
-                        />
-                      </div>
-                      <div>
-                        <Label>Dispute Period (Days)</Label>
-                        <Input
-                          type="number"
-                          value={config.credit_terms.dispute_period_days}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            credit_terms: { ...prev.credit_terms, dispute_period_days: parseInt(e.target.value) || 7 }
-                          }))}
-                          min="1"
-                        />
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Late Fee Configuration */}
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label className="text-base font-medium">Late Payment Fees</Label>
-                          <p className="text-sm text-slate-600">Charge fees for overdue payments</p>
-                        </div>
-                        <Switch
-                          checked={config.credit_terms.late_fee_enabled}
-                          onCheckedChange={(checked) => setConfig(prev => ({
-                            ...prev,
-                            credit_terms: { ...prev.credit_terms, late_fee_enabled: checked }
-                          }))}
-                        />
-                      </div>
-
-                      {config.credit_terms.late_fee_enabled && (
-                        <div className="grid grid-cols-3 gap-4 p-4 bg-red-50 rounded-lg border border-red-200">
-                          <div>
-                            <Label>Fee Type</Label>
-                            <Select 
-                              value={config.credit_terms.late_fee_type} 
-                              onValueChange={(value: any) => setConfig(prev => ({
-                                ...prev,
-                                credit_terms: { ...prev.credit_terms, late_fee_type: value }
-                              }))}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="percentage">Percentage</SelectItem>
-                                <SelectItem value="fixed">Fixed Amount</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <Label>Fee Amount {config.credit_terms.late_fee_type === 'percentage' ? '(%)' : '(R)'}</Label>
-                            <Input
-                              type="number"
-                              value={config.credit_terms.late_fee_amount}
-                              onChange={(e) => setConfig(prev => ({
-                                ...prev,
-                                credit_terms: { ...prev.credit_terms, late_fee_amount: parseFloat(e.target.value) || 0 }
-                              }))}
-                              min="0"
-                              step="0.01"
-                            />
-                          </div>
-                          <div>
-                            <Label>Frequency</Label>
-                            <Select 
-                              value={config.credit_terms.late_fee_frequency} 
-                              onValueChange={(value: any) => setConfig(prev => ({
-                                ...prev,
-                                credit_terms: { ...prev.credit_terms, late_fee_frequency: value }
-                              }))}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="once">One-time</SelectItem>
-                                <SelectItem value="daily">Daily</SelectItem>
-                                <SelectItem value="monthly">Monthly</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <Separator />
-
-                    {/* Early Payment Discount */}
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label className="text-base font-medium">Early Payment Discount</Label>
-                          <p className="text-sm text-slate-600">Offer discount for early payment</p>
-                        </div>
-                        <Switch
-                          checked={config.credit_terms.early_discount_enabled}
-                          onCheckedChange={(checked) => setConfig(prev => ({
-                            ...prev,
-                            credit_terms: { ...prev.credit_terms, early_discount_enabled: checked }
-                          }))}
-                        />
-                      </div>
-
-                      {config.credit_terms.early_discount_enabled && (
-                        <div className="grid grid-cols-2 gap-4 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                          <div>
-                            <Label>Discount Days</Label>
-                            <Input
-                              type="number"
-                              value={config.credit_terms.early_discount_days || ''}
-                              onChange={(e) => setConfig(prev => ({
-                                ...prev,
-                                credit_terms: { ...prev.credit_terms, early_discount_days: parseInt(e.target.value) || undefined }
-                              }))}
-                              min="1"
-                              placeholder="e.g., 10"
-                            />
-                          </div>
-                          <div>
-                            <Label>Discount Percentage (%)</Label>
-                            <Input
-                              type="number"
-                              value={config.credit_terms.early_discount_percentage || ''}
-                              onChange={(e) => setConfig(prev => ({
-                                ...prev,
-                                credit_terms: { ...prev.credit_terms, early_discount_percentage: parseFloat(e.target.value) || undefined }
-                              }))}
-                              min="0"
-                              max="100"
-                              step="0.01"
-                              placeholder="e.g., 2.0"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <Separator />
-
-                    {/* Credit Limit */}
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label className="text-base font-medium">Credit Limit Display</Label>
-                          <p className="text-sm text-slate-600">Show credit limit on invoice</p>
-                        </div>
-                        <Switch
-                          checked={config.credit_terms.credit_limit_enabled}
-                          onCheckedChange={(checked) => setConfig(prev => ({
-                            ...prev,
-                            credit_terms: { ...prev.credit_terms, credit_limit_enabled: checked }
-                          }))}
-                        />
-                      </div>
-
-                      {config.credit_terms.credit_limit_enabled && (
-                        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                          <Label>Credit Limit Amount (R)</Label>
-                          <Input
-                            type="number"
-                            value={config.credit_terms.credit_limit_amount || ''}
-                            onChange={(e) => setConfig(prev => ({
-                              ...prev,
-                              credit_terms: { ...prev.credit_terms, credit_limit_amount: parseFloat(e.target.value) || undefined }
-                            }))}
-                            min="0"
-                            step="0.01"
-                            placeholder="e.g., 50000"
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    <Separator />
-
-                    {/* Retention Terms */}
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label className="text-base font-medium">Retention Terms</Label>
-                          <p className="text-sm text-slate-600">Hold percentage of payment</p>
-                        </div>
-                        <Switch
-                          checked={config.credit_terms.retention_enabled}
-                          onCheckedChange={(checked) => setConfig(prev => ({
-                            ...prev,
-                            credit_terms: { ...prev.credit_terms, retention_enabled: checked }
-                          }))}
-                        />
-                      </div>
-
-                      {config.credit_terms.retention_enabled && (
-                        <div className="grid grid-cols-2 gap-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                          <div>
-                            <Label>Retention Percentage (%)</Label>
-                            <Input
-                              type="number"
-                              value={config.credit_terms.retention_percentage || ''}
-                              onChange={(e) => setConfig(prev => ({
-                                ...prev,
-                                credit_terms: { ...prev.credit_terms, retention_percentage: parseFloat(e.target.value) || undefined }
-                              }))}
-                              min="0"
-                              max="100"
-                              step="0.01"
-                              placeholder="e.g., 10"
-                            />
-                          </div>
-                          <div>
-                            <Label>Retention Period (Days)</Label>
-                            <Input
-                              type="number"
-                              value={config.credit_terms.retention_period_days || ''}
-                              onChange={(e) => setConfig(prev => ({
-                                ...prev,
-                                credit_terms: { ...prev.credit_terms, retention_period_days: parseInt(e.target.value) || undefined }
-                              }))}
-                              min="1"
-                              placeholder="e.g., 90"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <Separator />
-
-                    {/* Dispute Contact Information */}
-                    <div className="space-y-4">
-                      <Label className="text-base font-medium">Dispute Contact Information</Label>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label>Dispute Contact Email</Label>
-                          <Input
-                            type="email"
-                            value={config.credit_terms.dispute_contact_email || ''}
-                            onChange={(e) => setConfig(prev => ({
-                              ...prev,
-                              credit_terms: { ...prev.credit_terms, dispute_contact_email: e.target.value }
-                            }))}
-                            placeholder="disputes@company.com"
-                          />
-                        </div>
-                        <div>
-                          <Label>Dispute Contact Number</Label>
-                          <Input
-                            value={config.credit_terms.dispute_contact_number || ''}
-                            onChange={(e) => setConfig(prev => ({
-                              ...prev,
-                              credit_terms: { ...prev.credit_terms, dispute_contact_number: e.target.value }
-                            }))}
-                            placeholder="+27 11 123 4567"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* NEW: Payment Configuration Tab */}
-              <TabsContent value="payment" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-slate-900">
-                      <CreditCard className="h-5 w-5 text-purple-600" />
-                      Payment Configuration
-                    </CardTitle>
-                    <CardDescription>
-                      Configure payment methods and banking details
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Bank Details */}
-                    <div className="space-y-4">
-                      <Label className="text-base font-medium">Banking Details</Label>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label>Bank Name</Label>
-                          <Input
-                            value={config.payment_config.bank_name}
-                            onChange={(e) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, bank_name: e.target.value }
-                            }))}
-                          />
-                        </div>
-                        <div>
-                          <Label>Account Holder</Label>
-                          <Input
-                            value={config.payment_config.account_holder}
-                            onChange={(e) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, account_holder: e.target.value }
-                            }))}
-                          />
-                        </div>
-                        <div>
-                          <Label>Account Number</Label>
-                          <Input
-                            value={config.payment_config.account_number}
-                            onChange={(e) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, account_number: e.target.value }
-                            }))}
-                          />
-                        </div>
-                        <div>
-                          <Label>Branch Code</Label>
-                          <Input
-                            value={config.payment_config.branch_code}
-                            onChange={(e) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, branch_code: e.target.value }
-                            }))}
-                          />
-                        </div>
-                        <div>
-                          <Label>SWIFT Code (Optional)</Label>
-                          <Input
-                            value={config.payment_config.swift_code || ''}
-                            onChange={(e) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, swift_code: e.target.value }
-                            }))}
-                            placeholder="For international payments"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Payment Methods */}
-                    <div className="space-y-4">
-                      <Label className="text-base font-medium">Enabled Payment Methods</Label>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <CreditCard className="h-4 w-4 text-emerald-600" />
-                            <span className="text-sm font-medium">Instant EFT</span>
-                          </div>
-                          <Switch
-                            checked={config.payment_config.enable_instant_eft}
-                            onCheckedChange={(checked) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, enable_instant_eft: checked }
-                            }))}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <Smartphone className="h-4 w-4 text-blue-600" />
-                            <span className="text-sm font-medium">PayShap</span>
-                          </div>
-                          <Switch
-                            checked={config.payment_config.enable_payshap}
-                            onCheckedChange={(checked) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, enable_payshap: checked }
-                            }))}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <Smartphone className="h-4 w-4 text-green-600" />
-                            <span className="text-sm font-medium">SnapScan</span>
-                          </div>
-                          <Switch
-                            checked={config.payment_config.enable_snapscan}
-                            onCheckedChange={(checked) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, enable_snapscan: checked }
-                            }))}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <Smartphone className="h-4 w-4 text-orange-600" />
-                            <span className="text-sm font-medium">Zapper</span>
-                          </div>
-                          <Switch
-                            checked={config.payment_config.enable_zapper}
-                            onCheckedChange={(checked) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, enable_zapper: checked }
-                            }))}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 text-purple-600" />
-                            <span className="text-sm font-medium">Mobile Money</span>
-                          </div>
-                          <Switch
-                            checked={config.payment_config.enable_mobile_money}
-                            onCheckedChange={(checked) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, enable_mobile_money: checked }
-                            }))}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <Building className="h-4 w-4 text-slate-600" />
-                            <span className="text-sm font-medium">Bank Transfer</span>
-                          </div>
-                          <Switch
-                            checked={config.payment_config.enable_bank_transfer}
-                            onCheckedChange={(checked) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, enable_bank_transfer: checked }
-                            }))}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <CreditCard className="h-4 w-4 text-red-600" />
-                            <span className="text-sm font-medium">Card Payments</span>
-                          </div>
-                          <Switch
-                            checked={config.payment_config.enable_card_payments}
-                            onCheckedChange={(checked) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, enable_card_payments: checked }
-                            }))}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Payment Reference Configuration */}
-                    <div className="space-y-4">
-                      <Label className="text-base font-medium">Payment Reference Configuration</Label>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <Label>Reference Prefix</Label>
-                          <Input
-                            value={config.payment_config.reference_prefix}
-                            onChange={(e) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, reference_prefix: e.target.value }
-                            }))}
-                            placeholder="INV"
-                          />
-                        </div>
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <span className="text-sm font-medium">Include Company Code</span>
-                          <Switch
-                            checked={config.payment_config.include_company_code}
-                            onCheckedChange={(checked) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, include_company_code: checked }
-                            }))}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <span className="text-sm font-medium">Include Date</span>
-                          <Switch
-                            checked={config.payment_config.include_date}
-                            onCheckedChange={(checked) => setConfig(prev => ({
-                              ...prev,
-                              payment_config: { ...prev.payment_config, include_date: checked }
-                            }))}
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="p-3 bg-slate-50 rounded-lg">
-                        <Label className="text-sm font-medium">Preview Reference:</Label>
-                        <p className="text-sm text-slate-600 mt-1">{generatePaymentReference()}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Settings Tab - Enhanced */}
-              <TabsContent value="settings" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-slate-900">
-                      <Settings className="h-5 w-5 text-purple-600" />
-                      Invoice Settings
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label>Include VAT</Label>
-                        <p className="text-sm text-slate-600">Add 15% VAT to invoice</p>
-                      </div>
-                      <Switch
-                        checked={config.include_vat}
-                        onCheckedChange={(checked) => setConfig(prev => ({ ...prev, include_vat: checked }))}
-                      />
-                    </div>
-
-                    {config.include_vat && (
-                      <div>
-                        <Label>VAT Rate (%)</Label>
-                        <Input
-                          type="number"
-                          value={config.vat_rate * 100}
-                          onChange={(e) => setConfig(prev => ({ ...prev, vat_rate: (parseFloat(e.target.value) || 15) / 100 }))}
-                          min="0"
-                          max="100"
-                          step="0.01"
-                        />
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label>Global Discount</Label>
-                        <p className="text-sm text-slate-600">Apply discount to entire invoice</p>
-                      </div>
-                      <Switch
-                        checked={config.global_discount_enabled}
-                        onCheckedChange={(checked) => setConfig(prev => ({ ...prev, global_discount_enabled: checked }))}
-                      />
-                    </div>
-
-                    {config.global_discount_enabled && (
-                      <div>
-                        <Label>Discount Percentage (%)</Label>
-                        <Input
-                          type="number"
-                          value={config.global_discount_percentage}
-                          onChange={(e) => setConfig(prev => ({ ...prev, global_discount_percentage: parseFloat(e.target.value) || 0 }))}
-                          min="0"
-                          max="100"
-                          step="0.01"
-                        />
-                      </div>
-                    )}
-
-                    <div>
-                      <Label>Currency</Label>
-                      <Select value={config.currency} onValueChange={(value) => setConfig(prev => ({ ...prev, currency: value }))}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ZAR">South African Rand (ZAR)</SelectItem>
-                          <SelectItem value="USD">US Dollar (USD)</SelectItem>
-                          <SelectItem value="EUR">Euro (EUR)</SelectItem>
-                          <SelectItem value="GBP">British Pound (GBP)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label>Notes</Label>
-                      <Textarea
-                        value={config.notes || ''}
-                        onChange={(e) => setConfig(prev => ({ ...prev, notes: e.target.value }))}
-                        placeholder="Additional notes for the invoice"
-                        rows={3}
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Internal Notes</Label>
-                      <Textarea
-                        value={config.internal_notes || ''}
-                        onChange={(e) => setConfig(prev => ({ ...prev, internal_notes: e.target.value }))}
-                        placeholder="Internal notes (not shown on invoice)"
-                        rows={2}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-
-          {/* Enhanced Live Preview Section */}
-          <div className="lg:sticky lg:top-6">
-            <Card className="h-fit">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-slate-900">
-                  <Eye className="h-5 w-5 text-purple-600" />
-                  Live Preview
-                </CardTitle>
-                <CardDescription>
-                  See how your invoice will look
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="border border-slate-200 rounded-lg p-4 bg-white shadow-sm max-h-[600px] overflow-y-auto">
-                  {/* Enhanced Invoice Preview */}
-                  <div className="space-y-4 text-xs">
-                    {/* Header */}
-                    <div className="flex justify-between items-start border-b-2 border-blue-600 pb-3">
-                      <div>
-                        <h1 className="text-2xl font-bold text-blue-600">INVOICE</h1>
-                        <div className="text-slate-600">{config.business_profile.company_name}</div>
-                        {config.business_profile.trading_name && config.business_profile.trading_name !== config.business_profile.company_name && (
-                          <div className="text-xs text-slate-500 italic">t/a {config.business_profile.trading_name}</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Invoice Info */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-slate-50 p-3 rounded border-l-2 border-blue-600">
-                        <h3 className="font-bold text-blue-600 mb-2">Invoice Information</h3>
-                        <p><strong>Invoice #:</strong> {config.invoice_number}</p>
-                        <p><strong>Date:</strong> {config.invoice_date}</p>
-                        <p><strong>Due:</strong> {config.due_date}</p>
-                        <p><strong>Terms:</strong> {
-                          config.credit_terms.payment_terms_type === 'custom' 
-                            ? config.credit_terms.custom_payment_terms?.slice(0, 20) + '...'
-                            : config.credit_terms.payment_terms_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
-                        }</p>
-                        {config.client_details.purchase_order_number && (
-                          <p><strong>PO #:</strong> {config.client_details.purchase_order_number}</p>
-                        )}
-                      </div>
-                      <div className="bg-red-50 p-3 rounded border-l-2 border-red-600">
-                        <h3 className="font-bold text-red-600 mb-2">Payment Terms</h3>
-                        {config.credit_terms.late_fee_enabled && (
-                          <p><strong>Late Fee:</strong> {config.credit_terms.late_fee_amount}% {config.credit_terms.late_fee_frequency}</p>
-                        )}
-                        {config.credit_terms.early_discount_enabled && (
-                          <p><strong>Early Discount:</strong> {config.credit_terms.early_discount_percentage}% ({config.credit_terms.early_discount_days} days)</p>
-                        )}
-                        {config.credit_terms.credit_limit_enabled && config.credit_terms.credit_limit_amount && (
-                          <p><strong>Credit Limit:</strong> R{config.credit_terms.credit_limit_amount.toLocaleString('en-ZA')}</p>
-                        )}
-                        <p><strong>Total:</strong> R{total.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</p>
-                      </div>
-                    </div>
-
-                    {/* Addresses */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="border p-3 rounded">
-                        <h3 className="font-bold text-blue-600 mb-2">BILL FROM</h3>
-                        <p className="font-bold">{config.business_profile.company_name}</p>
-                        {config.business_profile.trading_name && config.business_profile.trading_name !== config.business_profile.company_name && (
-                          <p className="italic">t/a {config.business_profile.trading_name}</p>
-                        )}
-                        <p>{config.business_profile.address_line_1}</p>
-                        {config.business_profile.address_line_2 && <p>{config.business_profile.address_line_2}</p>}
-                        <p>{config.business_profile.city}, {config.business_profile.province} {config.business_profile.postal_code}</p>
-                        {config.business_profile.vat_number && <p><strong>VAT:</strong> {config.business_profile.vat_number}</p>}
-                        <p><strong>Email:</strong> {config.business_profile.email}</p>
-                        <p><strong>Phone:</strong> {config.business_profile.phone}</p>
-                      </div>
-                      <div className="border p-3 rounded">
-                        <h3 className="font-bold text-blue-600 mb-2">BILL TO</h3>
-                        <p className="font-bold">{config.client_details.company_name}</p>
-                        <p><strong>Attn:</strong> {config.client_details.contact_person}</p>
-                        <p><strong>Email:</strong> {config.client_details.email}</p>
-                        {config.client_details.phone && <p><strong>Phone:</strong> {config.client_details.phone}</p>}
-                        {config.client_details.address_line_1 && (
-                          <>
-                            <p>{config.client_details.address_line_1}</p>
-                            {config.client_details.address_line_2 && <p>{config.client_details.address_line_2}</p>}
-                            {config.client_details.city && (
-                              <p>{config.client_details.city}, {config.client_details.province} {config.client_details.postal_code}</p>
-                            )}
-                          </>
-                        )}
-                        {config.client_details.vat_number && <p><strong>VAT:</strong> {config.client_details.vat_number}</p>}
-                      </div>
-                    </div>
-
-                    {/* Items */}
-                    <div>
-                      <table className="w-full border-collapse border">
-                        <thead className="bg-blue-600 text-white">
-                          <tr>
-                            <th className="border p-2 text-left text-xs">Description</th>
-                            <th className="border p-2 text-xs">Qty</th>
-                            <th className="border p-2 text-xs">Unit</th>
-                            <th className="border p-2 text-xs">Rate</th>
-                            <th className="border p-2 text-xs">Amount</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {config.items.map((item) => {
-                            const lineTotal = (item.quantity * item.unit_price) * (1 - item.discount_percentage / 100)
-                            return (
-                              <tr key={item.id} className="border-b">
-                                <td className="border p-2">
-                                  <div className="font-medium">{item.title}</div>
-                                  {item.description && <div className="text-slate-600 text-xs">{item.description}</div>}
-                                  {(item.sku || item.category) && (
-                                    <div className="text-slate-500 text-xs">
-                                      {item.sku && `SKU: ${item.sku}`}
-                                      {item.sku && item.category && ' • '}
-                                      {item.category}
-                                    </div>
-                                  )}
-                                </td>
-                                <td className="border p-2 text-center">{item.quantity}</td>
-                                <td className="border p-2 text-center">{item.unit}</td>
-                                <td className="border p-2 text-right">R{item.unit_price.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</td>
-                                <td className="border p-2 text-right">R{lineTotal.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</td>
-                              </tr>
-                            )
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Totals */}
-                    <div className="flex justify-end">
-                      <div className="w-64">
-                        <div className="space-y-1">
-                          <div className="flex justify-between">
-                            <span>Subtotal:</span>
-                            <span>R{subtotal.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</span>
-                          </div>
-                          {globalDiscountAmount > 0 && (
-                            <div className="flex justify-between text-red-600">
-                              <span>Discount:</span>
-                              <span>-R{globalDiscountAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</span>
-                            </div>
-                          )}
-                          {config.include_vat && (
-                            <div className="flex justify-between">
-                              <span>VAT ({(config.vat_rate * 100).toFixed(0)}%):</span>
-                              <span>R{vatAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</span>
-                            </div>
-                          )}
-                          <div className="flex justify-between bg-blue-600 text-white p-2 font-bold">
-                            <span>TOTAL:</span>
-                            <span>R{total.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Terms & Conditions Preview */}
-                    <div className="bg-yellow-50 border border-yellow-200 p-3 rounded">
-                      <h4 className="font-bold text-yellow-800 mb-2">Terms & Conditions</h4>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        {config.credit_terms.late_fee_enabled && (
-                          <div className="bg-white p-2 rounded border-l-2 border-yellow-400">
-                            <strong>Late Payment:</strong> {config.credit_terms.late_fee_amount}% {config.credit_terms.late_fee_frequency} service charge
-                          </div>
-                        )}
-                        {config.credit_terms.early_discount_enabled && (
-                          <div className="bg-white p-2 rounded border-l-2 border-yellow-400">
-                            <strong>Early Payment:</strong> {config.credit_terms.early_discount_percentage}% discount if paid within {config.credit_terms.early_discount_days} days
-                          </div>
-                        )}
-                        <div className="bg-white p-2 rounded border-l-2 border-yellow-400">
-                          <strong>Disputes:</strong> Must be raised within {config.credit_terms.dispute_period_days} days
-                        </div>
-                        {config.credit_terms.retention_enabled && (
-                          <div className="bg-white p-2 rounded border-l-2 border-yellow-400">
-                            <strong>Retention:</strong> {config.credit_terms.retention_percentage}% held for {config.credit_terms.retention_period_days} days
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Payment Information Preview */}
-                    <div className="bg-green-50 border border-green-200 p-3 rounded">
-                      <h4 className="font-bold text-green-800 mb-2">Payment Information</h4>
-                      
-                      <div className="grid grid-cols-3 gap-2 mb-3">
-                        {config.payment_config.enable_instant_eft && (
-                          <div className="bg-white p-2 rounded text-center border">
-                            <strong className="text-xs">Instant EFT</strong>
-                            <div className="text-xs">Pay instantly online</div>
-                          </div>
-                        )}
-                        {config.payment_config.enable_payshap && (
-                          <div className="bg-white p-2 rounded text-center border">
-                            <strong className="text-xs">PayShap</strong>
-                            <div className="text-xs">Mobile payment</div>
-                          </div>
-                        )}
-                        {config.payment_config.enable_snapscan && (
-                          <div className="bg-white p-2 rounded text-center border">
-                            <strong className="text-xs">SnapScan</strong>
-                            <div className="text-xs">QR payment</div>
-                          </div>
-                        )}
-                        {config.payment_config.enable_bank_transfer && (
-                          <div className="bg-white p-2 rounded text-center border">
-                            <strong className="text-xs">Bank Transfer</strong>
-                            <div className="text-xs">Traditional EFT</div>
-                          </div>
-                        )}
-                        {config.payment_config.enable_card_payments && (
-                          <div className="bg-white p-2 rounded text-center border">
-                            <strong className="text-xs">Card Payment</strong>
-                            <div className="text-xs">Credit/Debit</div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="bg-yellow-50 border border-yellow-200 p-2 rounded">
-                        <p className="text-xs"><strong>Payment Reference:</strong> {generatePaymentReference()}</p>
-                        <p className="text-xs"><strong>Bank:</strong> {config.payment_config.bank_name} | <strong>Account:</strong> {config.payment_config.account_number} | <strong>Branch:</strong> {config.payment_config.branch_code}</p>
-                        <p className="text-xs"><strong>Account Holder:</strong> {config.payment_config.account_holder}</p>
-                        {config.payment_config.swift_code && (
-                          <p className="text-xs"><strong>SWIFT:</strong> {config.payment_config.swift_code} (international)</p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Notes */}
-                    {config.notes && (
-                      <div className="bg-slate-50 p-3 rounded border-l-2 border-slate-400">
-                        <h4 className="font-bold mb-2">Additional Notes</h4>
-                        <p className="text-xs">{config.notes}</p>
-                      </div>
-                    )}
-
-                    {/* Footer */}
-                    <div className="bg-slate-800 text-white p-2 rounded text-center">
-                      <p className="text-xs"><strong>{config.business_profile.company_name}</strong> | {config.business_profile.email} | {config.business_profile.phone}</p>
-                      <p className="text-xs">This invoice was generated electronically and is valid without signature.</p>
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              </div>
+
+              {/* Addresses */}
+              <div className="grid grid-cols-2 gap-8">
+                {/* Bill From - Essential */}
+                <div className="border rounded-lg p-4 hover:border-blue-300 transition-colors">
+                  <h3 className="font-bold text-blue-600 mb-3 flex items-center gap-2">
+                    <Building className="h-4 w-4" />
+                    BILL FROM
+                  </h3>
+                  <div className="space-y-2">
+                    <EditableField
+                      field="business_profile.company_name"
+                      value={config.business_profile.company_name}
+                      className="font-bold text-base"
+                      placeholder="Your Company Name"
+                    />
+
+                    {/* Essential Contact Info */}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-3 w-3 text-slate-500" />
+                        <EditableField
+                          field="business_profile.email"
+                          value={config.business_profile.email}
+                          type="email"
+                          placeholder="your@email.com"
+                          className="text-sm"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-3 w-3 text-slate-500" />
+                        <EditableField
+                          field="business_profile.phone"
+                          value={config.business_profile.phone}
+                          placeholder="+27 11 123 4567"
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Extended Business Details */}
+                    {showComponents.businessDetails && (
+                      <div className="mt-4 pt-3 border-t border-slate-200">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">
+                            Business Details
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleComponent("businessDetails")}
+                            className="h-5 w-5 p-0 text-slate-400 hover:text-slate-600"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+
+                        {/* Single Address Field */}
+                        <div className="mb-1">
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="font-medium text-slate-600 w-12">
+                              Address:
+                            </span>
+                            <EditableField
+                              field="business_profile.full_address"
+                              value={`${config.business_profile.address_line_1}`}
+                              placeholder="123 Business Street&#10;Suite 456&#10;Cape Town, Western Cape 8001"
+                              className="text-sm w-full"
+                              multiline
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mb-1">
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="font-medium text-slate-600 w-12">
+                              City:
+                            </span>
+                            <EditableField
+                              field="business_profile.full_address"
+                              value={`${config.business_profile.city}`}
+                              placeholder="123 Business Street&#10;Suite 456&#10;Cape Town, Western Cape 8001"
+                              className="text-sm w-full"
+                              multiline
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mb-1">
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="font-medium text-slate-600 w-12">
+                              Province:
+                            </span>
+                            <EditableField
+                              field="business_profile.full_address"
+                              value={`${config.business_profile.province}`}
+                              placeholder="123 Business Street&#10;Suite 456&#10;Cape Town, Western Cape 8001"
+                              className="text-sm w-full"
+                              multiline
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bill To - Essential */}
+                <div className="border rounded-lg p-4 hover:border-blue-300 transition-colors">
+                  <h3 className="font-bold text-blue-600 mb-3 flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    BILL TO
+                  </h3>
+                  <div className="space-y-2">
+                    <EditableField
+                      field="client_details.company_name"
+                      value={config.client_details.company_name}
+                      className="font-bold text-base"
+                      placeholder="Client Company Name"
+                    />
+
+                    {/* Essential Contact Info */}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-3 w-3 text-slate-500" />
+                        <EditableField
+                          field="client_details.email"
+                          value={config.client_details.email}
+                          type="email"
+                          placeholder="client@email.com"
+                          className="text-sm"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-3 w-3 text-slate-500" />
+                        <EditableField
+                          field="business_profile.phone"
+                          value={config.client_details.phone}
+                          placeholder="+27 11 123 4567"
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Extended Client Details */}
+                    {showComponents.clientAddress && (
+                      <div className="mt-4 pt-3 border-t border-slate-200">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">
+                            Client Address
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleComponent("clientAddress")}
+                            className="h-5 w-5 p-0 text-slate-400 hover:text-slate-600"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+
+                        {/* Single Address Field */}
+                        <div className="mb-1">
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="font-medium text-slate-600 w-12">
+                              Address:
+                            </span>
+                            <EditableField
+                              field="client_details.full_address"
+                              value={`${config.client_details.address_line_1}`}
+                              placeholder="789 Main Street&#10;Johannesburg, Gauteng 2000"
+                              className="text-sm w-full"
+                              multiline
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mb-1">
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="font-medium text-slate-600 w-12">
+                              City:
+                            </span>
+                            <EditableField
+                              field="client_details.full_address"
+                              value={`${config.client_details.city}`}
+                              placeholder="789 Main Street&#10;Johannesburg, Gauteng 2000"
+                              className="text-sm w-full"
+                              multiline
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mb-2">
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="font-medium text-slate-600 w-12">
+                              Province:
+                            </span>
+                            <EditableField
+                              field="client_details.full_address"
+                              value={`${config.client_details.province}`}
+                              placeholder="789 Main Street&#10;Johannesburg, Gauteng 2000"
+                              className="text-sm w-full"
+                              multiline
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Items Table - Essential */}
+              <div className="border rounded-lg overflow-hidden">
+                <div className="bg-blue-600 text-white p-3 flex items-center justify-between">
+                  <h3 className="font-bold flex items-center gap-2">
+                    <Calculator className="h-4 w-4" />
+                    Invoice Items
+                  </h3>
+                  <Button
+                    onClick={addItem}
+                    size="sm"
+                    variant="secondary"
+                    className="bg-white text-blue-600 hover:bg-blue-50"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Item
+                  </Button>
+                </div>
+
+                <table className="w-full">
+                  <thead className="bg-blue-50">
+                    <tr>
+                      <th className="text-left p-3 font-medium">Description</th>
+                      <th className="text-center p-3 font-medium w-20">Qty</th>
+                      <th className="text-center p-3 font-medium w-20">Unit</th>
+                      <th className="text-right p-3 font-medium w-32">Rate</th>
+                      <th className="text-right p-3 font-medium w-32">
+                        Amount
+                      </th>
+                      <th className="w-12"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {config.items.map((item, index) => {
+                      const lineTotal =
+                        item.quantity *
+                        item.unit_price *
+                        (1 - item.discount_percentage / 100);
+                      return (
+                        <tr
+                          key={item.id}
+                          className="border-b hover:bg-slate-50"
+                        >
+                          <td className="p-3">
+                            <div className="space-y-1">
+                              <EditableField
+                                field={`items.${item.id}.title`}
+                                value={item.title}
+                                className="font-medium block w-full"
+                                placeholder="Item title"
+                              />
+                              <EditableField
+                                field={`items.${item.id}.description`}
+                                value={item.description}
+                                className="text-sm text-slate-600 block w-full"
+                                placeholder="Description (optional)"
+                                multiline
+                              />
+                            </div>
+                          </td>
+                          <td className="p-3 text-center">
+                            <EditableField
+                              field={`items.${item.id}.quantity`}
+                              value={item.quantity}
+                              type="number"
+                              className="w-16 text-center"
+                            />
+                          </td>
+                          <td className="p-3 text-center">
+                            <EditableField
+                              field={`items.${item.id}.unit`}
+                              value={item.unit}
+                              selectOptions={[
+                                "each",
+                                "hours",
+                                "days",
+                                "kg",
+                                "m",
+                                "m2",
+                              ]}
+                              className="w-16 text-center"
+                            />
+                          </td>
+                          <td className="p-3 text-right">
+                            R
+                            <EditableField
+                              field={`items.${item.id}.unit_price`}
+                              value={item.unit_price}
+                              type="number"
+                              className="w-24 text-right"
+                            />
+                          </td>
+                          <td className="p-3 text-right font-medium">
+                            R
+                            {lineTotal.toLocaleString("en-ZA", {
+                              minimumFractionDigits: 2,
+                            })}
+                          </td>
+                          <td className="p-3">
+                            {config.items.length > 1 && (
+                              <Button
+                                onClick={() => removeItem(item.id)}
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Totals - Essential */}
+              <div className="flex justify-end">
+                <div className="w-80 space-y-2">
+                  <div className="flex justify-between py-2">
+                    <span className="font-medium">Subtotal:</span>
+                    <span className="font-medium">
+                      R
+                      {subtotal.toLocaleString("en-ZA", {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+
+                  {globalDiscountAmount > 0 && (
+                    <div className="flex justify-between text-red-600">
+                      <span>
+                        Discount ({config.global_discount_percentage}%):
+                      </span>
+                      <span>
+                        -R
+                        {globalDiscountAmount.toLocaleString("en-ZA", {
+                          minimumFractionDigits: 2,
+                        })}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* VAT Toggle - Common enough to show by default */}
+                  {showComponents.vatSettings && (
+                    <div className="flex justify-between items-center py-2 border-t">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={config.include_vat}
+                          onCheckedChange={(checked) =>
+                            setConfig((prev) => ({
+                              ...prev,
+                              include_vat: checked,
+                            }))
+                          }
+                        />
+                        <span className="font-medium">
+                          VAT ({(config.vat_rate * 100).toFixed(0)}%):
+                        </span>
+                      </div>
+                      <span className="font-medium">
+                        {config.include_vat
+                          ? `R${vatAmount.toLocaleString("en-ZA", {
+                              minimumFractionDigits: 2,
+                            })}`
+                          : "R0.00"}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between py-3 bg-blue-600 text-white px-4 rounded font-bold text-lg">
+                    <span>TOTAL:</span>
+                    <span>
+                      R
+                      {total.toLocaleString("en-ZA", {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Terms - Optional */}
+              {showComponents.paymentTerms && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-blue-800 flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      Payment Terms
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleComponent("paymentTerms")}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="text-sm">
+                    <p>
+                      <strong>Terms:</strong>{" "}
+                      <EditableField
+                        field="credit_terms.payment_terms_type"
+                        value={config.credit_terms.payment_terms_type}
+                        selectOptions={[
+                          "due_on_receipt",
+                          "net_15",
+                          "net_30",
+                          "net_60",
+                          "custom",
+                        ]}
+                        displayValue={config.credit_terms.payment_terms_type
+                          .replace("_", " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
+                      />
+                    </p>
+                    <p>
+                      <strong>Disputes:</strong> Must be raised within{" "}
+                      <EditableField
+                        field="credit_terms.dispute_period_days"
+                        value={config.credit_terms.dispute_period_days}
+                        type="number"
+                      />{" "}
+                      days
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Late Fees - Optional */}
+              {showComponents.lateFees &&
+                config.credit_terms.late_fee_enabled && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-bold text-red-800 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        Late Payment Fees
+                      </h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          toggleComponent("lateFees");
+                          setConfig((prev) => ({
+                            ...prev,
+                            credit_terms: {
+                              ...prev.credit_terms,
+                              late_fee_enabled: false,
+                            },
+                          }));
+                        }}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="text-sm">
+                      <p>
+                        <strong>Late Fee:</strong>{" "}
+                        <EditableField
+                          field="credit_terms.late_fee_amount"
+                          value={config.credit_terms.late_fee_amount}
+                          type="number"
+                        />
+                        % {config.credit_terms.late_fee_frequency} service
+                        charge applies to overdue invoices
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+              {/* Early Discount - Optional */}
+              {showComponents.earlyDiscount &&
+                config.credit_terms.early_discount_enabled && (
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-bold text-emerald-800 flex items-center gap-2">
+                        <Percent className="h-4 w-4" />
+                        Early Payment Discount
+                      </h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          toggleComponent("earlyDiscount");
+                          setConfig((prev) => ({
+                            ...prev,
+                            credit_terms: {
+                              ...prev.credit_terms,
+                              early_discount_enabled: false,
+                            },
+                          }));
+                        }}
+                        className="text-emerald-600 hover:text-emerald-800"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="text-sm">
+                      <p>
+                        <strong>Early Payment:</strong>{" "}
+                        <EditableField
+                          field="credit_terms.early_discount_percentage"
+                          value={config.credit_terms.early_discount_percentage}
+                          type="number"
+                        />
+                        % discount if paid within{" "}
+                        <EditableField
+                          field="credit_terms.early_discount_days"
+                          value={config.credit_terms.early_discount_days}
+                          type="number"
+                        />{" "}
+                        days
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+              {/* Notes - Optional */}
+              {showComponents.notes && (
+                <div className="border rounded-lg p-4 hover:border-purple-300 transition-colors">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-purple-600 flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4" />
+                      Additional Notes
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleComponent("notes")}
+                      className="text-purple-600 hover:text-purple-800"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <EditableField
+                    field="notes"
+                    value={config.notes}
+                    placeholder="Add any additional notes or terms..."
+                    multiline
+                    className="w-full min-h-[60px]"
+                  />
+                </div>
+              )}
+
+              {/* Payment Methods - Optional */}
+              {showComponents.paymentMethods && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-green-800 flex items-center gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      Payment Information
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleComponent("paymentMethods")}
+                      className="text-green-600 hover:text-green-800"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 mb-3">
+                    {config.payment_config.enable_instant_eft && (
+                      <div className="bg-white p-2 rounded text-center border">
+                        <strong className="text-xs">Instant EFT</strong>
+                        <div className="text-xs">Pay instantly online</div>
+                      </div>
+                    )}
+                    {config.payment_config.enable_payshap && (
+                      <div className="bg-white p-2 rounded text-center border">
+                        <strong className="text-xs">PayShap</strong>
+                        <div className="text-xs">Mobile payment</div>
+                      </div>
+                    )}
+                    {config.payment_config.enable_snapscan && (
+                      <div className="bg-white p-2 rounded text-center border">
+                        <strong className="text-xs">SnapScan</strong>
+                        <div className="text-xs">QR payment</div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-yellow-50 border border-yellow-200 p-2 rounded text-sm">
+                    <p>
+                      <strong>Payment Reference:</strong>{" "}
+                      {config.invoice_number}
+                    </p>
+                    <p>
+                      <strong>Bank:</strong>{" "}
+                      <EditableField
+                        field="payment_config.bank_name"
+                        value={config.payment_config.bank_name}
+                        placeholder="Bank Name"
+                      />{" "}
+                      | <strong>Account:</strong>{" "}
+                      <EditableField
+                        field="payment_config.account_number"
+                        value={config.payment_config.account_number}
+                        placeholder="Account Number"
+                      />
+                    </p>
+                    <p>
+                      <strong>Account Holder:</strong>{" "}
+                      <EditableField
+                        field="payment_config.account_holder"
+                        value={config.payment_config.account_holder}
+                        placeholder="Account Holder"
+                      />
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Add Components Section */}
+              <AddComponentButtons />
+
+              {/* Footer */}
+              <div className="bg-slate-800 text-white p-4 rounded text-center">
+                <p className="text-sm">
+                  <strong>{config.business_profile.company_name}</strong> |{" "}
+                  {config.business_profile.email} |{" "}
+                  {config.business_profile.phone}
+                </p>
+                <p className="text-xs mt-1">
+                  This invoice was generated electronically and is valid without
+                  signature.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
-  )
+  );
 }
