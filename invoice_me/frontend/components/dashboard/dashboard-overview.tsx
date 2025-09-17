@@ -10,6 +10,7 @@ import {
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { StatsGrid } from "../ui/stats-cards";
+import { useRouter } from "next/navigation";
 import {
   CalendarDays,
   CreditCard,
@@ -28,224 +29,246 @@ import { ServiceCardData } from "@/lib/types/user-interface";
 import { ServiceCard } from "../ui/service-card";
 
 // Dummy data
-const dashboardStats: DashboardStats = {
-  totalInvoices: 156,
-  totalFinanced: 89,
-  totalCollected: 234000,
-  pendingAmount: 145000,
-  monthlyGrowth: 12.5,
-};
-
-const recentInvoices: Invoice[] = [
-  {
-    id: "1",
-    invoiceNumber: "INV-001",
-    buyerName: "Ridgeway Butchery",
-    amount: 15000,
-    dueDate: "2025-09-15",
-    status: "pending",
-    service: "financing",
-    createdAt: "2025-08-25",
-  },
-  {
-    id: "2",
-    invoiceNumber: "INV-002",
-    buyerName: "De Abreu Essop Inc",
-    amount: 8500,
-    dueDate: "2025-09-10",
-    status: "overdue",
-    service: "collections",
-    createdAt: "2025-08-20",
-  },
-  {
-    id: "3",
-    invoiceNumber: "INV-003",
-    buyerName: "WLDF SA",
-    amount: 12000,
-    dueDate: "2025-09-20",
-    status: "financed",
-    service: "financing",
-    createdAt: "2025-08-28",
-  },
-];
-
-// Quick stats for each service
-const serviceStats: DashboardKPIs = {
-  financing: {
-    active: 12,
-    totalAdvanced: 145000,
-    avgProcessingTime: "2.3 hours",
-  },
-  collections: {
-    active: 34,
-    collectionRate: 94.2,
-    avgDaysToPayment: 18,
-  },
-  invoicing: {
-    thisMonth: 67,
-    paidOnTime: 89.5,
-    avgAmount: 8750,
-  },
-};
-
-const serviceCardData: ServiceCardData[] = [
-  {
-    title: "Pay-Me-Now Financing",
-    description: "Get instant cash for your invoices",
-    serviceClassColor: "border-emerald-200",
-    quickStatsColor: "bg-emerald-50",
-    icon: Zap,
-    inconColor: "text-emerald-600",
-    serviceStats: [
-      {
-        serviceTilte: "Active",
-        serviceValue: serviceStats.financing.active,
-      },
-      {
-        serviceTilte: "Total Advanced",
-        serviceValue: serviceStats.financing.totalAdvanced,
-        serviceValueAffix: "R",
-        affixPosition: "prefix",
-      },
-    ],
-    buttonInformation: [
-      {
-        buttonText: "New Request",
-        buttonIcon: Plus,
-        buttonVariant: "default",
-        buttonSize: "sm",
-        buttonColor: "bg-emerald-600",
-        buttonHoverColor: "bg-emerald-700",
-      },
-      {
-        buttonText: "View All",
-        buttonIcon: Eye,
-        buttonVariant: "outline",
-        buttonSize: "sm",
-        buttonColor: "border-emerald-200",
-        buttonTextColor: "text-emerald-700",
-        buttonHoverColor: "bg-emerald-50",
-      },
-    ],
-  },
-  {
-    title: "Smart Collections",
-    description: "Automated payment collection",
-    serviceClassColor: "border-blue-200",
-    quickStatsColor: "bg-blue-50",
-    icon: CreditCard,
-    inconColor: "text-blue-600",
-    serviceStats: [
-      {
-        serviceTilte: "Active",
-        serviceValue: serviceStats.collections.active,
-      },
-      {
-        serviceTilte: "Success Rate",
-        serviceValue: serviceStats.collections.collectionRate,
-        serviceValueAffix: "%",
-        affixPosition: "suffix",
-      },
-    ],
-    buttonInformation: [
-      {
-        buttonText: "Setup Collection",
-        buttonIcon: Plus,
-        buttonVariant: "default",
-        buttonSize: "sm",
-        buttonColor: "bg-blue-600",
-        buttonHoverColor: "bg-blue-700",
-      },
-      {
-        buttonText: "View All",
-        buttonIcon: Eye,
-        buttonVariant: "outline",
-        buttonSize: "sm",
-        buttonColor: "border-blue-200",
-        buttonTextColor: "text-emerald-700",
-        buttonHoverColor: "bg-blue-50",
-      },
-    ],
-  },
-  {
-    title: "Mobile Invoicing",
-    description: "Create & send invoices instantly",
-    serviceClassColor: "border-purple-200",
-    quickStatsColor: "bg-purple-50",
-    icon: Smartphone,
-    inconColor: "text-purple-600",
-    serviceStats: [
-      {
-        serviceTilte: "This month",
-        serviceValue: serviceStats.invoicing.thisMonth,
-      },
-      {
-        serviceTilte: "On time rate",
-        serviceValue: serviceStats.invoicing.paidOnTime,
-        serviceValueAffix: "%",
-        affixPosition: "suffix",
-      },
-    ],
-    buttonInformation: [
-      {
-        buttonText: "Create Invoice",
-        buttonIcon: Plus,
-        buttonVariant: "default",
-        buttonSize: "sm",
-        buttonColor: "bg-purple-600",
-        buttonHoverColor: "bg-purple-700",
-      },
-      {
-        buttonText: "View All",
-        buttonIcon: Eye,
-        buttonVariant: "outline",
-        buttonSize: "sm",
-        buttonColor: "border-purple-200",
-        buttonTextColor: "text-purple-700",
-        buttonHoverColor: "bg-purple-50",
-      },
-    ],
-  },
-];
-
-const dashboardStatsData: StatsCardData[] = [
-  {
-    title: "Total Invoices",
-    value: dashboardStats.totalInvoices,
-    subtitle: `+${dashboardStats.monthlyGrowth}% from last month`,
-    icon: FileText,
-    iconColor: "text-slate-500",
-    subtitleColor: "text-emerald-600 font-medium",
-  },
-  {
-    title: "Financed",
-    value: dashboardStats.totalFinanced,
-    subtitle: "Active financing agreements",
-    icon: CreditCard,
-    iconColor: "text-emerald-600",
-    subtitleColor: "text-slate-500",
-  },
-  {
-    title: "Collected",
-    value: dashboardStats.totalCollected.toLocaleString(),
-    subtitle: "Total collected this month",
-    icon: TrendingUp,
-    iconColor: "text-emerald-600",
-    subtitleColor: "text-emerald-600 font-medium",
-    valuePrefix: "R",
-  },
-  {
-    title: "Pending",
-    value: dashboardStats.pendingAmount.toLocaleString(),
-    subtitle: "Awaiting payment",
-    icon: CalendarDays,
-    iconColor: "text-slate-500",
-    subtitleColor: "text-slate-500",
-    valuePrefix: "R",
-  },
-];
 
 export function DashboardOverview() {
+  const router = useRouter()
+  const dashboardStats: DashboardStats = {
+    totalInvoices: 156,
+    totalFinanced: 89,
+    totalCollected: 234000,
+    pendingAmount: 145000,
+    monthlyGrowth: 12.5,
+  };
+
+  const recentInvoices: Invoice[] = [
+    {
+      id: "1",
+      invoiceNumber: "INV-001",
+      buyerName: "Ridgeway Butchery",
+      amount: 15000,
+      dueDate: "2025-09-15",
+      status: "pending",
+      service: "financing",
+      createdAt: "2025-08-25",
+    },
+    {
+      id: "2",
+      invoiceNumber: "INV-002",
+      buyerName: "De Abreu Essop Inc",
+      amount: 8500,
+      dueDate: "2025-09-10",
+      status: "overdue",
+      service: "collections",
+      createdAt: "2025-08-20",
+    },
+    {
+      id: "3",
+      invoiceNumber: "INV-003",
+      buyerName: "WLDF SA",
+      amount: 12000,
+      dueDate: "2025-09-20",
+      status: "financed",
+      service: "financing",
+      createdAt: "2025-08-28",
+    },
+  ];
+
+  // Quick stats for each service
+  const serviceStats: DashboardKPIs = {
+    financing: {
+      active: 12,
+      totalAdvanced: 145000,
+      avgProcessingTime: "2.3 hours",
+    },
+    collections: {
+      active: 34,
+      collectionRate: 94.2,
+      avgDaysToPayment: 18,
+    },
+    invoicing: {
+      thisMonth: 67,
+      paidOnTime: 89.5,
+      avgAmount: 8750,
+    },
+  };
+
+  const serviceCardData: ServiceCardData[] = [
+    {
+      title: "Pay-Me-Now Financing",
+      description: "Get instant cash for your invoices",
+      serviceClassColor: "border-emerald-200",
+      quickStatsColor: "bg-emerald-50",
+      icon: Zap,
+      inconColor: "text-emerald-600",
+      serviceStats: [
+        {
+          serviceTilte: "Active",
+          serviceValue: serviceStats.financing.active,
+        },
+        {
+          serviceTilte: "Total Advanced",
+          serviceValue: serviceStats.financing.totalAdvanced,
+          serviceValueAffix: "R",
+          affixPosition: "prefix",
+        },
+      ],
+      buttonInformation: [
+        {
+          buttonText: "New Request",
+          buttonIcon: Plus,
+          buttonVariant: "default",
+          buttonSize: "sm",
+          buttonColor: "bg-emerald-600",
+          buttonHoverColor: "bg-emerald-700",
+          onClick: () => {
+            console.log("New Financing Request");
+          },
+        },
+        {
+          buttonText: "View All",
+          buttonIcon: Eye,
+          buttonVariant: "outline",
+          buttonSize: "sm",
+          buttonColor: "border-emerald-200",
+          buttonTextColor: "text-emerald-700",
+          buttonHoverColor: "bg-emerald-50",
+          onClick: () => {
+            // Push to Financing page
+            router.push("/dashboard/financing")
+          },
+        },
+      ],
+    },
+    {
+      title: "Smart Collections",
+      description: "Automated payment collection",
+      serviceClassColor: "border-blue-200",
+      quickStatsColor: "bg-blue-50",
+      icon: CreditCard,
+      inconColor: "text-blue-600",
+      serviceStats: [
+        {
+          serviceTilte: "Active",
+          serviceValue: serviceStats.collections.active,
+        },
+        {
+          serviceTilte: "Success Rate",
+          serviceValue: serviceStats.collections.collectionRate,
+          serviceValueAffix: "%",
+          affixPosition: "suffix",
+        },
+      ],
+      buttonInformation: [
+        {
+          buttonText: "Setup Collection",
+          buttonIcon: Plus,
+          buttonVariant: "default",
+          buttonSize: "sm",
+          buttonColor: "bg-blue-600",
+          buttonHoverColor: "bg-blue-700",
+          onClick: () => {
+            console.log("Setup Collection");
+          },
+        },
+        {
+          buttonText: "View All",
+          buttonIcon: Eye,
+          buttonVariant: "outline",
+          buttonSize: "sm",
+          buttonColor: "border-blue-200",
+          buttonTextColor: "text-emerald-700",
+          buttonHoverColor: "bg-blue-50",
+          onClick: () => {
+            console.log("View All Collections");
+            router.push("/dashboard/collections")
+          },
+        },
+      ],
+    },
+    {
+      title: "Mobile Invoicing",
+      description: "Create & send invoices instantly",
+      serviceClassColor: "border-purple-200",
+      quickStatsColor: "bg-purple-50",
+      icon: Smartphone,
+      inconColor: "text-purple-600",
+      serviceStats: [
+        {
+          serviceTilte: "This month",
+          serviceValue: serviceStats.invoicing.thisMonth,
+        },
+        {
+          serviceTilte: "On time rate",
+          serviceValue: serviceStats.invoicing.paidOnTime,
+          serviceValueAffix: "%",
+          affixPosition: "suffix",
+        },
+      ],
+      buttonInformation: [
+        {
+          buttonText: "Create Invoice",
+          buttonIcon: Plus,
+          buttonVariant: "default",
+          buttonSize: "sm",
+          buttonColor: "bg-purple-600",
+          buttonHoverColor: "bg-purple-700",
+          onClick: () => {
+            console.log("Create Invoice");
+          },
+        },
+        {
+          buttonText: "View All",
+          buttonIcon: Eye,
+          buttonVariant: "outline",
+          buttonSize: "sm",
+          buttonColor: "border-purple-200",
+          buttonTextColor: "text-purple-700",
+          buttonHoverColor: "bg-purple-50",
+          onClick: () => {
+            console.log("View All Invoices");
+            router.push("/dashboard/invoicing")
+          },
+        },
+      ],
+    },
+  ];
+
+  const dashboardStatsData: StatsCardData[] = [
+    {
+      title: "Total Invoices",
+      value: dashboardStats.totalInvoices,
+      subtitle: `+${dashboardStats.monthlyGrowth}% from last month`,
+      icon: FileText,
+      iconColor: "text-slate-500",
+      subtitleColor: "text-emerald-600 font-medium",
+    },
+    {
+      title: "Financed",
+      value: dashboardStats.totalFinanced,
+      subtitle: "Active financing agreements",
+      icon: CreditCard,
+      iconColor: "text-emerald-600",
+      subtitleColor: "text-slate-500",
+    },
+    {
+      title: "Collected",
+      value: dashboardStats.totalCollected.toLocaleString(),
+      subtitle: "Total collected this month",
+      icon: TrendingUp,
+      iconColor: "text-emerald-600",
+      subtitleColor: "text-emerald-600 font-medium",
+      valuePrefix: "R",
+    },
+    {
+      title: "Pending",
+      value: dashboardStats.pendingAmount.toLocaleString(),
+      subtitle: "Awaiting payment",
+      icon: CalendarDays,
+      iconColor: "text-slate-500",
+      subtitleColor: "text-slate-500",
+      valuePrefix: "R",
+    },
+  ];
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <div className="space-y-6 p-6">

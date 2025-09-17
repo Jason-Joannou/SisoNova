@@ -5,6 +5,7 @@ export interface buttonWithIconInformation {
   buttonIcon: any;
   buttonVariant: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
   buttonSize: "icon" | "default" | "sm" | "lg" | null | undefined;
+  onClick: () => void;
   buttonColor?: string;
   buttonTextColor?: string;
   buttonHoverColor?: string;

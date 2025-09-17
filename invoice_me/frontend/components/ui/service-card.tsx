@@ -11,6 +11,7 @@ import { Button } from "./button";
 import { ServiceQuickStats } from "@/lib/types/dashboard";
 import { buttonWithIconInformation } from "@/lib/types/user-interface";
 
+// Need to add onClick Functionality for the buttons
 interface ServiceCardProps {
   data: ServiceCardData;
 }
@@ -67,6 +68,7 @@ export function ServiceCard({
                 variant={buttonInfo.buttonVariant}
                 className={`${buttonInfo.buttonColor} hover:${buttonInfo.buttonHoverColor} cursor-pointer`}
                 key={index}
+                onClick={buttonInfo.onClick}
               >
                 <buttonInfo.buttonIcon className="h-4 w-4 mr-2" />
                 {buttonInfo.buttonText}
