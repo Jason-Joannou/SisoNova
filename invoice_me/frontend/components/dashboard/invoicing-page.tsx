@@ -63,6 +63,7 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
+import { ExpandedBusinessDetailsBlock } from "../invoice-form/expanded-business-details-block";
 
 // Enhanced dummy data (same as before)
 const defaultBusinessProfile: BusinessProfile = {
@@ -740,67 +741,12 @@ export function InvoicingPage() {
 
                     {/* Extended Business Details */}
                     {showComponents.businessDetails && (
-                      <div className="mt-4 pt-3 border-t border-slate-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">
-                            Business Details
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleComponent("businessDetails")}
-                            className="h-5 w-5 p-0 text-slate-400 hover:text-slate-600"
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-
-                        {/* Single Address Field */}
-                        <div className="mb-1">
-                          <div className="flex items-center gap-2 text-xs">
-                            <span className="font-medium text-slate-600 w-12">
-                              Address:
-                            </span>
-                            <EditableField
-                              field="business_profile.full_address"
-                              value={`${config.business_profile.address_line_1}`}
-                              placeholder="123 Business Street&#10;Suite 456&#10;Cape Town, Western Cape 8001"
-                              className="text-sm w-full"
-                              multiline
-                            />
-                          </div>
-                        </div>
-
-                        <div className="mb-1">
-                          <div className="flex items-center gap-2 text-xs">
-                            <span className="font-medium text-slate-600 w-12">
-                              City:
-                            </span>
-                            <EditableField
-                              field="business_profile.full_address"
-                              value={`${config.business_profile.city}`}
-                              placeholder="123 Business Street&#10;Suite 456&#10;Cape Town, Western Cape 8001"
-                              className="text-sm w-full"
-                              multiline
-                            />
-                          </div>
-                        </div>
-
-                        <div className="mb-1">
-                          <div className="flex items-center gap-2 text-xs">
-                            <span className="font-medium text-slate-600 w-12">
-                              Province:
-                            </span>
-                            <EditableField
-                              field="business_profile.full_address"
-                              value={`${config.business_profile.province}`}
-                              placeholder="123 Business Street&#10;Suite 456&#10;Cape Town, Western Cape 8001"
-                              className="text-sm w-full"
-                              multiline
-                            />
-                          </div>
-                        </div>
-                      </div>
+                      <ExpandedBusinessDetailsBlock
+                        toggleComponent={toggleComponent}
+                        businessType="buyer"
+                        config={config}
+                        updateInvoiceConfig={updateInvoiceConfig}
+                      />
                     )}
                   </div>
                 </div>
@@ -862,67 +808,12 @@ export function InvoicingPage() {
 
                     {/* Extended Client Details */}
                     {showComponents.clientAddress && (
-                      <div className="mt-4 pt-3 border-t border-slate-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">
-                            Client Address
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleComponent("clientAddress")}
-                            className="h-5 w-5 p-0 text-slate-400 hover:text-slate-600"
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-
-                        {/* Single Address Field */}
-                        <div className="mb-1">
-                          <div className="flex items-center gap-2 text-xs">
-                            <span className="font-medium text-slate-600 w-12">
-                              Address:
-                            </span>
-                            <EditableField
-                              field="client_details.full_address"
-                              value={`${config.client_details.address_line_1}`}
-                              placeholder="789 Main Street&#10;Johannesburg, Gauteng 2000"
-                              className="text-sm w-full"
-                              multiline
-                            />
-                          </div>
-                        </div>
-
-                        <div className="mb-1">
-                          <div className="flex items-center gap-2 text-xs">
-                            <span className="font-medium text-slate-600 w-12">
-                              City:
-                            </span>
-                            <EditableField
-                              field="client_details.full_address"
-                              value={`${config.client_details.city}`}
-                              placeholder="789 Main Street&#10;Johannesburg, Gauteng 2000"
-                              className="text-sm w-full"
-                              multiline
-                            />
-                          </div>
-                        </div>
-
-                        <div className="mb-2">
-                          <div className="flex items-center gap-2 text-xs">
-                            <span className="font-medium text-slate-600 w-12">
-                              Province:
-                            </span>
-                            <EditableField
-                              field="client_details.full_address"
-                              value={`${config.client_details.province}`}
-                              placeholder="789 Main Street&#10;Johannesburg, Gauteng 2000"
-                              className="text-sm w-full"
-                              multiline
-                            />
-                          </div>
-                        </div>
-                      </div>
+                      <ExpandedBusinessDetailsBlock
+                        toggleComponent={toggleComponent}
+                        businessType="seller"
+                        config={config}
+                        updateInvoiceConfig={updateInvoiceConfig}
+                      />
                     )}
                   </div>
                 </div>
