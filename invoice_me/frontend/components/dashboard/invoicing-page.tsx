@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { EditableInputField } from "../ui/editable-field";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -91,6 +91,8 @@ const defaultClientDetails: ClientDetails = {
   province: "Gauteng",
   postal_code: "2000",
   vat_number: "4987654321",
+  purchase_order_number: "PO123",
+  credit_limit_enabled: false,
 };
 
 const defaultCreditTerms: CreditTerms = {
@@ -217,6 +219,48 @@ export function InvoicingPage() {
     setEditingField(field);
     setTempValue(currentValue);
   };
+
+  const updateInvoiceConfig = (section: string, field: string, value: any) => {
+
+    switch (section) {
+      case "business_profile":
+        setConfig((prev: InvoiceConfiguration) => ({
+          ...prev,
+          business_profile: {
+            ...prev.business_profile,
+            [field]: value,
+          },
+      }))
+      break;
+
+      case "client_details":
+        setConfig((prev: InvoiceConfiguration) => ({
+          ...prev,
+          client_details: {
+            ...prev.client_details,
+            [field]: value,
+          },
+      }))
+      break;
+
+      case "invoice_items":
+        setConfig((prev: InvoiceConfiguration) => ({
+          ...prev,
+          items: prev.items.map((item) => {
+            if (item.id === field) {
+              return {
+                ...item,
+                [field]: value,
+              };
+            }
+            return item;
+          }),
+        }))
+
+      default:
+        setConfig((prev) => ({ ...prev, [field]: value }));
+    }
+  }
 
   const saveEdit = (field: string, value: any) => {
     const fieldParts = field.split(".");
@@ -587,11 +631,17 @@ export function InvoicingPage() {
                   <h1 className="text-3xl font-bold text-blue-600 mb-2">
                     INVOICE
                   </h1>
-                  <EditableField
-                    field="business_profile.company_name"
+                  <EditableInputField
                     value={config.business_profile.company_name}
-                    className="text-lg font-semibold"
                     placeholder="Your Company Name"
+                    className="text-lg font-semibold"
+                    onEdit={(value) => {
+                      updateInvoiceConfig(
+                        "business_profile",
+                        "company_name",
+                        value
+                      );
+                    }}
                   />
                 </div>
                 <div className="text-right">
@@ -599,27 +649,33 @@ export function InvoicingPage() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium">Invoice #:</span>
-                        <EditableField
-                          field="invoice_number"
+                        <EditableInputField
                           value={config.invoice_number}
-                          className="font-mono"
                           placeholder="INV-001"
+                          className="font-mono"
+                          onEdit={(value) => {
+                            updateInvoiceConfig("", "invoice_number", value);
+                          }}
                         />
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium">Date:</span>
-                        <EditableField
-                          field="invoice_date"
+                        <EditableInputField
                           value={config.invoice_date}
                           type="date"
+                          onEdit={(value) => {
+                            updateInvoiceConfig("", "invoice_date", value);
+                          }}
                         />
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium">Due:</span>
-                        <EditableField
-                          field="due_date"
+                        <EditableInputField
                           value={config.due_date}
                           type="date"
+                          onEdit={(value) => {
+                            updateInvoiceConfig("", "due_date", value);
+                          }}
                         />
                       </div>
                     </div>
@@ -636,31 +692,47 @@ export function InvoicingPage() {
                     BILL FROM
                   </h3>
                   <div className="space-y-2">
-                    <EditableField
-                      field="business_profile.company_name"
+                    <EditableInputField
                       value={config.business_profile.company_name}
-                      className="font-bold text-base"
                       placeholder="Your Company Name"
+                      className="font-bold text-base"
+                      onEdit={(value) => {
+                        updateInvoiceConfig(
+                          "business_profile",
+                          "company_name",
+                          value
+                        );
+                      }}
                     />
-
                     {/* Essential Contact Info */}
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Mail className="h-3 w-3 text-slate-500" />
-                        <EditableField
-                          field="business_profile.email"
+                        <EditableInputField
                           value={config.business_profile.email}
                           type="email"
                           placeholder="your@email.com"
-                          className="text-sm"
+                          onEdit={(value) => {
+                            updateInvoiceConfig(
+                              "business_profile",
+                              "email",
+                              value
+                            );
+                          }}
                         />
                       </div>
                       <div className="flex items-center gap-2">
                         <Phone className="h-3 w-3 text-slate-500" />
-                        <EditableField
-                          field="business_profile.phone"
+                        <EditableInputField
                           value={config.business_profile.phone}
                           placeholder="+27 11 123 4567"
+                          onEdit={(value) => {
+                            updateInvoiceConfig(
+                              "business_profile",
+                              "phone",
+                              value
+                            );
+                          }}
                           className="text-sm"
                         />
                       </div>
@@ -740,32 +812,50 @@ export function InvoicingPage() {
                     BILL TO
                   </h3>
                   <div className="space-y-2">
-                    <EditableField
-                      field="client_details.company_name"
+                    <EditableInputField
                       value={config.client_details.company_name}
-                      className="font-bold text-base"
                       placeholder="Client Company Name"
+                      onEdit={(value) => {
+                        updateInvoiceConfig(
+                          "client_details",
+                          "company_name",
+                          value
+                        );
+                      }}
+                      className="font-bold text-base"
                     />
 
                     {/* Essential Contact Info */}
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Mail className="h-3 w-3 text-slate-500" />
-                        <EditableField
-                          field="client_details.email"
+                        <EditableInputField
                           value={config.client_details.email}
-                          type="email"
                           placeholder="client@email.com"
+                          onEdit={(value) => {
+                            updateInvoiceConfig(
+                              "client_details",
+                              "email",
+                              value
+                            );
+                          }}
                           className="text-sm"
+                          type="email"
                         />
                       </div>
                       <div className="flex items-center gap-2">
                         <Phone className="h-3 w-3 text-slate-500" />
-                        <EditableField
-                          field="business_profile.phone"
+                        <EditableInputField
                           value={config.client_details.phone}
                           placeholder="+27 11 123 4567"
                           className="text-sm"
+                          onEdit={(value) => {
+                            updateInvoiceConfig(
+                              "client_details",
+                              "phone",
+                              value
+                            );
+                          }}
                         />
                       </div>
                     </div>

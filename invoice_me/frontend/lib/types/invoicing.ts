@@ -54,6 +54,8 @@ export interface ClientDetails {
   postal_code?: string
   vat_number?: string
   purchase_order_number?: string
+  credit_limit_enabled: boolean
+  credit_limit_amount?: number
 }
 
 export interface CreditTerms {
@@ -95,6 +97,18 @@ export interface PaymentConfiguration {
   include_date: boolean
 }
 
+export interface InvoicePaymentTerms {
+  payment_terms_type: 'net_15' | 'net_30' | 'net_60' | 'cash_on_delivery' | 'cash_in_advance' | 'cash_before_delivery' | 'cash_with_order' | 'custom'
+  payment_description?: string
+  accepted_payment_methods: ('instant_eft' | 'eft' | 'payshap' | 'snapscan' | 'zapper' | 'mobile_money' | 'card_payments' | 'cash')[]
+  late_fee_enabled: boolean
+  late_fee_type: 'percentage' | 'fixed'
+  late_fee_amount: number
+  benefit_enabled: boolean
+  benefit_type: 'percentage' | 'fixed'
+  benefit_amount: number
+}
+
 export interface InvoiceConfiguration {
   invoice_number: string
   invoice_date: string
@@ -109,6 +123,7 @@ export interface InvoiceConfiguration {
   global_discount_amount?: number
   credit_terms: CreditTerms
   payment_config: PaymentConfiguration
+  payment_terms?: InvoicePaymentTerms
   currency: string
   notes?: string
   internal_notes?: string
