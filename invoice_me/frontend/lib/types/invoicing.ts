@@ -1,3 +1,4 @@
+import { PaymentTermsType, AcceptedPaymentMethods } from "../enums/invoicing";
 export interface Invoice {
   id: string;
   invoiceNumber: string;
@@ -98,9 +99,12 @@ export interface PaymentConfiguration {
 }
 
 export interface InvoicePaymentTerms {
-  payment_terms_type: 'net_15' | 'net_30' | 'net_60' | 'cash_on_delivery' | 'cash_in_advance' | 'cash_before_delivery' | 'cash_with_order' | 'custom'
-  payment_description?: string
-  accepted_payment_methods: ('instant_eft' | 'eft' | 'payshap' | 'snapscan' | 'zapper' | 'mobile_money' | 'card_payments' | 'cash')[]
+  payment_terms_type: PaymentTermsType[]
+  payment_description?: {
+    payment_terms_type: PaymentTermsType
+    description: string
+  }[]
+  accepted_payment_methods: AcceptedPaymentMethods[]
   late_fee_enabled: boolean
   late_fee_type: 'percentage' | 'fixed'
   late_fee_amount: number

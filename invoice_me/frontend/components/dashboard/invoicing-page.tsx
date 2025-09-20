@@ -64,6 +64,7 @@ import {
   Zap,
 } from "lucide-react";
 import { ExpandedBusinessDetailsBlock } from "../invoice-form/expanded-business-details-block";
+import { PaymentTermsBlock } from "../invoice-form/payment-terms-block";
 
 // Enhanced dummy data (same as before)
 const defaultBusinessProfile: BusinessProfile = {
@@ -1003,50 +1004,11 @@ export function InvoicingPage() {
 
               {/* Payment Terms - Optional */}
               {showComponents.paymentTerms && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-bold text-blue-800 flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      Payment Terms
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleComponent("paymentTerms")}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="text-sm">
-                    <p>
-                      <strong>Terms:</strong>{" "}
-                      <EditableField
-                        field="credit_terms.payment_terms_type"
-                        value={config.credit_terms.payment_terms_type}
-                        selectOptions={[
-                          "due_on_receipt",
-                          "net_15",
-                          "net_30",
-                          "net_60",
-                          "custom",
-                        ]}
-                        displayValue={config.credit_terms.payment_terms_type
-                          .replace("_", " ")
-                          .replace(/\b\w/g, (l) => l.toUpperCase())}
-                      />
-                    </p>
-                    <p>
-                      <strong>Disputes:</strong> Must be raised within{" "}
-                      <EditableField
-                        field="credit_terms.dispute_period_days"
-                        value={config.credit_terms.dispute_period_days}
-                        type="number"
-                      />{" "}
-                      days
-                    </p>
-                  </div>
-                </div>
+                <PaymentTermsBlock
+                  config={config}
+                  toggleComponent={toggleComponent}
+                  updateInvoiceConfig={updateInvoiceConfig}
+                />
               )}
 
               {/* Late Fees - Optional */}
