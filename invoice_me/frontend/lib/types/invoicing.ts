@@ -1,4 +1,5 @@
 import { PaymentTermsType, AcceptedPaymentMethods } from "../enums/invoicing";
+import { PaymentMethodInfo } from "./payment-information";
 export interface Invoice {
   id: string;
   invoiceNumber: string;
@@ -113,6 +114,14 @@ export interface InvoicePaymentTerms {
   benefit_amount: number
 }
 
+export interface InvoiceAcceptedPaymentMethods {
+  accepted_payment_methods: AcceptedPaymentMethods[]
+  payments_method_information: {
+    payment_method: AcceptedPaymentMethods
+    payment_method_info?: PaymentMethodInfo
+  }[]
+}
+
 export interface InvoiceConfiguration {
   invoice_number: string
   invoice_date: string
@@ -128,6 +137,7 @@ export interface InvoiceConfiguration {
   credit_terms: CreditTerms
   payment_config: PaymentConfiguration
   payment_terms?: InvoicePaymentTerms
+  accepted_payment_methods?: InvoiceAcceptedPaymentMethods
   currency: string
   notes?: string
   internal_notes?: string

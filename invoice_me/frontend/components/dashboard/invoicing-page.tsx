@@ -65,6 +65,7 @@ import {
 } from "lucide-react";
 import { ExpandedBusinessDetailsBlock } from "../invoice-form/expanded-business-details-block";
 import { PaymentTermsBlock } from "../invoice-form/payment-terms-block";
+import { AcceptedPaymentsBlock } from "../invoice-form/accepted-payments-block";
 
 // Enhanced dummy data (same as before)
 const defaultBusinessProfile: BusinessProfile = {
@@ -1129,72 +1130,11 @@ export function InvoicingPage() {
 
               {/* Payment Methods - Optional */}
               {showComponents.paymentMethods && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-bold text-green-800 flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      Payment Information
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleComponent("paymentMethods")}
-                      className="text-green-600 hover:text-green-800"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 mb-3">
-                    {config.payment_config.enable_instant_eft && (
-                      <div className="bg-white p-2 rounded text-center border">
-                        <strong className="text-xs">Instant EFT</strong>
-                        <div className="text-xs">Pay instantly online</div>
-                      </div>
-                    )}
-                    {config.payment_config.enable_payshap && (
-                      <div className="bg-white p-2 rounded text-center border">
-                        <strong className="text-xs">PayShap</strong>
-                        <div className="text-xs">Mobile payment</div>
-                      </div>
-                    )}
-                    {config.payment_config.enable_snapscan && (
-                      <div className="bg-white p-2 rounded text-center border">
-                        <strong className="text-xs">SnapScan</strong>
-                        <div className="text-xs">QR payment</div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="bg-yellow-50 border border-yellow-200 p-2 rounded text-sm">
-                    <p>
-                      <strong>Payment Reference:</strong>{" "}
-                      {config.invoice_number}
-                    </p>
-                    <p>
-                      <strong>Bank:</strong>{" "}
-                      <EditableField
-                        field="payment_config.bank_name"
-                        value={config.payment_config.bank_name}
-                        placeholder="Bank Name"
-                      />{" "}
-                      | <strong>Account:</strong>{" "}
-                      <EditableField
-                        field="payment_config.account_number"
-                        value={config.payment_config.account_number}
-                        placeholder="Account Number"
-                      />
-                    </p>
-                    <p>
-                      <strong>Account Holder:</strong>{" "}
-                      <EditableField
-                        field="payment_config.account_holder"
-                        value={config.payment_config.account_holder}
-                        placeholder="Account Holder"
-                      />
-                    </p>
-                  </div>
-                </div>
+                <AcceptedPaymentsBlock
+                  toggleComponent={toggleComponent}
+                  updateInvoiceConfig={updateInvoiceConfig}
+                  config={config}
+                />
               )}
 
               {/* Add Components Section */}
