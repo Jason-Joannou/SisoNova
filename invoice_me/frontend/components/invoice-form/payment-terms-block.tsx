@@ -44,10 +44,6 @@ function loadPaymentTerms(config: InvoiceConfiguration): InvoicePaymentTerms {
         description: getDefaultDescription(PaymentTermsType.NET_30),
       },
     ],
-    accepted_payment_methods: [
-      AcceptedPaymentMethods.EFT,
-      AcceptedPaymentMethods.CARD_PAYMENTS,
-    ],
     late_fee_enabled: false,
     late_fee_type: "percentage",
     late_fee_amount: 0,
@@ -280,63 +276,6 @@ export function PaymentTermsBlock({
               </p>
             </div>
           )}
-        </div>
-
-        {/* Accepted Payment Methods */}
-        <div>
-          <label className="text-sm font-medium text-blue-800 block mb-3">
-            How can clients pay you?
-          </label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {Object.values(AcceptedPaymentMethods).map((method) => {
-              const isSelected =
-                componentConfig.accepted_payment_methods.includes(method);
-              return (
-                <div
-                  key={method}
-                  className={`relative p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                    isSelected
-                      ? "border-blue-500 bg-blue-50 ring-2 ring-blue-200"
-                      : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm"
-                  }`}
-                  onClick={() => {
-                    const current = componentConfig.accepted_payment_methods;
-                    const updated = isSelected
-                      ? current.filter((m) => m !== method)
-                      : [...current, method];
-                    updateComponentConfig("accepted_payment_methods", updated);
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm text-gray-900">
-                        {formatPaymentMethod(method)}
-                      </h4>
-                    </div>
-                    <div className="ml-2">
-                      {isSelected ? (
-                        <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                          <svg
-                            className="w-2.5 h-2.5 text-white"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                      ) : (
-                        <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
 
         {/* Late Fees Section */}

@@ -105,7 +105,6 @@ export interface InvoicePaymentTerms {
     payment_terms_type: PaymentTermsType
     description: string
   }[]
-  accepted_payment_methods: AcceptedPaymentMethods[]
   late_fee_enabled: boolean
   late_fee_type: 'percentage' | 'fixed'
   late_fee_amount: number
