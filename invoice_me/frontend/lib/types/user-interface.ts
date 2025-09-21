@@ -2,13 +2,14 @@ import { ServiceQuickStats } from "./dashboard";
 
 export interface buttonWithIconInformation {
   buttonText: string;
-  buttonIcon: any;
+  buttonIcon?: any;
   buttonVariant: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
   buttonSize: "icon" | "default" | "sm" | "lg" | null | undefined;
-  onClick: () => void;
+  onClick?: () => void;
   buttonColor?: string;
   buttonTextColor?: string;
   buttonHoverColor?: string;
+  buttonClass?: string;
 }
 export interface NavigationItem {
   title: string;

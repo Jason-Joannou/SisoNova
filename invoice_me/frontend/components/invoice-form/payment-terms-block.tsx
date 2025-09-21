@@ -13,6 +13,7 @@ import {
   InvoicePaymentTerms,
   InvoiceConfiguration,
 } from "@/lib/types/invoicing";
+import { ConfirmationModalWithButton } from "../modals/invoice-form/confirmation-modal-button";
 
 interface PaymentTermsBlockProps {
   config: InvoiceConfiguration;
@@ -99,7 +100,10 @@ export function PaymentTermsBlock({
   const formatPaymentMethod = (method: string) =>
     method.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
-  const handlePaymentTermToggle = (term: PaymentTermsType, checked: boolean) => {
+  const handlePaymentTermToggle = (
+    term: PaymentTermsType,
+    checked: boolean
+  ) => {
     const current = componentConfig.payment_terms_type;
     const updated = checked
       ? [...current, term]
@@ -139,14 +143,28 @@ export function PaymentTermsBlock({
           <Clock className="h-4 w-4" />
           Payment Terms
         </h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => toggleComponent("paymentTerms")}
-          className="text-blue-600 hover:text-blue-800"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+        <ConfirmationModalWithButton
+          modalInformation={{
+            modalTitle: "Remove Payment Terms?",
+            modalDescription: "Are you sure you want to remove this component? This will reset all payment terms to default.",
+          }}
+          buttonInformation={{
+            buttonVariant: "ghost",
+            buttonSize: "sm",
+            buttonClass: "text-blue-600 hover:text-blue-800",
+            buttonIcon: <X className="h-4 w-4" />,
+            buttonText: "X",
+          }}
+          config={config}
+          updateInvoiceConfig={updateInvoiceConfig}
+          toggleComponent={toggleComponent}
+          componentInfo={{
+            component: "paymentTerms",
+            section: "",
+            field: "payment_terms",
+            value: undefined,
+          }}
+        />
       </div>
 
       <div className="space-y-6">
@@ -157,14 +175,15 @@ export function PaymentTermsBlock({
           </label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {Object.values(PaymentTermsType).map((term) => {
-              const isSelected = componentConfig.payment_terms_type.includes(term);
+              const isSelected =
+                componentConfig.payment_terms_type.includes(term);
               return (
                 <div
                   key={term}
                   className={`relative p-4 rounded-lg border-2 cursor-pointer transition-all ${
                     isSelected
-                      ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
-                      : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm'
+                      ? "border-blue-500 bg-blue-50 ring-2 ring-blue-200"
+                      : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm"
                   }`}
                   onClick={() => handlePaymentTermToggle(term, !isSelected)}
                 >
@@ -177,8 +196,16 @@ export function PaymentTermsBlock({
                     <div className="ml-3">
                       {isSelected ? (
                         <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         </div>
                       ) : (
@@ -235,8 +262,18 @@ export function PaymentTermsBlock({
           ) : (
             <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
               <div className="text-gray-400 mb-2">
-                <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  className="w-8 h-8 mx-auto"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <p className="text-sm text-gray-500 italic">
@@ -253,14 +290,15 @@ export function PaymentTermsBlock({
           </label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {Object.values(AcceptedPaymentMethods).map((method) => {
-              const isSelected = componentConfig.accepted_payment_methods.includes(method);
+              const isSelected =
+                componentConfig.accepted_payment_methods.includes(method);
               return (
                 <div
                   key={method}
                   className={`relative p-3 rounded-lg border-2 cursor-pointer transition-all ${
                     isSelected
-                      ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
-                      : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm'
+                      ? "border-blue-500 bg-blue-50 ring-2 ring-blue-200"
+                      : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm"
                   }`}
                   onClick={() => {
                     const current = componentConfig.accepted_payment_methods;
@@ -279,8 +317,16 @@ export function PaymentTermsBlock({
                     <div className="ml-2">
                       {isSelected ? (
                         <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                          <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          <svg
+                            className="w-2.5 h-2.5 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         </div>
                       ) : (
