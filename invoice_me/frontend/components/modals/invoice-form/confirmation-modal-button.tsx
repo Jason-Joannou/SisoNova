@@ -19,7 +19,6 @@ interface ConfirmationModalProps {
     modalDescription: string;
   };
   buttonInformation: buttonWithIconInformation;
-  config: InvoiceConfiguration;
   updateInvoiceConfig: (section: string, field: string, value: any) => void;
   toggleComponent: (
     component:
@@ -52,7 +51,6 @@ export function ConfirmationModalWithButton({
   modalInformation,
   buttonInformation,
   componentInfo,
-  config,
   updateInvoiceConfig,
   toggleComponent,
 }: ConfirmationModalProps) {

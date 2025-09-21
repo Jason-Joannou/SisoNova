@@ -155,7 +155,6 @@ export function PaymentTermsBlock({
             buttonIcon: <X className="h-4 w-4" />,
             buttonText: "X",
           }}
-          config={config}
           updateInvoiceConfig={updateInvoiceConfig}
           toggleComponent={toggleComponent}
           componentInfo={{
