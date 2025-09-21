@@ -24,7 +24,7 @@ import {
   CashPaymentInfo,
   MobileMoneyPaymentInfo,
 } from "@/lib/types/payment-information";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface AcceptedPaymentsBlockProps {
   toggleComponent: (
@@ -123,9 +123,8 @@ function getPaymentMethodNameAndDescription(method: string) {
   }
 }
 
-function initPaymentMethodInformation(method: string) {
-  const paymentMethod =
-    AcceptedPaymentMethods[method as keyof typeof AcceptedPaymentMethods];
+function initPaymentMethodInformation(method: AcceptedPaymentMethods) {
+  const paymentMethod = method;
   const paymentMethodMetaData =
     getPaymentMethodNameAndDescription(paymentMethod);
   const basePaymentMethodInfo: BasePaymentMethodInfo = {
@@ -217,7 +216,7 @@ function getPaymentMethodIcon(method: AcceptedPaymentMethods) {
 }
 
 function loadPaymentMethodInformation(
-  method: string,
+  method: AcceptedPaymentMethods,
   componentConfig: InvoiceAcceptedPaymentMethods
 ) {
   const paymentInformation = componentConfig.payments_method_information.find(
@@ -236,6 +235,13 @@ export function AcceptedPaymentsBlock({
 }: AcceptedPaymentsBlockProps) {
   const [componentConfig, setComponentConfig] =
     useState<InvoiceAcceptedPaymentMethods>(loadAcceptedPaymentMethods(config));
+
+    useEffect(() => {
+        if (!config.accepted_payment_methods) {
+          const defaultTerms = loadAcceptedPaymentMethods(config);
+          updateInvoiceConfig("", "accepted_payment_methods", defaultTerms);
+        }
+      }, [config.accepted_payment_methods, updateInvoiceConfig]);
 
   const updateComponentConfig = (
     updatedComponentConfig: InvoiceAcceptedPaymentMethods
@@ -335,7 +341,7 @@ export function AcceptedPaymentsBlock({
           How can clients pay you?
         </label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {Object.values(AcceptedPaymentMethods).map((method) => {
+          {Object.values(AcceptedPaymentMethods).map((method: AcceptedPaymentMethods) => {
             const isSelected =
               componentConfig.accepted_payment_methods.includes(method);
             const methodInfo = getPaymentMethodNameAndDescription(method);
