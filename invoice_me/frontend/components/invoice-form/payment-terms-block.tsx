@@ -79,9 +79,6 @@ export function PaymentTermsBlock({
   toggleComponent,
   updateInvoiceConfig,
 }: PaymentTermsBlockProps) {
-  const [editingField, setEditingField] = useState<string | null>(null);
-  const [tempValue, setTempValue] = useState<any>("");
-
   const [componentConfig, setComponentConfig] = useState<InvoicePaymentTerms>(
     loadPaymentTerms(config)
   );
@@ -96,12 +93,44 @@ export function PaymentTermsBlock({
   const updateComponentConfig = (field: string, value: any) => {
     const updatedConfig = { ...componentConfig, [field]: value };
     setComponentConfig(updatedConfig);
-
     updateInvoiceConfig("", "payment_terms", updatedConfig);
   };
 
   const formatPaymentMethod = (method: string) =>
     method.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+
+  const handlePaymentTermToggle = (term: PaymentTermsType, checked: boolean) => {
+    const current = componentConfig.payment_terms_type;
+    const updated = checked
+      ? [...current, term]
+      : current.filter((t) => t !== term);
+
+    let updatedDescriptions = componentConfig.payment_description || [];
+    if (checked) {
+      if (!updatedDescriptions.find((d) => d.payment_terms_type === term)) {
+        updatedDescriptions = [
+          ...updatedDescriptions,
+          {
+            payment_terms_type: term,
+            description: getDefaultDescription(term),
+          },
+        ];
+      }
+    } else {
+      updatedDescriptions = updatedDescriptions.filter(
+        (d) => d.payment_terms_type !== term
+      );
+    }
+
+    const newConfig = {
+      ...componentConfig,
+      payment_terms_type: updated,
+      payment_description: updatedDescriptions,
+    };
+
+    setComponentConfig(newConfig);
+    updateInvoiceConfig("", "payment_terms", newConfig);
+  };
 
   return (
     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -120,78 +149,68 @@ export function PaymentTermsBlock({
         </Button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {/* Payment Terms Type */}
         <div>
-          <label className="text-sm font-medium text-blue-800 block mb-1">
-            Payment Terms:
+          <label className="text-sm font-medium text-blue-800 block mb-3">
+            Choose your payment terms:
           </label>
-          <div className="grid grid-cols-2 gap-2">
-            {Object.values(PaymentTermsType).map((term) => (
-              <div key={term} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id={term}
-                  checked={componentConfig.payment_terms_type.includes(term)}
-                  onChange={(e) => {
-                    const current = componentConfig.payment_terms_type;
-                    const updated = e.target.checked
-                      ? [...current, term]
-                      : current.filter((t) => t !== term);
-
-                    let updatedDescriptions =
-                      componentConfig.payment_description || [];
-                    if (e.target.checked) {
-                      // Add description placeholder if missing
-                      if (
-                        !updatedDescriptions.find(
-                          (d) => d.payment_terms_type === term
-                        )
-                      ) {
-                        updatedDescriptions = [
-                          ...updatedDescriptions,
-                          {
-                            payment_terms_type: term,
-                            description: getDefaultDescription(term),
-                          },
-                        ];
-                      }
-                    } else {
-                      // Remove description for unchecked term
-                      updatedDescriptions = updatedDescriptions.filter(
-                        (d) => d.payment_terms_type !== term
-                      );
-                    }
-
-                    const newConfig = {
-                      ...componentConfig,
-                      payment_terms_type: updated,
-                      payment_description: updatedDescriptions,
-                    };
-
-                    setComponentConfig(newConfig);
-                    updateInvoiceConfig("", "payment_terms", newConfig);
-                  }}
-                  className="rounded border-gray-300"
-                />
-                <label htmlFor={term} className="text-sm cursor-pointer">
-                  {formatPaymentMethod(term)}
-                </label>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {Object.values(PaymentTermsType).map((term) => {
+              const isSelected = componentConfig.payment_terms_type.includes(term);
+              return (
+                <div
+                  key={term}
+                  className={`relative p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                    isSelected
+                      ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
+                      : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm'
+                  }`}
+                  onClick={() => handlePaymentTermToggle(term, !isSelected)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-sm text-gray-900">
+                        {formatPaymentMethod(term)}
+                      </h4>
+                    </div>
+                    <div className="ml-3">
+                      {isSelected ? (
+                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      ) : (
+                        <div className="w-5 h-5 border-2 border-gray-300 rounded-full"></div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         {/* Payment Description */}
         <div>
-          <label className="text-sm font-medium text-blue-800 block mb-1">
-            Descriptions:
+          <label className="text-sm font-medium text-blue-800 block mb-3">
+            Customize your payment term descriptions:
           </label>
           {componentConfig.payment_description &&
           componentConfig.payment_description.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {componentConfig.payment_description.map((desc, index) => (
-                <div key={desc.payment_terms_type}>
+                <div
+                  key={desc.payment_terms_type}
+                  className="bg-white border border-gray-200 rounded-lg p-4"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <h5 className="font-medium text-sm text-gray-900">
+                      {formatPaymentMethod(desc.payment_terms_type)}
+                    </h5>
+                  </div>
                   <EditableInputField
                     value={desc.description}
                     onEdit={(value) => {
@@ -208,50 +227,75 @@ export function PaymentTermsBlock({
                     }}
                     placeholder={getDefaultDescription(desc.payment_terms_type)}
                     multiline
+                    className="w-full"
                   />
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 italic">
-              Select payment terms above to add descriptions
-            </p>
+            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
+              <div className="text-gray-400 mb-2">
+                <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <p className="text-sm text-gray-500 italic">
+                Select payment terms above to customize their descriptions
+              </p>
+            </div>
           )}
         </div>
 
         {/* Accepted Payment Methods */}
         <div>
-          <label className="text-sm font-medium text-blue-800 block mb-2">
-            Accepted Payment Methods:
+          <label className="text-sm font-medium text-blue-800 block mb-3">
+            How can clients pay you?
           </label>
-          <div className="grid grid-cols-2 gap-2">
-            {Object.values(AcceptedPaymentMethods).map((method) => (
-              <div key={method} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id={method}
-                  checked={componentConfig.accepted_payment_methods.includes(
-                    method
-                  )}
-                  onChange={(e) => {
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {Object.values(AcceptedPaymentMethods).map((method) => {
+              const isSelected = componentConfig.accepted_payment_methods.includes(method);
+              return (
+                <div
+                  key={method}
+                  className={`relative p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                    isSelected
+                      ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
+                      : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm'
+                  }`}
+                  onClick={() => {
                     const current = componentConfig.accepted_payment_methods;
-                    const updated = e.target.checked
-                      ? [...current, method]
-                      : current.filter((m) => m !== method);
+                    const updated = isSelected
+                      ? current.filter((m) => m !== method)
+                      : [...current, method];
                     updateComponentConfig("accepted_payment_methods", updated);
                   }}
-                  className="rounded border-gray-300"
-                />
-                <label htmlFor={method} className="text-sm cursor-pointer">
-                  {formatPaymentMethod(method)}
-                </label>
-              </div>
-            ))}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-sm text-gray-900">
+                        {formatPaymentMethod(method)}
+                      </h4>
+                    </div>
+                    <div className="ml-2">
+                      {isSelected ? (
+                        <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                          <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      ) : (
+                        <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         {/* Late Fees Section */}
-        <div className="border-t pt-3">
+        <div className="border-t pt-4">
           <div className="flex items-center justify-between mb-2">
             <label className="text-sm font-medium text-blue-800">
               Late Payment Fees:
@@ -303,7 +347,7 @@ export function PaymentTermsBlock({
         </div>
 
         {/* Early Payment Benefit Section */}
-        <div className="border-t pt-3">
+        <div className="border-t pt-4">
           <div className="flex items-center justify-between mb-2">
             <label className="text-sm font-medium text-blue-800">
               Early Payment Discount:
