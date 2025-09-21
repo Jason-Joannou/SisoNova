@@ -191,6 +191,13 @@ function initPaymentMethodInformation(method: AcceptedPaymentMethods) {
         ...basePaymentMethodInfo,
         payment_method: AcceptedPaymentMethods.CASH,
       } as CashPaymentInfo;
+    case AcceptedPaymentMethods.PAYSHAP:
+      return {
+        ...basePaymentMethodInfo,
+        payment_method: AcceptedPaymentMethods.PAYSHAP,
+        payshap_id: "",
+        reference_prefix: "",
+      } as PayShapPaymentInfo;
     default:
       return undefined;
   }
