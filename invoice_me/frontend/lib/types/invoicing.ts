@@ -158,6 +158,8 @@ export interface InvoiceConfiguration {
   payment_config: PaymentConfiguration
   payment_terms?: InvoicePaymentTerms
   accepted_payment_methods?: InvoiceAcceptedPaymentMethods
+  late_payment_terms?: LatePaymentConfig
+  early_discount_terms?: EarlyDiscountConfig
   currency: string
   notes?: string
   internal_notes?: string

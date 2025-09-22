@@ -1,7 +1,7 @@
 // components/dashboard/invoicing-page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -68,6 +68,7 @@ import { PaymentTermsBlock } from "../invoice-form/payment-terms-block";
 import { AcceptedPaymentsBlock } from "../invoice-form/accepted-payments-block";
 import { LatePaymentsBlock } from "../invoice-form/late-payments-block";
 import { DiscountedPaymentsBlock } from "../invoice-form/discounted-payments-block";
+import { NotesBlock } from "../invoice-form/notes-block";
 
 // Enhanced dummy data (same as before)
 const defaultBusinessProfile: BusinessProfile = {
@@ -169,8 +170,7 @@ export function InvoicingPage() {
     global_discount_percentage: 0,
     credit_terms: defaultCreditTerms,
     payment_config: defaultPaymentConfig,
-    currency: "ZAR",
-    notes: "",
+    currency: "ZAR"
   });
 
   // Component visibility states
@@ -225,7 +225,7 @@ export function InvoicingPage() {
     setTempValue(currentValue);
   };
 
-  const updateInvoiceConfig = (section: string, field: string, value: any) => {
+  const updateInvoiceConfig = useCallback((section: string, field: string, value: any) => {
     switch (section) {
       case "business_profile":
         setConfig((prev: InvoiceConfiguration) => ({
@@ -264,7 +264,7 @@ export function InvoicingPage() {
       default:
         setConfig((prev) => ({ ...prev, [field]: value }));
     }
-  };
+  }, []);
 
   const saveEdit = (field: string, value: any) => {
     const fieldParts = field.split(".");
@@ -1033,29 +1033,11 @@ export function InvoicingPage() {
 
               {/* Notes - Optional */}
               {showComponents.notes && (
-                <div className="border rounded-lg p-4 hover:border-purple-300 transition-colors">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-bold text-purple-600 flex items-center gap-2">
-                      <MessageSquare className="h-4 w-4" />
-                      Additional Notes
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleComponent("notes")}
-                      className="text-purple-600 hover:text-purple-800"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <EditableField
-                    field="notes"
-                    value={config.notes}
-                    placeholder="Add any additional notes or terms..."
-                    multiline
-                    className="w-full min-h-[60px]"
+                <NotesBlock
+                  config={config}
+                  toggleComponent={toggleComponent}
+                  updateInvoiceConfig={updateInvoiceConfig}
                   />
-                </div>
               )}
 
               {/* Payment Methods - Optional */}
