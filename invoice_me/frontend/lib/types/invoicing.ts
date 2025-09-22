@@ -130,6 +130,17 @@ export interface LatePaymentConfig {
   late_fee_description: string;
 }
 
+export interface DiscountTier {
+  id: string;
+  discount_percentage: number;
+  discount_days: number;
+  description: string;
+}
+
+export interface EarlyDiscountConfig {
+  early_discount_enabled: boolean;
+  discount_tiers: DiscountTier[];
+}
 
 export interface InvoiceConfiguration {
   invoice_number: string
