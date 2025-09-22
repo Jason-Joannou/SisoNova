@@ -66,6 +66,7 @@ import {
 import { ExpandedBusinessDetailsBlock } from "../invoice-form/expanded-business-details-block";
 import { PaymentTermsBlock } from "../invoice-form/payment-terms-block";
 import { AcceptedPaymentsBlock } from "../invoice-form/accepted-payments-block";
+import { LatePaymentsBlock } from "../invoice-form/late-payments-block";
 
 // Enhanced dummy data (same as before)
 const defaultBusinessProfile: BusinessProfile = {
@@ -1013,46 +1014,13 @@ export function InvoicingPage() {
               )}
 
               {/* Late Fees - Optional */}
-              {showComponents.lateFees &&
-                config.credit_terms.late_fee_enabled && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-bold text-red-800 flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4" />
-                        Late Payment Fees
-                      </h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          toggleComponent("lateFees");
-                          setConfig((prev) => ({
-                            ...prev,
-                            credit_terms: {
-                              ...prev.credit_terms,
-                              late_fee_enabled: false,
-                            },
-                          }));
-                        }}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="text-sm">
-                      <p>
-                        <strong>Late Fee:</strong>{" "}
-                        <EditableField
-                          field="credit_terms.late_fee_amount"
-                          value={config.credit_terms.late_fee_amount}
-                          type="number"
-                        />
-                        % {config.credit_terms.late_fee_frequency} service
-                        charge applies to overdue invoices
-                      </p>
-                    </div>
-                  </div>
-                )}
+              {showComponents.lateFees && (
+                <LatePaymentsBlock
+                  config={config}
+                  toggleComponent={toggleComponent}
+                  updateInvoiceConfig={updateInvoiceConfig}
+                />
+              )}
 
               {/* Early Discount - Optional */}
               {showComponents.earlyDiscount &&
