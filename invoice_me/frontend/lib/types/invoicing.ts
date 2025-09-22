@@ -121,6 +121,16 @@ export interface InvoiceAcceptedPaymentMethods {
   }[]
 }
 
+export interface LatePaymentConfig {
+  late_fee_enabled: boolean;
+  late_fee_amount: number;
+  late_fee_type: "percentage" | "fixed";
+  grace_period_days: number;
+  compound_interest: boolean;
+  late_fee_description: string;
+}
+
+
 export interface InvoiceConfiguration {
   invoice_number: string
   invoice_date: string
