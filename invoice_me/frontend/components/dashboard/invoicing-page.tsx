@@ -67,6 +67,7 @@ import { ExpandedBusinessDetailsBlock } from "../invoice-form/expanded-business-
 import { PaymentTermsBlock } from "../invoice-form/payment-terms-block";
 import { AcceptedPaymentsBlock } from "../invoice-form/accepted-payments-block";
 import { LatePaymentsBlock } from "../invoice-form/late-payments-block";
+import { DiscountedPaymentsBlock } from "../invoice-form/discounted-payments-block";
 
 // Enhanced dummy data (same as before)
 const defaultBusinessProfile: BusinessProfile = {
@@ -225,7 +226,6 @@ export function InvoicingPage() {
   };
 
   const updateInvoiceConfig = (section: string, field: string, value: any) => {
-
     switch (section) {
       case "business_profile":
         setConfig((prev: InvoiceConfiguration) => ({
@@ -234,8 +234,8 @@ export function InvoicingPage() {
             ...prev.business_profile,
             [field]: value,
           },
-      }))
-      break;
+        }));
+        break;
 
       case "client_details":
         setConfig((prev: InvoiceConfiguration) => ({
@@ -244,8 +244,8 @@ export function InvoicingPage() {
             ...prev.client_details,
             [field]: value,
           },
-      }))
-      break;
+        }));
+        break;
 
       case "invoice_items":
         setConfig((prev: InvoiceConfiguration) => ({
@@ -259,12 +259,12 @@ export function InvoicingPage() {
             }
             return item;
           }),
-        }))
+        }));
 
       default:
         setConfig((prev) => ({ ...prev, [field]: value }));
     }
-  }
+  };
 
   const saveEdit = (field: string, value: any) => {
     const fieldParts = field.split(".");
@@ -1023,51 +1023,13 @@ export function InvoicingPage() {
               )}
 
               {/* Early Discount - Optional */}
-              {showComponents.earlyDiscount &&
-                config.credit_terms.early_discount_enabled && (
-                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-bold text-emerald-800 flex items-center gap-2">
-                        <Percent className="h-4 w-4" />
-                        Early Payment Discount
-                      </h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          toggleComponent("earlyDiscount");
-                          setConfig((prev) => ({
-                            ...prev,
-                            credit_terms: {
-                              ...prev.credit_terms,
-                              early_discount_enabled: false,
-                            },
-                          }));
-                        }}
-                        className="text-emerald-600 hover:text-emerald-800"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="text-sm">
-                      <p>
-                        <strong>Early Payment:</strong>{" "}
-                        <EditableField
-                          field="credit_terms.early_discount_percentage"
-                          value={config.credit_terms.early_discount_percentage}
-                          type="number"
-                        />
-                        % discount if paid within{" "}
-                        <EditableField
-                          field="credit_terms.early_discount_days"
-                          value={config.credit_terms.early_discount_days}
-                          type="number"
-                        />{" "}
-                        days
-                      </p>
-                    </div>
-                  </div>
-                )}
+              {showComponents.earlyDiscount && (
+                <DiscountedPaymentsBlock
+                  config={config}
+                  toggleComponent={toggleComponent}
+                  updateInvoiceConfig={updateInvoiceConfig}
+                />
+              )}
 
               {/* Notes - Optional */}
               {showComponents.notes && (
