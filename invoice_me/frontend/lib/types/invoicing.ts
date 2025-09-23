@@ -60,45 +60,6 @@ export interface ClientDetails {
   credit_limit_amount?: number
 }
 
-export interface CreditTerms {
-  payment_terms_type: 'net_15' | 'net_30' | 'net_60' | 'due_on_receipt' | 'custom'
-  custom_payment_terms?: string
-  payment_due_days?: number
-  late_fee_enabled: boolean
-  late_fee_type: 'percentage' | 'fixed'
-  late_fee_amount: number
-  late_fee_frequency: 'daily' | 'monthly' | 'once'
-  early_discount_enabled: boolean
-  early_discount_days?: number
-  early_discount_percentage?: number
-  credit_limit_enabled: boolean
-  credit_limit_amount?: number
-  dispute_period_days: number
-  dispute_contact_email?: string
-  dispute_contact_number?: string
-  retention_enabled: boolean
-  retention_percentage?: number
-  retention_period_days?: number
-}
-
-export interface PaymentConfiguration {
-  bank_name: string
-  account_holder: string
-  account_number: string
-  branch_code: string
-  swift_code?: string
-  enable_instant_eft: boolean
-  enable_payshap: boolean
-  enable_snapscan: boolean
-  enable_zapper: boolean
-  enable_mobile_money: boolean
-  enable_bank_transfer: boolean
-  enable_card_payments: boolean
-  reference_prefix: string
-  include_company_code: boolean
-  include_date: boolean
-}
-
 export interface InvoicePaymentTerms {
   payment_terms_type: PaymentTermsType[]
   payment_description?: {
@@ -141,6 +102,13 @@ export interface EarlyDiscountConfig {
   early_discount_enabled: boolean;
   discount_tiers: DiscountTier[];
 }
+export interface InvoiceConfigurationSettings {
+  enable_collections_service: boolean
+  collection_service_settings?: {
+    automated_reminders_enabled: boolean
+    reminder_schedule: number[]
+  }
+}
 
 export interface InvoiceConfiguration {
   invoice_number: string
@@ -151,16 +119,10 @@ export interface InvoiceConfiguration {
   items: InvoiceItem[]
   include_vat: boolean
   vat_rate: number
-  global_discount_enabled: boolean
-  global_discount_percentage: number
-  global_discount_amount?: number
-  credit_terms: CreditTerms
-  payment_config: PaymentConfiguration
   payment_terms?: InvoicePaymentTerms
   accepted_payment_methods?: InvoiceAcceptedPaymentMethods
   late_payment_terms?: LatePaymentConfig
   early_discount_terms?: EarlyDiscountConfig
   currency: string
   notes?: string
-  internal_notes?: string
 }

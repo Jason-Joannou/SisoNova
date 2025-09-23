@@ -13,8 +13,6 @@ import {
   BusinessProfile,
   ClientDetails,
   InvoiceItem,
-  CreditTerms,
-  PaymentConfiguration,
   InvoiceConfiguration,
 } from "@/lib/types/invoicing";
 import {
