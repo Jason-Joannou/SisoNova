@@ -2,10 +2,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EditableInputField } from "../ui/editable-field";
 import { Switch } from "@/components/ui/switch";
@@ -570,152 +567,199 @@ export function InvoicingPage() {
 
               {/* Items Table - Essential */}
               <div className="border rounded-lg overflow-hidden">
-                <div className="bg-blue-600 text-white p-3 flex items-center justify-between">
+                <div className="bg-blue-600 text-white p-4 flex items-center justify-between">
                   <h3 className="font-bold flex items-center gap-2">
                     <Calculator className="h-4 w-4" />
                     Invoice Items
                   </h3>
-                  <Button
-                    onClick={addItem}
-                    size="sm"
-                    variant="secondary"
-                    className="bg-white text-blue-600 hover:bg-blue-50"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Item
-                  </Button>
                 </div>
 
-                <table className="w-full">
-                  <thead className="bg-blue-50">
-                    <tr>
-                      <th className="text-left p-3 font-medium">Description</th>
-                      <th className="text-center p-3 font-medium w-20">Qty</th>
-                      <th className="text-center p-3 font-medium w-20">Unit</th>
-                      <th className="text-right p-3 font-medium w-32">Rate</th>
-                      <th className="text-right p-3 font-medium w-32">
-                        Amount
-                      </th>
-                      <th className="w-12"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {config.items.map((item, index) => {
-                      const lineTotal =
-                        item.quantity *
-                        item.unit_price *
-                        (1 - item.discount_percentage / 100);
-                      return (
-                        <tr
-                          key={item.id}
-                          className="border-b hover:bg-slate-50"
-                        >
-                          <td className="p-3">
-                            <div className="space-y-1">
-                              <EditableInputField
-                              value={item.title}
-                              className="font-medium block w-full"
-                              placeholder="Item title"
-                              onEdit={(value) => {
-                                updateInvoiceConfig(
-                                  "invoice_items",
-                                  "title",
-                                  value,
-                                  item.id
-                                );
-                              }}
-                              />
-                              <EditableInputField
-                              value={item.description}
-                              className="text-sm text-slate-600 block w-full"
-                              placeholder="Description (optional)"
-                              multiline
-                              onEdit={(value) => {
-                                updateInvoiceConfig(
-                                  "invoice_items",
-                                  "description",
-                                  value,
-                                  item.id
-                                );
-                              }}
-                              />
-                            </div>
-                          </td>
-                          <td className="p-3 text-center">
-                            <EditableInputField
-                            value={item.quantity}
-                            type="number"
-                            className="w-16 text-center"
-                            onEdit={(value) => {
-                              updateInvoiceConfig(
-                                "invoice_items",
-                                "quantity",
-                                value,
-                                item.id
-                              );
-                            }}
-                            />
-                          </td>
-                          <td className="p-3 text-center">
-                            <EditableInputField
-                            value={item.unit}
-                            selectOptions={[
-                              "each",
-                              "hours",
-                              "days",
-                              "kg",
-                              "m",
-                              "m2",]}
-                              className="w-16 text-center"
-                              onEdit={(value) => {
-                                updateInvoiceConfig(
-                                  "invoice_items",
-                                  "unit",
-                                  value,
-                                  item.id
-                                );
-                              }}
-                              />
-                          </td>
-                          <td className="p-3 text-right">
-                            R
-                            <EditableInputField
-                            value={item.unit_price}
-                            type="number"
-                            className="w-24 text-right"
-                            onEdit={(value) => {
-                              updateInvoiceConfig(
-                                "invoice_items",
-                                "unit_price",
-                                value,
-                                item.id
-                              );
-                            }}
-                            />
-                          </td>
-                          <td className="p-3 text-right font-medium">
-                            R
-                            {lineTotal.toLocaleString("en-ZA", {
-                              minimumFractionDigits: 2,
-                            })}
-                          </td>
-                          <td className="p-3">
-                            {config.items.length > 1 && (
-                              <Button
-                                onClick={() => removeItem(item.id)}
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[800px]">
+                    <thead className="bg-blue-50 border-b">
+                      <tr>
+                        <th className="text-left p-4 font-semibold text-gray-700 min-w-[300px]">
+                          Description
+                        </th>
+                        <th className="text-center p-4 font-semibold text-gray-700 w-20">
+                          Qty
+                        </th>
+                        <th className="text-center p-4 font-semibold text-gray-700 w-24">
+                          Unit
+                        </th>
+                        <th className="text-right p-4 font-semibold text-gray-700 w-32">
+                          Rate
+                        </th>
+                        <th className="text-right p-4 font-semibold text-gray-700 w-32">
+                          Amount
+                        </th>
+                        <th className="w-12 p-4"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {config.items.map((item, index) => {
+                        const lineTotal =
+                          item.quantity *
+                          item.unit_price *
+                          (1 - item.discount_percentage / 100);
+                        return (
+                          <tr
+                            key={item.id}
+                            className={`border-b hover:bg-slate-50 transition-colors ${
+                              index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                            }`}
+                          >
+                            <td className="p-4">
+                              <div className="space-y-2">
+                                <EditableInputField
+                                  value={item.title}
+                                  className="font-medium text-gray-900 w-full"
+                                  placeholder="Item title"
+                                  onEdit={(value) => {
+                                    updateInvoiceConfig(
+                                      "invoice_items",
+                                      "title",
+                                      value,
+                                      item.id
+                                    );
+                                  }}
+                                />
+                                <EditableInputField
+                                  value={item.description || ""}
+                                  className="text-sm text-gray-600 w-full"
+                                  placeholder="Add description (optional)"
+                                  multiline
+                                  onEdit={(value) => {
+                                    updateInvoiceConfig(
+                                      "invoice_items",
+                                      "description",
+                                      value,
+                                      item.id
+                                    );
+                                  }}
+                                />
+                                {item.sku && (
+                                  <div className="text-xs text-gray-500 font-mono">
+                                    SKU: {item.sku}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+
+                            <td className="p-4">
+                              <div className="flex justify-center">
+                                <EditableInputField
+                                  value={item.quantity}
+                                  type="number"
+                                  className="w-16 text-center font-medium"
+                                  onEdit={(value) => {
+                                    updateInvoiceConfig(
+                                      "invoice_items",
+                                      "quantity",
+                                      Number(value) || 0,
+                                      item.id
+                                    );
+                                  }}
+                                />
+                              </div>
+                            </td>
+
+                            <td className="p-4">
+                              <div className="flex justify-center">
+                                <EditableInputField
+                                  value={item.unit}
+                                  selectOptions={[
+                                    "each",
+                                    "hours",
+                                    "days",
+                                    "weeks",
+                                    "months",
+                                    "kg",
+                                    "g",
+                                    "m",
+                                    "m2",
+                                    "m3",
+                                    "km",
+                                    "l",
+                                    "ml",
+                                  ]}
+                                  className="w-20 text-center text-sm"
+                                  displayValue={item.unit}
+                                  onEdit={(value) => {
+                                    updateInvoiceConfig(
+                                      "invoice_items",
+                                      "unit",
+                                      value,
+                                      item.id
+                                    );
+                                  }}
+                                />
+                              </div>
+                            </td>
+
+                            <td className="p-4">
+                              <div className="flex items-center justify-end gap-1">
+                                <span className="text-gray-600 font-medium">
+                                  R
+                                </span>
+                                <EditableInputField
+                                  value={item.unit_price}
+                                  type="number"
+                                  className="w-24 text-right font-medium"
+                                  onEdit={(value) => {
+                                    updateInvoiceConfig(
+                                      "invoice_items",
+                                      "unit_price",
+                                      Number(value) || 0,
+                                      item.id
+                                    );
+                                  }}
+                                />
+                              </div>
+                            </td>
+
+                            <td className="p-4">
+                              <div className="text-right font-semibold text-gray-900">
+                                R
+                                {lineTotal.toLocaleString("en-ZA", {
+                                  minimumFractionDigits: 2,
+                                })}
+                              </div>
+                            </td>
+
+                            <td className="p-4">
+                              <div className="flex justify-center">
+                                {config.items.length > 1 && (
+                                  <Button
+                                    onClick={() => removeItem(item.id)}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Add Item Row */}
+                <div className="bg-gray-50 border-t p-4">
+                  <Button
+                    onClick={addItem}
+                    variant="outline"
+                    size="sm"
+                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Another Item
+                  </Button>
+                </div>
               </div>
 
               {/* Totals - Essential */}
