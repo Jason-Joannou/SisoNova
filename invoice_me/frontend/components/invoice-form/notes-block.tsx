@@ -97,17 +97,6 @@ export function NotesBlock({
             These notes will appear at the bottom of your invoice
           </p>
         </div>
-
-        {componentConfig && ( // Changed from componentConfig.notes to just componentConfig
-          <div className="bg-white border border-purple-200 rounded-lg p-3">
-            <h4 className="text-sm font-medium text-purple-800 mb-2">
-              Preview:
-            </h4>
-            <div className="text-sm text-gray-700 whitespace-pre-wrap bg-gray-50 p-2 rounded border">
-              {componentConfig} {/* Changed from componentConfig.notes to just componentConfig */}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
