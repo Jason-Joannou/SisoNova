@@ -69,6 +69,8 @@ import { AcceptedPaymentsBlock } from "../invoice-form/accepted-payments-block";
 import { LatePaymentsBlock } from "../invoice-form/late-payments-block";
 import { DiscountedPaymentsBlock } from "../invoice-form/discounted-payments-block";
 import { NotesBlock } from "../invoice-form/notes-block";
+import { InvoiceTemplate } from "../invoice-form/invoice-template";
+import { InvoicePreviewModal } from "../modals/invoice-form/invoice-preview-modal";
 
 // Enhanced dummy data (same as before)
 const defaultBusinessProfile: BusinessProfile = {
@@ -166,11 +168,7 @@ export function InvoicingPage() {
     ],
     include_vat: true,
     vat_rate: 0.15,
-    global_discount_enabled: false,
-    global_discount_percentage: 0,
-    credit_terms: defaultCreditTerms,
-    payment_config: defaultPaymentConfig,
-    currency: "ZAR"
+    currency: "ZAR",
   });
 
   // Component visibility states
@@ -188,6 +186,7 @@ export function InvoicingPage() {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<any>("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Calculate totals (same as before)
   const calculateTotals = () => {
@@ -197,19 +196,14 @@ export function InvoicingPage() {
       return sum + (lineTotal - discountAmount);
     }, 0);
 
-    const globalDiscountAmount = config.global_discount_enabled
-      ? subtotal * (config.global_discount_percentage / 100)
-      : 0;
-
-    const taxableAmount = subtotal - globalDiscountAmount;
+    const taxableAmount = subtotal;
     const vatAmount = config.include_vat ? taxableAmount * config.vat_rate : 0;
     const total = taxableAmount + vatAmount;
 
-    return { subtotal, globalDiscountAmount, vatAmount, total };
+    return { subtotal, vatAmount, total };
   };
 
-  const { subtotal, globalDiscountAmount, vatAmount, total } =
-    calculateTotals();
+  const { subtotal, vatAmount, total } = calculateTotals();
 
   // Toggle component visibility
   const toggleComponent = (component: keyof typeof showComponents) => {
@@ -225,46 +219,49 @@ export function InvoicingPage() {
     setTempValue(currentValue);
   };
 
-  const updateInvoiceConfig = useCallback((section: string, field: string, value: any) => {
-    switch (section) {
-      case "business_profile":
-        setConfig((prev: InvoiceConfiguration) => ({
-          ...prev,
-          business_profile: {
-            ...prev.business_profile,
-            [field]: value,
-          },
-        }));
-        break;
+  const updateInvoiceConfig = useCallback(
+    (section: string, field: string, value: any) => {
+      switch (section) {
+        case "business_profile":
+          setConfig((prev: InvoiceConfiguration) => ({
+            ...prev,
+            business_profile: {
+              ...prev.business_profile,
+              [field]: value,
+            },
+          }));
+          break;
 
-      case "client_details":
-        setConfig((prev: InvoiceConfiguration) => ({
-          ...prev,
-          client_details: {
-            ...prev.client_details,
-            [field]: value,
-          },
-        }));
-        break;
+        case "client_details":
+          setConfig((prev: InvoiceConfiguration) => ({
+            ...prev,
+            client_details: {
+              ...prev.client_details,
+              [field]: value,
+            },
+          }));
+          break;
 
-      case "invoice_items":
-        setConfig((prev: InvoiceConfiguration) => ({
-          ...prev,
-          items: prev.items.map((item) => {
-            if (item.id === field) {
-              return {
-                ...item,
-                [field]: value,
-              };
-            }
-            return item;
-          }),
-        }));
+        case "invoice_items":
+          setConfig((prev: InvoiceConfiguration) => ({
+            ...prev,
+            items: prev.items.map((item) => {
+              if (item.id === field) {
+                return {
+                  ...item,
+                  [field]: value,
+                };
+              }
+              return item;
+            }),
+          }));
 
-      default:
-        setConfig((prev) => ({ ...prev, [field]: value }));
-    }
-  }, []);
+        default:
+          setConfig((prev) => ({ ...prev, [field]: value }));
+      }
+    },
+    []
+  );
 
   const saveEdit = (field: string, value: any) => {
     const fieldParts = field.split(".");
@@ -288,26 +285,6 @@ export function InvoicingPage() {
             ...prev,
             client_details: {
               ...prev.client_details,
-              [key]: value,
-            },
-          }));
-          break;
-
-        case "credit_terms":
-          setConfig((prev) => ({
-            ...prev,
-            credit_terms: {
-              ...prev.credit_terms,
-              [key]: value,
-            },
-          }));
-          break;
-
-        case "payment_config":
-          setConfig((prev) => ({
-            ...prev,
-            payment_config: {
-              ...prev.payment_config,
               [key]: value,
             },
           }));
@@ -525,10 +502,6 @@ export function InvoicingPage() {
           size="sm"
           onClick={() => {
             toggleComponent("lateFees");
-            setConfig((prev) => ({
-              ...prev,
-              credit_terms: { ...prev.credit_terms, late_fee_enabled: true },
-            }));
           }}
           className="text-red-600 border-red-200 hover:bg-red-50"
         >
@@ -543,13 +516,6 @@ export function InvoicingPage() {
           size="sm"
           onClick={() => {
             toggleComponent("earlyDiscount");
-            setConfig((prev) => ({
-              ...prev,
-              credit_terms: {
-                ...prev.credit_terms,
-                early_discount_enabled: true,
-              },
-            }));
           }}
           className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
         >
@@ -600,13 +566,16 @@ export function InvoicingPage() {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="border-purple-200 text-purple-700 hover:bg-purple-50"
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </Button>
+              <InvoicePreviewModal config={config} onGeneratePDF={generatePDF}>
+                <Button
+                  variant="outline"
+                  className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Preview
+                </Button>
+              </InvoicePreviewModal>
+
               <Button
                 onClick={generatePDF}
                 disabled={isGenerating}
@@ -951,20 +920,6 @@ export function InvoicingPage() {
                     </span>
                   </div>
 
-                  {globalDiscountAmount > 0 && (
-                    <div className="flex justify-between text-red-600">
-                      <span>
-                        Discount ({config.global_discount_percentage}%):
-                      </span>
-                      <span>
-                        -R
-                        {globalDiscountAmount.toLocaleString("en-ZA", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </span>
-                    </div>
-                  )}
-
                   {/* VAT Toggle - Common enough to show by default */}
                   {showComponents.vatSettings && (
                     <div className="flex justify-between items-center py-2 border-t">
@@ -1037,7 +992,7 @@ export function InvoicingPage() {
                   config={config}
                   toggleComponent={toggleComponent}
                   updateInvoiceConfig={updateInvoiceConfig}
-                  />
+                />
               )}
 
               {/* Payment Methods - Optional */}
