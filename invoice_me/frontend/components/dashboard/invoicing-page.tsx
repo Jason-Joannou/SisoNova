@@ -5,24 +5,10 @@ import { useState, useCallback } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { EditableInputField } from "../ui/editable-field";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   BusinessProfile,
   ClientDetails,
@@ -36,31 +22,17 @@ import {
   Trash2,
   Eye,
   Download,
-  Send,
   FileText,
   Calculator,
   Building,
   User,
   CreditCard,
-  Settings,
-  Smartphone,
   Clock,
   AlertTriangle,
   Percent,
-  DollarSign,
-  Calendar,
   Phone,
   Mail,
-  Edit,
-  Save,
-  X,
-  MoreHorizontal,
-  PlusCircle,
-  FileX,
-  Banknote,
-  Receipt,
   MessageSquare,
-  Shield,
   Zap,
 } from "lucide-react";
 import { ExpandedBusinessDetailsBlock } from "../invoice-form/expanded-business-details-block";
@@ -101,39 +73,6 @@ const defaultClientDetails: ClientDetails = {
   vat_number: "4987654321",
   purchase_order_number: "PO123",
   credit_limit_enabled: false,
-};
-
-const defaultCreditTerms: CreditTerms = {
-  payment_terms_type: "net_30",
-  payment_due_days: 30,
-  late_fee_enabled: false,
-  late_fee_type: "percentage",
-  late_fee_amount: 2.0,
-  late_fee_frequency: "monthly",
-  early_discount_enabled: false,
-  early_discount_days: 10,
-  early_discount_percentage: 2.0,
-  credit_limit_enabled: false,
-  dispute_period_days: 7,
-  retention_enabled: false,
-};
-
-const defaultPaymentConfig: PaymentConfiguration = {
-  bank_name: "First National Bank",
-  account_holder: "SisoNova Solutions (Pty) Ltd",
-  account_number: "62123456789",
-  branch_code: "250655",
-  swift_code: "FIRNZAJJ",
-  enable_instant_eft: true,
-  enable_payshap: true,
-  enable_snapscan: true,
-  enable_zapper: false,
-  enable_mobile_money: true,
-  enable_bank_transfer: true,
-  enable_card_payments: false,
-  reference_prefix: "INV",
-  include_company_code: true,
-  include_date: false,
 };
 
 export function InvoicingPage() {
@@ -183,10 +122,7 @@ export function InvoicingPage() {
     vatSettings: true, // VAT is common enough to show by default
   });
 
-  const [editingField, setEditingField] = useState<string | null>(null);
-  const [tempValue, setTempValue] = useState<any>("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
 
   // Calculate totals (same as before)
   const calculateTotals = () => {
@@ -213,14 +149,8 @@ export function InvoicingPage() {
     }));
   };
 
-  // Inline editing functions (same as before)
-  const startEditing = (field: string, currentValue: any) => {
-    setEditingField(field);
-    setTempValue(currentValue);
-  };
-
   const updateInvoiceConfig = useCallback(
-    (section: string, field: string, value: any) => {
+    (section: string, field: string, value: any, index?: string) => {
       switch (section) {
         case "business_profile":
           setConfig((prev: InvoiceConfiguration) => ({
@@ -246,7 +176,7 @@ export function InvoicingPage() {
           setConfig((prev: InvoiceConfiguration) => ({
             ...prev,
             items: prev.items.map((item) => {
-              if (item.id === field) {
+              if (item.id === index) {
                 return {
                   ...item,
                   [field]: value,
@@ -262,57 +192,6 @@ export function InvoicingPage() {
     },
     []
   );
-
-  const saveEdit = (field: string, value: any) => {
-    const fieldParts = field.split(".");
-
-    if (fieldParts.length === 2) {
-      const [section, key] = fieldParts;
-
-      switch (section) {
-        case "business_profile":
-          setConfig((prev) => ({
-            ...prev,
-            business_profile: {
-              ...prev.business_profile,
-              [key]: value,
-            },
-          }));
-          break;
-
-        case "client_details":
-          setConfig((prev) => ({
-            ...prev,
-            client_details: {
-              ...prev.client_details,
-              [key]: value,
-            },
-          }));
-          break;
-
-        default:
-          setConfig((prev) => ({ ...prev, [field]: value }));
-      }
-    } else if (fieldParts.length === 3 && fieldParts[0] === "items") {
-      const [, itemId, key] = fieldParts;
-      setConfig((prev) => ({
-        ...prev,
-        items: prev.items.map((item) =>
-          item.id === itemId ? { ...item, [key]: value } : item
-        ),
-      }));
-    } else {
-      setConfig((prev) => ({ ...prev, [field]: value }));
-    }
-
-    setEditingField(null);
-    setTempValue("");
-  };
-
-  const cancelEdit = () => {
-    setEditingField(null);
-    setTempValue("");
-  };
 
   // Add new item
   const addItem = () => {
@@ -351,106 +230,6 @@ export function InvoicingPage() {
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  // Editable field component (same as before but simplified)
-  const EditableField = ({
-    field,
-    value,
-    type = "text",
-    className = "",
-    placeholder = "Click to edit",
-    multiline = false,
-    selectOptions = null,
-    displayValue = null,
-  }: {
-    field: string;
-    value: any;
-    type?: string;
-    className?: string;
-    placeholder?: string;
-    multiline?: boolean;
-    selectOptions?: string[] | null;
-    displayValue?: string | null;
-  }) => {
-    const isEditing = editingField === field;
-    const displayText = displayValue || value;
-
-    if (isEditing) {
-      return (
-        <div className="flex items-center gap-2 min-w-0">
-          {selectOptions ? (
-            <Select value={tempValue} onValueChange={setTempValue}>
-              <SelectTrigger className={`${className} min-w-[120px]`}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {selectOptions.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : multiline ? (
-            <Textarea
-              value={tempValue}
-              onChange={(e) => setTempValue(e.target.value)}
-              className={`${className} min-h-[60px] resize-none`}
-              placeholder={placeholder}
-              autoFocus
-            />
-          ) : (
-            <Input
-              type={type}
-              value={tempValue}
-              onChange={(e) =>
-                setTempValue(
-                  type === "number"
-                    ? parseFloat(e.target.value) || 0
-                    : e.target.value
-                )
-              }
-              className={`${className} min-w-0`}
-              placeholder={placeholder}
-              autoFocus
-            />
-          )}
-          <div className="flex gap-1 flex-shrink-0">
-            <Button
-              size="sm"
-              onClick={() => saveEdit(field, tempValue)}
-              className="h-8 w-8 p-0"
-            >
-              <Save className="h-3 w-3" />
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={cancelEdit}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div
-        className={`${className} cursor-pointer hover:bg-blue-50 hover:border-blue-200 border border-transparent rounded px-2 py-1 transition-colors group inline-flex items-center gap-1 min-w-0`}
-        onClick={() => startEditing(field, value)}
-        title="Click to edit"
-      >
-        <span className="truncate">
-          {displayText || (
-            <span className="text-slate-400 italic">{placeholder}</span>
-          )}
-        </span>
-        <Edit className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-      </div>
-    );
   };
 
   // Component add buttons
@@ -835,51 +614,85 @@ export function InvoicingPage() {
                         >
                           <td className="p-3">
                             <div className="space-y-1">
-                              <EditableField
-                                field={`items.${item.id}.title`}
-                                value={item.title}
-                                className="font-medium block w-full"
-                                placeholder="Item title"
+                              <EditableInputField
+                              value={item.title}
+                              className="font-medium block w-full"
+                              placeholder="Item title"
+                              onEdit={(value) => {
+                                updateInvoiceConfig(
+                                  "invoice_items",
+                                  "title",
+                                  value,
+                                  item.id
+                                );
+                              }}
                               />
-                              <EditableField
-                                field={`items.${item.id}.description`}
-                                value={item.description}
-                                className="text-sm text-slate-600 block w-full"
-                                placeholder="Description (optional)"
-                                multiline
+                              <EditableInputField
+                              value={item.description}
+                              className="text-sm text-slate-600 block w-full"
+                              placeholder="Description (optional)"
+                              multiline
+                              onEdit={(value) => {
+                                updateInvoiceConfig(
+                                  "invoice_items",
+                                  "description",
+                                  value,
+                                  item.id
+                                );
+                              }}
                               />
                             </div>
                           </td>
                           <td className="p-3 text-center">
-                            <EditableField
-                              field={`items.${item.id}.quantity`}
-                              value={item.quantity}
-                              type="number"
-                              className="w-16 text-center"
+                            <EditableInputField
+                            value={item.quantity}
+                            type="number"
+                            className="w-16 text-center"
+                            onEdit={(value) => {
+                              updateInvoiceConfig(
+                                "invoice_items",
+                                "quantity",
+                                value,
+                                item.id
+                              );
+                            }}
                             />
                           </td>
                           <td className="p-3 text-center">
-                            <EditableField
-                              field={`items.${item.id}.unit`}
-                              value={item.unit}
-                              selectOptions={[
-                                "each",
-                                "hours",
-                                "days",
-                                "kg",
-                                "m",
-                                "m2",
-                              ]}
+                            <EditableInputField
+                            value={item.unit}
+                            selectOptions={[
+                              "each",
+                              "hours",
+                              "days",
+                              "kg",
+                              "m",
+                              "m2",]}
                               className="w-16 text-center"
-                            />
+                              onEdit={(value) => {
+                                updateInvoiceConfig(
+                                  "invoice_items",
+                                  "unit",
+                                  value,
+                                  item.id
+                                );
+                              }}
+                              />
                           </td>
                           <td className="p-3 text-right">
                             R
-                            <EditableField
-                              field={`items.${item.id}.unit_price`}
-                              value={item.unit_price}
-                              type="number"
-                              className="w-24 text-right"
+                            <EditableInputField
+                            value={item.unit_price}
+                            type="number"
+                            className="w-24 text-right"
+                            onEdit={(value) => {
+                              updateInvoiceConfig(
+                                "invoice_items",
+                                "unit_price",
+                                value,
+                                item.id
+                              );
+                            }}
                             />
                           </td>
                           <td className="p-3 text-right font-medium">
