@@ -29,6 +29,7 @@ import {
   Mail,
   MessageSquare,
   Zap,
+  Info,
 } from "lucide-react";
 import { ExpandedBusinessDetailsBlock } from "../invoice-form/expanded-business-details-block";
 import { PaymentTermsBlock } from "../invoice-form/payment-terms-block";
@@ -36,7 +37,7 @@ import { AcceptedPaymentsBlock } from "../invoice-form/accepted-payments-block";
 import { LatePaymentsBlock } from "../invoice-form/late-payments-block";
 import { DiscountedPaymentsBlock } from "../invoice-form/discounted-payments-block";
 import { NotesBlock } from "../invoice-form/notes-block";
-import { InvoiceTemplate } from "../invoice-form/invoice-template";
+import { PricingModal } from "../modals/invoice-form/invoice-pricing-modal";
 import { InvoicePreviewModal } from "../modals/invoice-form/invoice-preview-modal";
 
 // Enhanced dummy data (same as before)
@@ -340,6 +341,15 @@ export function InvoicingPage() {
               </p>
             </div>
             <div className="flex gap-2">
+              <PricingModal invoiceTotal={total} currency={config.currency}>
+                <Button
+                  variant="outline"
+                  className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                >
+                  <Info className="h-4 w-4 mr-2" />
+                  Pricing Info
+                </Button>
+              </PricingModal>
               <InvoicePreviewModal config={config} onGeneratePDF={generatePDF}>
                 <Button
                   variant="outline"
