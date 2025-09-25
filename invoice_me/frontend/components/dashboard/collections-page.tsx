@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { StatsCardData } from "@/lib/types/user-interface"
 import { StatsGrid } from "../ui/stats-cards"
-import { ReminderSettings, CollectionItem, CollectionStats } from "@/lib/types/collections"
+import { CollectionSettings, CollectionItem, CollectionStats } from "@/lib/types/collections"
 import { 
   Plus, 
   Trash2, 
@@ -106,7 +106,7 @@ const collectionItems: CollectionItem[] = [
   }
 ]
 
-const defaultReminderSettings: ReminderSettings = {
+const defaultCollectionSettings: CollectionSettings = {
   enabled: true,
   reminder_schedule: [-7, -3, 0, 3, 7, 14], // Days relative to due date
   whatsapp_enabled: true,
@@ -175,7 +175,7 @@ const collectionsStatsData: StatsCardData[] = [
 export function CollectionsPage() {
   const [activeTab, setActiveTab] = useState("overview")
   const [selectedItems, setSelectedItems] = useState<string[]>([])
-  const [reminderSettings, setReminderSettings] = useState<ReminderSettings>(defaultReminderSettings)
+  const [collectionSettings, setCollectionSettings] = useState<CollectionSettings>(defaultCollectionSettings)
   const [filterStatus, setFilterStatus] = useState<string>("all")
   const [searchTerm, setSearchTerm] = useState("")
 
@@ -473,12 +473,12 @@ export function CollectionsPage() {
                     <p className="text-sm text-slate-600">Automatically send payment reminders</p>
                   </div>
                   <Switch
-                    checked={reminderSettings.enabled}
-                    onCheckedChange={(checked) => setReminderSettings(prev => ({ ...prev, enabled: checked }))}
+                    checked={collectionSettings.enabled}
+                    onCheckedChange={(checked) => setCollectionSettings(prev => ({ ...prev, enabled: checked }))}
                   />
                 </div>
 
-                {reminderSettings.enabled && (
+                {collectionSettings.enabled && (
                   <>
                     <Separator />
                     
@@ -492,8 +492,8 @@ export function CollectionsPage() {
                             <span className="text-sm font-medium">Email</span>
                           </div>
                           <Switch
-                            checked={reminderSettings.email_enabled}
-                            onCheckedChange={(checked) => setReminderSettings(prev => ({ ...prev, email_enabled: checked }))}
+                            checked={collectionSettings.email_enabled}
+                            onCheckedChange={(checked) => setCollectionSettings(prev => ({ ...prev, email_enabled: checked }))}
                           />
                         </div>
                         <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -502,8 +502,8 @@ export function CollectionsPage() {
                             <span className="text-sm font-medium">WhatsApp</span>
                           </div>
                           <Switch
-                            checked={reminderSettings.whatsapp_enabled}
-                            onCheckedChange={(checked) => setReminderSettings(prev => ({ ...prev, whatsapp_enabled: checked }))}
+                            checked={collectionSettings.whatsapp_enabled}
+                            onCheckedChange={(checked) => setCollectionSettings(prev => ({ ...prev, whatsapp_enabled: checked }))}
                           />
                         </div>
                         <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -512,8 +512,8 @@ export function CollectionsPage() {
                             <span className="text-sm font-medium">SMS</span>
                           </div>
                           <Switch
-                            checked={reminderSettings.sms_enabled}
-                            onCheckedChange={(checked) => setReminderSettings(prev => ({ ...prev, sms_enabled: checked }))}
+                            checked={collectionSettings.sms_enabled}
+                            onCheckedChange={(checked) => setCollectionSettings(prev => ({ ...prev, sms_enabled: checked }))}
                           />
                         </div>
                       </div>
@@ -526,15 +526,15 @@ export function CollectionsPage() {
                       <Label className="text-base font-medium">Reminder Schedule</Label>
                       <p className="text-sm text-slate-600">Days relative to due date (negative = before, positive = after)</p>
                       <div className="grid grid-cols-6 gap-2">
-                        {reminderSettings.reminder_schedule.map((day, index) => (
+                        {collectionSettings.reminder_schedule.map((day, index) => (
                           <div key={index} className="flex items-center gap-2">
                             <Input
                               type="number"
                               value={day}
                               onChange={(e) => {
-                                const newSchedule = [...reminderSettings.reminder_schedule]
+                                const newSchedule = [...collectionSettings.reminder_schedule]
                                 newSchedule[index] = parseInt(e.target.value) || 0
-                                setReminderSettings(prev => ({ ...prev, reminder_schedule: newSchedule }))
+                                setCollectionSettings(prev => ({ ...prev, reminder_schedule: newSchedule }))
                               }}
                               className="text-center"
                             />
@@ -545,7 +545,7 @@ export function CollectionsPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => setReminderSettings(prev => ({
+                          onClick={() => setCollectionSettings(prev => ({
                             ...prev,
                             reminder_schedule: [...prev.reminder_schedule, 0]
                           }))}
@@ -553,11 +553,11 @@ export function CollectionsPage() {
                           <Plus className="h-3 w-3 mr-1" />
                           Add Day
                         </Button>
-                        {reminderSettings.reminder_schedule.length > 1 && (
+                        {collectionSettings.reminder_schedule.length > 1 && (
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => setReminderSettings(prev => ({
+                            onClick={() => setCollectionSettings(prev => ({
                               ...prev,
                               reminder_schedule: prev.reminder_schedule.slice(0, -1)
                             }))}
@@ -578,8 +578,8 @@ export function CollectionsPage() {
                         Available variables: {"{buyer_name}"}, {"{invoice_number}"}, {"{amount}"}, {"{due_date}"}, {"{payment_reference}"}
                       </p>
                       <Textarea
-                        value={reminderSettings.custom_message || ''}
-                        onChange={(e) => setReminderSettings(prev => ({ ...prev, custom_message: e.target.value }))}
+                        value={collectionSettings.custom_message || ''}
+                        onChange={(e) => setCollectionSettings(prev => ({ ...prev, custom_message: e.target.value }))}
                         rows={4}
                         placeholder="Enter your custom reminder message..."
                       />
@@ -595,18 +595,18 @@ export function CollectionsPage() {
                           <p className="text-sm text-slate-600">Escalate to management after specified days</p>
                         </div>
                         <Switch
-                          checked={reminderSettings.escalation_enabled}
-                          onCheckedChange={(checked) => setReminderSettings(prev => ({ ...prev, escalation_enabled: checked }))}
+                          checked={collectionSettings.escalation_enabled}
+                          onCheckedChange={(checked) => setCollectionSettings(prev => ({ ...prev, escalation_enabled: checked }))}
                         />
                       </div>
 
-                      {reminderSettings.escalation_enabled && (
+                      {collectionSettings.escalation_enabled && (
                         <div>
                           <Label>Escalation Days</Label>
                           <Input
                             type="number"
-                            value={reminderSettings.escalation_days}
-                            onChange={(e) => setReminderSettings(prev => ({ ...prev, escalation_days: parseInt(e.target.value) || 30 }))}
+                            value={collectionSettings.escalation_days}
+                            onChange={(e) => setCollectionSettings(prev => ({ ...prev, escalation_days: parseInt(e.target.value) || 30 }))}
                             min="1"
                             className="w-32"
                           />

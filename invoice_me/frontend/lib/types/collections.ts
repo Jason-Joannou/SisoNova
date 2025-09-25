@@ -14,7 +14,7 @@ export interface CollectionItem {
   created_at: string
 }
 
-export interface ReminderSettings {
+export interface CollectionSettings {
   enabled: boolean
   reminder_schedule: number[]
   whatsapp_enabled: boolean
