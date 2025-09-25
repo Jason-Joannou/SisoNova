@@ -59,7 +59,6 @@ const collectionItems: CollectionItem[] = [
     due_date: "2025-09-15",
     days_overdue: 0,
     status: "active",
-    dedicated_account: "ACC-RID-001",
     payment_reference: "INV-250825-001-RID",
     reminder_count: 1,
     created_at: "2025-08-25"
@@ -73,7 +72,6 @@ const collectionItems: CollectionItem[] = [
     due_date: "2025-09-10",
     days_overdue: 5,
     status: "overdue",
-    dedicated_account: "ACC-DEA-002",
     payment_reference: "INV-250820-002-DEA",
     last_reminder_sent: "2025-09-12",
     reminder_count: 2,
@@ -88,7 +86,6 @@ const collectionItems: CollectionItem[] = [
     due_date: "2025-08-30",
     days_overdue: 15,
     status: "overdue",
-    dedicated_account: "ACC-WLD-003",
     payment_reference: "INV-250815-003-WLD",
     last_reminder_sent: "2025-09-10",
     reminder_count: 3,
@@ -103,7 +100,6 @@ const collectionItems: CollectionItem[] = [
     due_date: "2025-08-25",
     days_overdue: 0,
     status: "paid",
-    dedicated_account: "ACC-TEC-004",
     payment_reference: "INV-250810-004-TEC",
     reminder_count: 0,
     created_at: "2025-08-10"

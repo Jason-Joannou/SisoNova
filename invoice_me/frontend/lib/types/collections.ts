@@ -8,7 +8,6 @@ export interface CollectionItem {
   due_date: string
   days_overdue: number
   status: 'active' | 'paid' | 'overdue' | 'disputed' | 'written_off'
-  dedicated_account: string
   payment_reference: string
   last_reminder_sent?: string
   reminder_count: number
