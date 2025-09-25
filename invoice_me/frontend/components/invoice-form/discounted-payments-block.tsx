@@ -20,6 +20,7 @@ interface DiscountedPaymentsBlockProps {
       | "earlyDiscount"
       | "clientAddress"
       | "businessDetails"
+      | "invoiceSettings"
   ) => void;
   config: InvoiceConfiguration;
   updateInvoiceConfig: (section: string, field: string, value: any) => void;

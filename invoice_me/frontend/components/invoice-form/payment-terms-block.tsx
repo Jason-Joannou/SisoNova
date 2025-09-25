@@ -26,6 +26,7 @@ interface PaymentTermsBlockProps {
       | "earlyDiscount"
       | "clientAddress"
       | "businessDetails"
+      | "invoiceSettings"
   ) => void;
   updateInvoiceConfig: (section: string, field: string, value: any) => void;
 }
