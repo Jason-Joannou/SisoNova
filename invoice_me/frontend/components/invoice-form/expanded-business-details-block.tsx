@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { EditableInputField } from "../ui/editable-field";
 
 interface businessDetailsProps {
-  toggleComponent: (component: "notes" | "paymentTerms" | "paymentMethods" | "lateFees" | "earlyDiscount" | "clientAddress" | "businessDetails" | "vatSettings") => void;
+  toggleComponent: (component: "notes" | "paymentTerms" | "paymentMethods" | "lateFees" | "earlyDiscount" | "clientAddress" | "businessDetails") => void;
   businessType: "buyer" | "seller";
   config: InvoiceConfiguration;
   updateInvoiceConfig: (section: string, field: string, value: any) => void;

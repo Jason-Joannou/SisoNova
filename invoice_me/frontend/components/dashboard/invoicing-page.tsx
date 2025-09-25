@@ -115,7 +115,6 @@ export function InvoicingPage() {
     earlyDiscount: false,
     clientAddress: false,
     businessDetails: false,
-    vatSettings: true, // VAT is common enough to show by default
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -784,33 +783,30 @@ export function InvoicingPage() {
                       })}
                     </span>
                   </div>
-
-                  {/* VAT Toggle - Common enough to show by default */}
-                  {showComponents.vatSettings && (
-                    <div className="flex justify-between items-center py-2 border-t">
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={config.include_vat}
-                          onCheckedChange={(checked) =>
-                            setConfig((prev) => ({
-                              ...prev,
-                              include_vat: checked,
-                            }))
-                          }
-                        />
-                        <span className="font-medium">
-                          VAT ({(config.vat_rate * 100).toFixed(0)}%):
-                        </span>
-                      </div>
+                  
+                  <div className="flex justify-between items-center py-2 border-t">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={config.include_vat}
+                        onCheckedChange={(checked) =>
+                          setConfig((prev) => ({
+                            ...prev,
+                            include_vat: checked,
+                          }))
+                        }
+                      />
                       <span className="font-medium">
-                        {config.include_vat
-                          ? `R${vatAmount.toLocaleString("en-ZA", {
-                              minimumFractionDigits: 2,
-                            })}`
-                          : "R0.00"}
+                        VAT ({(config.vat_rate * 100).toFixed(0)}%):
                       </span>
                     </div>
-                  )}
+                    <span className="font-medium">
+                      {config.include_vat
+                        ? `R${vatAmount.toLocaleString("en-ZA", {
+                            minimumFractionDigits: 2,
+                          })}`
+                        : "R0.00"}
+                    </span>
+                  </div>
 
                   <div className="flex justify-between py-3 bg-blue-600 text-white px-4 rounded font-bold text-lg">
                     <span>TOTAL:</span>

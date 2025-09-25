@@ -37,7 +37,6 @@ interface AcceptedPaymentsBlockProps {
       | "earlyDiscount"
       | "clientAddress"
       | "businessDetails"
-      | "vatSettings"
   ) => void;
   updateInvoiceConfig: (section: string, field: string, value: any) => void;
   config: InvoiceConfiguration;

@@ -29,7 +29,6 @@ interface ConfirmationModalProps {
       | "earlyDiscount"
       | "clientAddress"
       | "businessDetails"
-      | "vatSettings"
   ) => void;
   componentInfo: {
     component:
@@ -40,7 +39,6 @@ interface ConfirmationModalProps {
       | "earlyDiscount"
       | "clientAddress"
       | "businessDetails"
-      | "vatSettings";
     section: string;
     field: string;
     value?: any;
