@@ -30,6 +30,7 @@ import {
   MessageSquare,
   Zap,
   Info,
+  Settings,
 } from "lucide-react";
 import { ExpandedBusinessDetailsBlock } from "../invoice-form/expanded-business-details-block";
 import { PaymentTermsBlock } from "../invoice-form/payment-terms-block";
@@ -39,6 +40,7 @@ import { DiscountedPaymentsBlock } from "../invoice-form/discounted-payments-blo
 import { NotesBlock } from "../invoice-form/notes-block";
 import { PricingModal } from "../modals/invoice-form/invoice-pricing-modal";
 import { InvoicePreviewModal } from "../modals/invoice-form/invoice-preview-modal";
+import { InvoiceSettingsBlock } from "../invoice-form/invoice-settings-block";
 
 // Enhanced dummy data (same as before)
 const defaultBusinessProfile: BusinessProfile = {
@@ -115,6 +117,7 @@ export function InvoicingPage() {
     earlyDiscount: false,
     clientAddress: false,
     businessDetails: false,
+    invoiceSettings: false,
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -130,7 +133,6 @@ export function InvoicingPage() {
     const taxableAmount = subtotal;
     const vatAmount = config.include_vat ? taxableAmount * config.vat_rate : 0;
     const total = taxableAmount + vatAmount;
-
     return { subtotal, vatAmount, total };
   };
 
@@ -319,6 +321,18 @@ export function InvoicingPage() {
         >
           <FileText className="h-4 w-4 mr-2" />
           Business Details
+        </Button>
+      )}
+
+      {!showComponents.invoiceSettings && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => toggleComponent("invoiceSettings")}
+          className="text-slate-700 border-slate-300 hover:bg-indigo-50 hover:text-indigo-600"
+        >
+          <Settings className="h-4 w-4 mr-2" />
+          Invoice Settings
         </Button>
       )}
     </div>
@@ -783,7 +797,7 @@ export function InvoicingPage() {
                       })}
                     </span>
                   </div>
-                  
+
                   <div className="flex justify-between items-center py-2 border-t">
                     <div className="flex items-center gap-2">
                       <Switch
@@ -862,6 +876,15 @@ export function InvoicingPage() {
                   toggleComponent={toggleComponent}
                   updateInvoiceConfig={updateInvoiceConfig}
                   config={config}
+                />
+              )}
+
+              {/* Invoice Settings - Optional */}
+              {showComponents.invoiceSettings && (
+                <InvoiceSettingsBlock
+                  config={config}
+                  toggleComponent={toggleComponent}
+                  updateInvoiceConfig={updateInvoiceConfig}
                 />
               )}
 

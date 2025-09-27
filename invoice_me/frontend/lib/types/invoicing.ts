@@ -1,5 +1,6 @@
 import { PaymentTermsType, AcceptedPaymentMethods } from "../enums/invoicing";
 import { PaymentMethodInfo } from "./payment-information";
+import { CollectionSettings } from "./collections";
 export interface Invoice {
   id: string;
   invoiceNumber: string;
@@ -104,10 +105,9 @@ export interface EarlyDiscountConfig {
 }
 export interface InvoiceConfigurationSettings {
   enable_collections_service: boolean
-  collection_service_settings?: {
-    automated_reminders_enabled: boolean
-    reminder_schedule: number[]
-  }
+  collection_service_settings: CollectionSettings
+
+  
 }
 
 export interface InvoiceConfiguration {
@@ -123,6 +123,7 @@ export interface InvoiceConfiguration {
   accepted_payment_methods?: InvoiceAcceptedPaymentMethods
   late_payment_terms?: LatePaymentConfig
   early_discount_terms?: EarlyDiscountConfig
+  invoice_settings?: InvoiceConfigurationSettings
   currency: string
   notes?: string
 }
