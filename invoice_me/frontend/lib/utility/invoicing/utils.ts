@@ -3,7 +3,21 @@ import {
   InvoicePaymentTerms,
   LatePaymentConfig,
 } from "@/lib/types/invoicing";
-import { PaymentTermsType } from "@/lib/enums/invoicing";
+import {
+  PaymentTermsType,
+  AcceptedPaymentMethods,
+} from "@/lib/enums/invoicing";
+import {
+  CardPaymentInfo,
+  PaymentMethodInfo,
+  InstantEFTPaymentInfo,
+  EFTPaymentInfo,
+  ZapperPaymentInfo,
+  SnapScanPaymentInfo,
+  CashPaymentInfo,
+  PayShapPaymentInfo,
+  MobileMoneyPaymentInfo,
+} from "@/lib/types/payment-information";
 
 export function generateInvoiceNumber(businessName: string): string {
   const bID = businessName.slice(0, 3).toUpperCase();
@@ -104,4 +118,50 @@ export function loadLatePaymentConfig(
     compound_interest: false,
     late_fee_description: "Late payment fee applied after due date",
   };
+}
+
+export function isEFTPayment(info: PaymentMethodInfo): info is EFTPaymentInfo {
+  return info.payment_method === AcceptedPaymentMethods.EFT;
+}
+
+export function isInstantEFTPayment(
+  info: PaymentMethodInfo
+): info is InstantEFTPaymentInfo {
+  return info.payment_method === AcceptedPaymentMethods.INSTANT_EFT;
+}
+
+export function isSnapScanPayment(
+  info: PaymentMethodInfo
+): info is SnapScanPaymentInfo {
+  return info.payment_method === AcceptedPaymentMethods.SNAPSCAN;
+}
+
+export function isZapperPayment(
+  info: PaymentMethodInfo
+): info is ZapperPaymentInfo {
+  return info.payment_method === AcceptedPaymentMethods.ZAPPER;
+}
+
+export function isPayShapPayment(
+  info: PaymentMethodInfo
+): info is PayShapPaymentInfo {
+  return info.payment_method === AcceptedPaymentMethods.PAYSHAP;
+}
+
+export function isCardPayment(
+  info: PaymentMethodInfo
+): info is CardPaymentInfo {
+  return info.payment_method === AcceptedPaymentMethods.CARD_PAYMENTS;
+}
+
+export function isMobileMoneyPayment(
+  info: PaymentMethodInfo
+): info is MobileMoneyPaymentInfo {
+  return info.payment_method === AcceptedPaymentMethods.MOBILE_MONEY;
+}
+
+export function isCashPayment(
+  info: PaymentMethodInfo
+): info is CashPaymentInfo {
+  return info.payment_method === AcceptedPaymentMethods.CASH;
 }

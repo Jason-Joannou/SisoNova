@@ -13,74 +13,28 @@ import {
   MobileMoneyPaymentInfo,
   CashPaymentInfo,
 } from "@/lib/types/payment-information";
+import {
+  calculateTotals,
+  isZapperPayment,
+  isSnapScanPayment,
+  isPayShapPayment,
+  isMobileMoneyPayment,
+  isInstantEFTPayment,
+  isEFTPayment,
+  isCashPayment,
+  isCardPayment,
+} from "@/lib/utility/invoicing/utils";
 
 interface InvoiceTemplateProps {
   config: InvoiceConfiguration;
   className?: string;
 }
-
-// Type Guards
-const isEFTPayment = (info: PaymentMethodInfo): info is EFTPaymentInfo => {
-  return info.payment_method === AcceptedPaymentMethods.EFT;
-};
-
-const isInstantEFTPayment = (
-  info: PaymentMethodInfo
-): info is InstantEFTPaymentInfo => {
-  return info.payment_method === AcceptedPaymentMethods.INSTANT_EFT;
-};
-
-const isSnapScanPayment = (
-  info: PaymentMethodInfo
-): info is SnapScanPaymentInfo => {
-  return info.payment_method === AcceptedPaymentMethods.SNAPSCAN;
-};
-
-const isZapperPayment = (
-  info: PaymentMethodInfo
-): info is ZapperPaymentInfo => {
-  return info.payment_method === AcceptedPaymentMethods.ZAPPER;
-};
-
-const isPayShapPayment = (
-  info: PaymentMethodInfo
-): info is PayShapPaymentInfo => {
-  return info.payment_method === AcceptedPaymentMethods.PAYSHAP;
-};
-
-const isCardPayment = (info: PaymentMethodInfo): info is CardPaymentInfo => {
-  return info.payment_method === AcceptedPaymentMethods.CARD_PAYMENTS;
-};
-
-const isMobileMoneyPayment = (
-  info: PaymentMethodInfo
-): info is MobileMoneyPaymentInfo => {
-  return info.payment_method === AcceptedPaymentMethods.MOBILE_MONEY;
-};
-
-const isCashPayment = (info: PaymentMethodInfo): info is CashPaymentInfo => {
-  return info.payment_method === AcceptedPaymentMethods.CASH;
-};
-
 export const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({
   config,
   className = "",
 }) => {
   // Calculate totals
-  const calculateTotals = () => {
-    const subtotal = config.items.reduce((sum, item) => {
-      const lineTotal = item.quantity * item.unit_price;
-      const discountAmount = lineTotal * (item.discount_percentage / 100);
-      return sum + (lineTotal - discountAmount);
-    }, 0);
-
-    const vatAmount = config.include_vat ? subtotal * config.vat_rate : 0;
-    const total = subtotal + vatAmount;
-
-    return { subtotal, vatAmount, total };
-  };
-
-  const { subtotal, vatAmount, total } = calculateTotals();
+  const { subtotal, vatAmount, total } = calculateTotals(config);
 
   return (
     <div
