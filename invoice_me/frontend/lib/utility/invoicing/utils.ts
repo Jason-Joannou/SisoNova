@@ -3,7 +3,8 @@ import {
   InvoicePaymentTerms,
   LatePaymentConfig,
   InvoiceConfigurationSettings,
-  EarlyDiscountConfig
+  EarlyDiscountConfig,
+  InvoiceAcceptedPaymentMethods
 } from "@/lib/types/invoicing";
 import { CollectionSettings } from "@/lib/types/collections";
 import {
@@ -20,7 +21,9 @@ import {
   CashPaymentInfo,
   PayShapPaymentInfo,
   MobileMoneyPaymentInfo,
+  BasePaymentMethodInfo
 } from "@/lib/types/payment-information";
+import { Banknote, CreditCard, QrCode, Smartphone, Wallet } from "lucide-react";
 
 export function generateInvoiceNumber(businessName: string): string {
   const bID = businessName.slice(0, 3).toUpperCase();
@@ -214,4 +217,164 @@ export function loadEarlyDiscountConfig(
 
 export function generateId(): string {
   return Math.random().toString(36).slice(2, 9);
+}
+
+export function loadAcceptedPaymentMethods(
+  config: InvoiceConfiguration
+): InvoiceAcceptedPaymentMethods {
+  if (config?.accepted_payment_methods) {
+    return config.accepted_payment_methods;
+  }
+
+  const defaultAcceptedPaymentMethods: InvoiceAcceptedPaymentMethods = {
+    accepted_payment_methods: [
+      AcceptedPaymentMethods.EFT,
+      AcceptedPaymentMethods.CARD_PAYMENTS,
+    ],
+    payments_method_information: [
+      {
+        payment_method: AcceptedPaymentMethods.EFT,
+        payment_method_info: initPaymentMethodInformation(
+          AcceptedPaymentMethods.EFT
+        ),
+      },
+      {
+        payment_method: AcceptedPaymentMethods.CARD_PAYMENTS,
+        payment_method_info: initPaymentMethodInformation(
+          AcceptedPaymentMethods.CARD_PAYMENTS
+        ),
+      },
+    ],
+  };
+
+  return defaultAcceptedPaymentMethods;
+}
+
+export function getPaymentMethodNameAndDescription(method: string) {
+  switch (method) {
+    case AcceptedPaymentMethods.EFT:
+      return {
+        name: "EFT",
+        description: "Pay instantly online using EFT",
+      };
+    case AcceptedPaymentMethods.PAYSHAP:
+      return {
+        name: "PayShap",
+        description: "Pay instantly online using PayShap ID",
+      };
+    case AcceptedPaymentMethods.ZAPPER:
+      return {
+        name: "Zapper",
+        description: "Pay instantly online using Zapper merchant ID",
+      };
+    case AcceptedPaymentMethods.SNAPSCAN:
+      return {
+        name: "SnapScan",
+        description: "Pay instantly online using SnapScan merchant ID",
+      };
+    case AcceptedPaymentMethods.MOBILE_MONEY:
+      return {
+        name: "Mobile Money",
+        description: "Pay instantly online using Mobile Money number",
+      };
+    case AcceptedPaymentMethods.INSTANT_EFT:
+      return {
+        name: "Instant EFT",
+        description: "Pay instantly online using Instant EFT",
+      };
+    case AcceptedPaymentMethods.CASH:
+      return {
+        name: "Cash",
+        description: "Pay using cash by coming in person",
+      };
+    case AcceptedPaymentMethods.CARD_PAYMENTS:
+      return {
+        name: "Card Payment",
+        description: "Credit/Debit",
+      };
+    default:
+      return {
+        name: "",
+        description: "",
+      };
+  }
+}
+
+export function initPaymentMethodInformation(method: AcceptedPaymentMethods) {
+  const paymentMethod = method;
+  const paymentMethodMetaData =
+    getPaymentMethodNameAndDescription(paymentMethod);
+  const basePaymentMethodInfo: BasePaymentMethodInfo = {
+    payment_method: paymentMethod,
+    enabled: true,
+    information_present: false,
+    display_name: paymentMethodMetaData.name,
+    description: paymentMethodMetaData.description,
+  };
+
+  switch (paymentMethod) {
+    case AcceptedPaymentMethods.EFT:
+      return {
+        ...basePaymentMethodInfo,
+        payment_method: AcceptedPaymentMethods.EFT,
+        bank_name: "",
+        account_holder: "",
+        account_number: "",
+        branch_code: "",
+        swift_code: "",
+      } as EFTPaymentInfo;
+    case AcceptedPaymentMethods.CARD_PAYMENTS:
+      return {
+        ...basePaymentMethodInfo,
+        payment_method: AcceptedPaymentMethods.CARD_PAYMENTS,
+        merchant_id: "",
+      } as CardPaymentInfo;
+    case AcceptedPaymentMethods.ZAPPER:
+      return {
+        ...basePaymentMethodInfo,
+        payment_method: AcceptedPaymentMethods.ZAPPER,
+        merchant_id: "",
+        store_id: "",
+        qr_code_url: "",
+      } as ZapperPaymentInfo;
+    case AcceptedPaymentMethods.SNAPSCAN:
+      return {
+        ...basePaymentMethodInfo,
+        payment_method: AcceptedPaymentMethods.SNAPSCAN,
+        merchant_id: "",
+        store_id: "",
+        qr_code_url: "",
+      } as SnapScanPaymentInfo;
+    case AcceptedPaymentMethods.MOBILE_MONEY:
+      return {
+        ...basePaymentMethodInfo,
+        payment_method: AcceptedPaymentMethods.MOBILE_MONEY,
+        provider: "",
+        merchant_code: "",
+      } as MobileMoneyPaymentInfo;
+    case AcceptedPaymentMethods.INSTANT_EFT:
+      return {
+        ...basePaymentMethodInfo,
+        payment_method: AcceptedPaymentMethods.INSTANT_EFT,
+        bank_name: "",
+        account_holder: "",
+        account_number: "",
+        branch_code: "",
+        swift_code: "",
+      } as InstantEFTPaymentInfo;
+    case AcceptedPaymentMethods.CASH:
+      return {
+        ...basePaymentMethodInfo,
+        payment_method: AcceptedPaymentMethods.CASH,
+      } as CashPaymentInfo;
+    case AcceptedPaymentMethods.PAYSHAP:
+      return {
+        ...basePaymentMethodInfo,
+        payment_method: AcceptedPaymentMethods.PAYSHAP,
+        payshap_id: "",
+        reference_prefix: "",
+      } as PayShapPaymentInfo;
+    default:
+      return undefined;
+  }
 }
