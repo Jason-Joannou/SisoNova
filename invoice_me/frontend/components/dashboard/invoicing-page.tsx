@@ -41,6 +41,7 @@ import { NotesBlock } from "../invoice-form/notes-block";
 import { PricingModal } from "../modals/invoice-form/invoice-pricing-modal";
 import { InvoicePreviewModal } from "../modals/invoice-form/invoice-preview-modal";
 import { InvoiceSettingsBlock } from "../invoice-form/invoice-settings-block";
+import { generateInvoiceNumber, calculateTotals } from "@/lib/utility/invoicing/utils";
 
 // Enhanced dummy data (same as before)
 const defaultBusinessProfile: BusinessProfile = {
@@ -74,16 +75,9 @@ const defaultClientDetails: ClientDetails = {
 };
 
 export function InvoicingPage() {
-  const generateInvoiceNumber = () => {
-    const today = new Date();
-    const year = today.getFullYear().toString().slice(-2);
-    const month = (today.getMonth() + 1).toString().padStart(2, "0");
-    const day = today.getDate().toString().padStart(2, "0");
-    return `INV-${year}${month}${day}-001`;
-  };
-
+  
   const [config, setConfig] = useState<InvoiceConfiguration>({
-    invoice_number: generateInvoiceNumber(),
+    invoice_number: generateInvoiceNumber(defaultBusinessProfile.company_name),
     invoice_date: new Date().toISOString().split("T")[0],
     due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
       .toISOString()
@@ -122,21 +116,7 @@ export function InvoicingPage() {
 
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Calculate totals (same as before)
-  const calculateTotals = () => {
-    const subtotal = config.items.reduce((sum, item) => {
-      const lineTotal = item.quantity * item.unit_price;
-      const discountAmount = lineTotal * (item.discount_percentage / 100);
-      return sum + (lineTotal - discountAmount);
-    }, 0);
-
-    const taxableAmount = subtotal;
-    const vatAmount = config.include_vat ? taxableAmount * config.vat_rate : 0;
-    const total = taxableAmount + vatAmount;
-    return { subtotal, vatAmount, total };
-  };
-
-  const { subtotal, vatAmount, total } = calculateTotals();
+  const { subtotal, vatAmount, total } = calculateTotals(config);
 
   // Toggle component visibility
   const toggleComponent = (component: keyof typeof showComponents) => {
