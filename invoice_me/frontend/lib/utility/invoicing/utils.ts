@@ -2,7 +2,9 @@ import {
   InvoiceConfiguration,
   InvoicePaymentTerms,
   LatePaymentConfig,
+  InvoiceConfigurationSettings
 } from "@/lib/types/invoicing";
+import { CollectionSettings } from "@/lib/types/collections";
 import {
   PaymentTermsType,
   AcceptedPaymentMethods,
@@ -164,4 +166,26 @@ export function isCashPayment(
   info: PaymentMethodInfo
 ): info is CashPaymentInfo {
   return info.payment_method === AcceptedPaymentMethods.CASH;
+}
+
+export function loadInvoiceConfigurationSettings(
+  config: InvoiceConfiguration
+): InvoiceConfigurationSettings {
+  const enable_collections_service =
+    config?.invoice_settings?.enable_collections_service ?? false;
+  const collection_service_settings =
+    config?.invoice_settings?.collection_service_settings ??
+    ({
+      enabled: false,
+      reminder_schedule: [-7, -3, 0, 3, 7, 14], // Days relative to due date
+      whatsapp_enabled: true,
+      email_enabled: false,
+      sms_enabled: false,
+      escalation_enabled: true,
+      escalation_days: 30,
+    } as CollectionSettings);
+  return {
+    enable_collections_service: enable_collections_service,
+    collection_service_settings: collection_service_settings,
+  } as InvoiceConfigurationSettings;
 }

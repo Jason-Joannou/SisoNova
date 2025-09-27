@@ -16,7 +16,7 @@ import { EditableInputField } from "../ui/editable-field";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { CollectionSettings } from "@/lib/types/collections";
+import { loadInvoiceConfigurationSettings } from "@/lib/utility/invoicing/utils";
 
 interface InvoiceSettingsBlockProps {
   toggleComponent: (
@@ -32,28 +32,6 @@ interface InvoiceSettingsBlockProps {
   ) => void;
   config: InvoiceConfiguration;
   updateInvoiceConfig: (section: string, field: string, value: any) => void;
-}
-
-function loadInvoiceConfigurationSettings(
-  config: InvoiceConfiguration
-): InvoiceConfigurationSettings {
-  const enable_collections_service =
-    config?.invoice_settings?.enable_collections_service ?? false;
-  const collection_service_settings =
-    config?.invoice_settings?.collection_service_settings ??
-    ({
-      enabled: false,
-      reminder_schedule: [-7, -3, 0, 3, 7, 14], // Days relative to due date
-      whatsapp_enabled: true,
-      email_enabled: false,
-      sms_enabled: false,
-      escalation_enabled: true,
-      escalation_days: 30,
-    } as CollectionSettings);
-  return {
-    enable_collections_service: enable_collections_service,
-    collection_service_settings: collection_service_settings,
-  } as InvoiceConfigurationSettings;
 }
 
 export function InvoiceSettingsBlock({
