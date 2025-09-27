@@ -4,6 +4,7 @@ import { ConfirmationModalWithButton } from "../modals/invoice-form/confirmation
 import { EditableInputField } from "../ui/editable-field";
 import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
+import { loadLatePaymentConfig } from "@/lib/utility/invoicing/utils";
 
 interface LatePaymentsBlockProps {
   toggleComponent: (
@@ -19,24 +20,6 @@ interface LatePaymentsBlockProps {
   ) => void;
   config: InvoiceConfiguration;
   updateInvoiceConfig: (section: string, field: string, value: any) => void;
-}
-
-function loadLatePaymentConfig(
-  config: InvoiceConfiguration
-): LatePaymentConfig {
-  if (config?.late_payment_terms) {
-    return config.late_payment_terms;
-  }
-
-  // Default configuration
-  return {
-    late_fee_enabled: false,
-    late_fee_amount: 0,
-    late_fee_type: "percentage",
-    grace_period_days: 0,
-    compound_interest: false,
-    late_fee_description: "Late payment fee applied after due date",
-  };
 }
 
 export function LatePaymentsBlock({

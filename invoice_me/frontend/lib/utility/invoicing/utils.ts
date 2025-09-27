@@ -1,8 +1,10 @@
 import {
   InvoiceConfiguration,
   InvoicePaymentTerms,
+  LatePaymentConfig,
 } from "@/lib/types/invoicing";
 import { PaymentTermsType } from "@/lib/enums/invoicing";
+
 export function generateInvoiceNumber(businessName: string): string {
   const bID = businessName.slice(0, 3).toUpperCase();
   const today = new Date();
@@ -84,4 +86,22 @@ export function loadNotesConfig(config: InvoiceConfiguration): string {
 
   // Default configuration
   return "";
+}
+
+export function loadLatePaymentConfig(
+  config: InvoiceConfiguration
+): LatePaymentConfig {
+  if (config?.late_payment_terms) {
+    return config.late_payment_terms;
+  }
+
+  // Default configuration
+  return {
+    late_fee_enabled: false,
+    late_fee_amount: 0,
+    late_fee_type: "percentage",
+    grace_period_days: 0,
+    compound_interest: false,
+    late_fee_description: "Late payment fee applied after due date",
+  };
 }
