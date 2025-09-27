@@ -14,6 +14,7 @@ import {
   InvoiceConfiguration,
 } from "@/lib/types/invoicing";
 import { ConfirmationModalWithButton } from "../modals/invoice-form/confirmation-modal-button";
+import { getDefaultDescription, loadPaymentTerms, formatPaymentMethod } from "@/lib/utility/invoicing/utils";
 
 interface PaymentTermsBlockProps {
   config: InvoiceConfiguration;
@@ -30,46 +31,6 @@ interface PaymentTermsBlockProps {
   ) => void;
   updateInvoiceConfig: (section: string, field: string, value: any) => void;
 }
-
-function loadPaymentTerms(config: InvoiceConfiguration): InvoicePaymentTerms {
-  if (config?.payment_terms) {
-    return config.payment_terms;
-  }
-  // No payment terms present, create defaults
-  const defaultPaymentTerms: InvoicePaymentTerms = {
-    payment_terms_type: [PaymentTermsType.NET_30],
-    payment_description: [
-      {
-        payment_terms_type: PaymentTermsType.NET_30,
-        description: getDefaultDescription(PaymentTermsType.NET_30),
-      },
-    ],
-    late_fee_enabled: false,
-    late_fee_type: "percentage",
-    late_fee_amount: 0,
-    benefit_enabled: false,
-    benefit_type: "percentage",
-    benefit_amount: 0,
-  };
-
-  return defaultPaymentTerms;
-}
-
-const getDefaultDescription = (term: PaymentTermsType): string => {
-  const descriptions = {
-    [PaymentTermsType.NET_15]: "Payment due within 15 days of invoice date",
-    [PaymentTermsType.NET_30]: "Payment due within 30 days of invoice date",
-    [PaymentTermsType.NET_60]: "Payment due within 60 days of invoice date",
-    [PaymentTermsType.CASH_ON_DELIVERY]:
-      "Payment required upon delivery of goods/services",
-    [PaymentTermsType.CASH_IN_ADVANCE]:
-      "Full payment required before work begins",
-    [PaymentTermsType.CASH_BEFORE_DELIVERY]: "Payment required before delivery",
-    [PaymentTermsType.CASH_WITH_ORDER]: "Payment required when order is placed",
-    [PaymentTermsType.CUSTOM]: "Your custom payment terms here",
-  };
-  return descriptions[term] || `Payment terms: ${term}`;
-};
 
 export function PaymentTermsBlock({
   config,
@@ -92,9 +53,6 @@ export function PaymentTermsBlock({
     setComponentConfig(updatedConfig);
     updateInvoiceConfig("", "payment_terms", updatedConfig);
   };
-
-  const formatPaymentMethod = (method: string) =>
-    method.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
   const handlePaymentTermToggle = (
     term: PaymentTermsType,
