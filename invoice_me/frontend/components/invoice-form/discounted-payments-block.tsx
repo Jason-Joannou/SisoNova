@@ -9,6 +9,7 @@ import { EditableInputField } from "../ui/editable-field";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { loadEarlyDiscountConfig, generateId } from "@/lib/utility/invoicing/utils";
 
 interface DiscountedPaymentsBlockProps {
   toggleComponent: (
@@ -24,31 +25,6 @@ interface DiscountedPaymentsBlockProps {
   ) => void;
   config: InvoiceConfiguration;
   updateInvoiceConfig: (section: string, field: string, value: any) => void;
-}
-
-function loadEarlyDiscountConfig(
-  config: InvoiceConfiguration
-): EarlyDiscountConfig {
-  if (config?.early_discount_terms) {
-    return config.early_discount_terms;
-  }
-
-  // Default configuration with one tier
-  return {
-    early_discount_enabled: false,
-    discount_tiers: [
-      {
-        id: generateId(),
-        discount_percentage: 2,
-        discount_days: 10,
-        description: "Early payment discount for payment within 10 days",
-      },
-    ],
-  };
-}
-
-function generateId(): string {
-  return Math.random().toString(36).substr(2, 9);
 }
 
 export function DiscountedPaymentsBlock({

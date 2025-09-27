@@ -2,7 +2,8 @@ import {
   InvoiceConfiguration,
   InvoicePaymentTerms,
   LatePaymentConfig,
-  InvoiceConfigurationSettings
+  InvoiceConfigurationSettings,
+  EarlyDiscountConfig
 } from "@/lib/types/invoicing";
 import { CollectionSettings } from "@/lib/types/collections";
 import {
@@ -188,4 +189,29 @@ export function loadInvoiceConfigurationSettings(
     enable_collections_service: enable_collections_service,
     collection_service_settings: collection_service_settings,
   } as InvoiceConfigurationSettings;
+}
+
+export function loadEarlyDiscountConfig(
+  config: InvoiceConfiguration
+): EarlyDiscountConfig {
+  if (config?.early_discount_terms) {
+    return config.early_discount_terms;
+  }
+
+  // Default configuration with one tier
+  return {
+    early_discount_enabled: false,
+    discount_tiers: [
+      {
+        id: generateId(),
+        discount_percentage: 2,
+        discount_days: 10,
+        description: "Early payment discount for payment within 10 days",
+      },
+    ],
+  };
+}
+
+export function generateId(): string {
+  return Math.random().toString(36).slice(2, 9);
 }
