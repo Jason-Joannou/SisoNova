@@ -76,3 +76,12 @@ export function loadPaymentTerms(
 export function formatPaymentMethod(method: string): string {
   return method.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 }
+
+export function loadNotesConfig(config: InvoiceConfiguration): string {
+  if (config?.notes) {
+    return config.notes;
+  }
+
+  // Default configuration
+  return "";
+}

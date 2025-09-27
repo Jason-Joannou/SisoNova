@@ -3,6 +3,7 @@ import { MessageSquare, X } from "lucide-react";
 import { ConfirmationModalWithButton } from "../modals/invoice-form/confirmation-modal-button";
 import { EditableInputField } from "../ui/editable-field";
 import { useState, useEffect } from "react";
+import { loadNotesConfig } from "@/lib/utility/invoicing/utils";
 
 interface NotesBlockProps {
   toggleComponent: (
@@ -18,15 +19,6 @@ interface NotesBlockProps {
   ) => void;
   config: InvoiceConfiguration;
   updateInvoiceConfig: (section: string, field: string, value: any) => void;
-}
-
-function loadNotesConfig(config: InvoiceConfiguration): string {
-  if (config?.notes) {
-    return config.notes;
-  }
-
-  // Default configuration
-  return "";
 }
 
 export function NotesBlock({
