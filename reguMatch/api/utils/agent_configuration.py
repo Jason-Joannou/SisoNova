@@ -24,7 +24,7 @@ def get_agent_system_prompt_based_on_user_region(region: AgentRegion):
 - Municipal websites and portals
 - CIPC official documentation
 - SARS official resources
-- Industry regulatory bodies (e.g., National Liquor Authority, SAHPRA)
+- Industry regulatory bodies (e.g., National Liquor Authority, SAHPRA, SAMSA, etc.)
 - Gazette publications
 
 **YOUR CAPABILITIES:**
