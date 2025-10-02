@@ -1,6 +1,13 @@
 from pydantic import BaseModel, Field
 from enum import Enum
-from typing import Optional
+from typing import Optional, Dict
+
+class BusinessMetadataCriteria(BaseModel):
+    business_size: str = Field(..., description="Which business sizes this applies to. e.g. ['Large', 'Enterprise']. If None, applies to all sizes.")
+    business_type: str = Field(..., description="Which business types this applies to. e.g. ['Pty Ltd', 'Public Company']. If None, applies to all types.")
+    business_sector: str = Field(..., description="The sector that this applies to. e.g. ['Commercial Fishing']. If None, applies to all activities.")
+    custom_criteria: Dict[str, str] = Field(..., description="Custom criteria specific to the industry. e.g. {'vessel_length_meters': '>24', 'crew_size': '>20'}")
+    exemptions: Optional[Dict[str, str]] = Field(None, description="Exemptions from this regulation. e.g. {'business_size': 'Micro', 'reason': 'Small-scale exemption'}")
 
 class CountryNodeInformation(BaseModel):
     country_name: str = Field(..., description="The name of the country. e.g. 'South Africa'")
@@ -36,5 +43,8 @@ class RegulationNodeInformation(BaseModel):
     province_name: str = Field(..., description="The province where the regulation is located. e.g. 'Western Cape'")
     industry_name: str = Field(..., description="The industry where the regulation is located. e.g. 'Fishing'")
     sector_name: str = Field(..., description="The sector where the regulation is located. e.g. 'Commercial Fishing'")
+    affected_businesses_metadata: BusinessMetadataCriteria = Field(..., description="Metadata defining which types of businesses this regulation affects.")
+    compliance_level: Optional[str] = Field(None,description="The compliance level. e.g. 'Mandatory', 'Recommended', 'Optional'")
+
 
 
