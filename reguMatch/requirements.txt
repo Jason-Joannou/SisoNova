@@ -4,3 +4,4 @@ pydantic
 beautifulsoup4
 aiohttp
 dotenv
+pydantic-ai-slim[mcp]
