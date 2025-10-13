@@ -4,7 +4,7 @@
 import { useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { EditableInputField } from "../ui/editable-field";
+import { EditableInputField } from "../../ui/editable-field";
 import { Switch } from "@/components/ui/switch";
 import {
   BusinessProfile,
@@ -32,15 +32,15 @@ import {
   Info,
   Settings,
 } from "lucide-react";
-import { ExpandedBusinessDetailsBlock } from "../invoice-form/expanded-business-details-block";
-import { PaymentTermsBlock } from "../invoice-form/payment-terms-block";
-import { AcceptedPaymentsBlock } from "../invoice-form/accepted-payments-block";
-import { LatePaymentsBlock } from "../invoice-form/late-payments-block";
-import { DiscountedPaymentsBlock } from "../invoice-form/discounted-payments-block";
-import { NotesBlock } from "../invoice-form/notes-block";
-import { PricingModal } from "../modals/invoice-form/invoice-pricing-modal";
-import { InvoicePreviewModal } from "../modals/invoice-form/invoice-preview-modal";
-import { InvoiceSettingsBlock } from "../invoice-form/invoice-settings-block";
+import { ExpandedBusinessDetailsBlock } from "../../invoice-form/expanded-business-details-block";
+import { PaymentTermsBlock } from "../../invoice-form/payment-terms-block";
+import { AcceptedPaymentsBlock } from "../../invoice-form/accepted-payments-block";
+import { LatePaymentsBlock } from "../../invoice-form/late-payments-block";
+import { DiscountedPaymentsBlock } from "../../invoice-form/discounted-payments-block";
+import { NotesBlock } from "../../invoice-form/notes-block";
+import { PricingModal } from "../../modals/invoice-form/invoice-pricing-modal";
+import { InvoicePreviewModal } from "../../modals/invoice-form/invoice-preview-modal";
+import { InvoiceSettingsBlock } from "../../invoice-form/invoice-settings-block";
 import { generateInvoiceNumber, calculateTotals } from "@/lib/utility/invoicing/utils";
 
 // Enhanced dummy data (same as before)

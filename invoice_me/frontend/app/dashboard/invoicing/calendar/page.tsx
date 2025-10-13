@@ -1,10 +1,12 @@
 import { SidebarLeft } from "@/components/dashboard/sidebar-left"
-import { InvoiceCalendar } from "@/components/dashboard/invoice-calendar"
+import { InvoiceCalendar } from "@/components/dashboard/invoicing/invoice-calendar"
 import {
   Breadcrumb,
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -13,12 +15,12 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-export default function CalendarPage() {
+export default function InvoiceCalendarPage() {
   return (
     <SidebarProvider>
       <SidebarLeft />
       <SidebarInset>
-        <header className="bg-background sticky top-0 flex h-14 shrink-0 items-center gap-2 border-b">
+        <header className="bg-background sticky top-0 flex h-14 shrink-0 items-center gap-2 border-b z-10">
           <div className="flex flex-1 items-center gap-2 px-3">
             <SidebarTrigger />
             <Separator
@@ -28,17 +30,21 @@ export default function CalendarPage() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
+                  <BreadcrumbLink href="/dashboard/invoicing">
+                    Invoicing
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
                   <BreadcrumbPage className="line-clamp-1">
-                    Invoice Calendar
+                    Calendar
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          <InvoiceCalendar />
-        </div>
+        <InvoiceCalendar />
       </SidebarInset>
     </SidebarProvider>
   )

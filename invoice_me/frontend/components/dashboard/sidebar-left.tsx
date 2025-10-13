@@ -1,6 +1,6 @@
 "use client"
 
-import { Calendar, CreditCard, FileText, Home, Settings, TrendingUp, Smartphone, LogOut, User, Zap } from "lucide-react"
+import { Calendar, CreditCard, FileText, Home, Settings, TrendingUp, Smartphone, LogOut, User, Zap, ChevronDown, LayoutDashboard, Plus, CalendarDays } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +12,9 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarFooter,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar"
 import {
   DropdownMenu,
@@ -21,9 +24,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { NavigationItem, UserData } from "@/lib/types/user-interface"
+import { usePathname } from "next/navigation"
+import { useState } from "react"
 
 const navigationItems: NavigationItem[] = [
   {
@@ -45,22 +55,29 @@ const navigationItems: NavigationItem[] = [
     color: "text-blue-600"
   },
   {
-    title: "Invoicing",
-    url: "/dashboard/invoicing",
-    icon: Smartphone,
-    color: "text-purple-600"
-  },
-  {
-    title: "Calendar",
-    url: "/dashboard/calendar",
-    icon: Calendar,
-    color: "text-slate-600"
-  },
-  {
-    title: "Grow Your Business", // New section
+    title: "Grow Your Business",
     url: "/dashboard/grow",
     icon: TrendingUp,
     color: "text-emerald-600"
+  },
+]
+
+// Invoicing submenu items
+const invoicingSubItems = [
+  {
+    title: "Overview",
+    url: "/dashboard/invoicing",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Create Invoice",
+    url: "/dashboard/invoicing/create",
+    icon: Plus,
+  },
+  {
+    title: "Calendar",
+    url: "/dashboard/invoicing/calendar",
+    icon: CalendarDays,
   },
 ]
 
@@ -82,11 +99,22 @@ const userData: UserData = {
 }
 
 export function SidebarLeft() {
+  const pathname = usePathname()
+  const [isInvoicingOpen, setIsInvoicingOpen] = useState(
+    pathname?.startsWith("/dashboard/invoicing") || false
+  )
+
   const handleLogout = () => {
     // Add your logout logic here
-    // For example: signOut(), clear tokens, redirect to login, etc.
     console.log("Logging out...")
     // window.location.href = "/login"
+  }
+
+  const isActive = (url: string) => {
+    if (url === "/dashboard/invoicing") {
+      return pathname === url
+    }
+    return pathname === url || pathname?.startsWith(url + "/")
   }
 
   return (
@@ -94,7 +122,7 @@ export function SidebarLeft() {
       <SidebarHeader className="border-b border-slate-200 p-4">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600">
-            <span className="text-sm font-bold text-white">P</span>
+            <span className="text-sm font-bold text-white">S</span>
           </div>
           <div>
             <h2 className="text-lg font-bold text-slate-900">SisoNova</h2>
@@ -113,7 +141,11 @@ export function SidebarLeft() {
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="hover:bg-slate-50 data-[active=true]:bg-emerald-50 data-[active=true]:text-emerald-700">
+                  <SidebarMenuButton 
+                    asChild 
+                    className="hover:bg-slate-50 data-[active=true]:bg-emerald-50 data-[active=true]:text-emerald-700"
+                    isActive={isActive(item.url)}
+                  >
                     <a href={item.url} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors">
                       <item.icon className={`h-4 w-4 ${item.color}`} />
                       <span className="text-slate-700 font-medium">{item.title}</span>
@@ -121,6 +153,46 @@ export function SidebarLeft() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+
+              {/* Invoicing with Collapsible Submenu */}
+              <Collapsible
+                open={isInvoicingOpen}
+                onOpenChange={setIsInvoicingOpen}
+                className="group/collapsible"
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton 
+                      className="hover:bg-slate-50 data-[active=true]:bg-purple-50 data-[active=true]:text-purple-700"
+                      isActive={pathname?.startsWith("/dashboard/invoicing")}
+                    >
+                      <Smartphone className="h-4 w-4 text-purple-600" />
+                      <span className="text-slate-700 font-medium">Invoicing</span>
+                      <ChevronDown className={`ml-auto h-4 w-4 text-slate-500 transition-transform duration-200 ${
+                        isInvoicingOpen ? "rotate-180" : ""
+                      }`} />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {invoicingSubItems.map((subItem) => (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton 
+                            asChild
+                            isActive={isActive(subItem.url)}
+                            className="hover:bg-slate-50 data-[active=true]:bg-purple-50 data-[active=true]:text-purple-700"
+                          >
+                            <a href={subItem.url} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors">
+                              <subItem.icon className="h-4 w-4 text-purple-500" />
+                              <span className="text-slate-700">{subItem.title}</span>
+                            </a>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -134,7 +206,11 @@ export function SidebarLeft() {
             <SidebarMenu>
               {settingsItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="hover:bg-slate-50">
+                  <SidebarMenuButton 
+                    asChild 
+                    className="hover:bg-slate-50"
+                    isActive={isActive(item.url)}
+                  >
                     <a href={item.url} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors">
                       <item.icon className={`h-4 w-4 ${item.color}`} />
                       <span className="text-slate-700 font-medium">{item.title}</span>
