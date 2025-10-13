@@ -1,6 +1,6 @@
 "use client"
 
-import { Calendar, CreditCard, FileText, Home, Settings, TrendingUp, Smartphone, LogOut, User, Zap, ChevronDown, LayoutDashboard, Plus, CalendarDays } from "lucide-react"
+import { BarChart3, Home, Settings, TrendingUp, Smartphone, LogOut, User, Zap, ChevronDown, LayoutDashboard, Plus, CalendarDays } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -68,6 +68,11 @@ const invoicingSubItems = [
     title: "Overview",
     url: "/dashboard/invoicing",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Analytics",
+    url: "/dashboard/invoicing/analytics",
+    icon: BarChart3,
   },
   {
     title: "Create Invoice",
