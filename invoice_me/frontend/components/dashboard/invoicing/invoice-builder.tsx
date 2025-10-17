@@ -74,7 +74,13 @@ const defaultClientDetails: ClientDetails = {
   credit_limit_enabled: false,
 };
 
-export function InvoicingPage() {
+export function InvoiceBuilder({ 
+  initialBuyer, 
+  initialTemplate 
+}: { 
+  initialBuyer?: ClientDetails | null;
+  initialTemplate?: string | null;
+}) {
   
   const [config, setConfig] = useState<InvoiceConfiguration>({
     invoice_number: generateInvoiceNumber(defaultBusinessProfile.company_name),
