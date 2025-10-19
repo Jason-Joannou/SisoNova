@@ -121,3 +121,11 @@ async def verify_website_exists(url: str) -> Dict[str, any]:
 
     return result
 
+
+@mcp.tool(
+    name="add_url_to_whitelist",
+    description="The purpose of this tool is to add a url to the whitelist after it has been verified",
+)
+async def add_url_to_whitelist(url: str) -> None:
+    pass
+
