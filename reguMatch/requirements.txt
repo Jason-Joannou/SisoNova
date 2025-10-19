@@ -8,3 +8,4 @@ pydantic-ai-slim[mcp]
 google-genai
 playwright
 pymongo[srv]
+motor
