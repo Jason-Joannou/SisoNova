@@ -6,3 +6,4 @@ aiohttp
 dotenv
 pydantic-ai-slim[mcp]
 google-genai
+playwright
