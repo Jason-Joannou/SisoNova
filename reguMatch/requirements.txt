@@ -9,3 +9,4 @@ google-genai
 playwright
 pymongo[srv]
 motor
+googlesearch-python
