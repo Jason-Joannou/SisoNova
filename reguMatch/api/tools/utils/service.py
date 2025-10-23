@@ -1,11 +1,11 @@
-from api.models.utils import URLVerificationResult
+from api.tools.utils.models import URLVerificationResult
 from api.custom_exceptions.database import URLVerificationException
 import requests
 
 from fastmcp import FastMCP
 
 mcp = FastMCP(
-    name="Wesbite Utility Service",
+    name="Utility Service",
     instructions="The purpose of this mcp server is to provide utility support for interacting with web services",
 )
 

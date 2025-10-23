@@ -1,4 +1,3 @@
-from api.models.utils import URLVerificationResult
 class URLVerificationException(Exception):
     """Exception raised when URL verification fails"""
     
