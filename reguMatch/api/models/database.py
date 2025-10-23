@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 class CountryInformation(BaseModel):
     country_name: str = Field(
@@ -108,8 +108,8 @@ class WhiteListQueryParameters(BaseModel):
         None,
         description="Province/state name in snake_case (e.g., 'western_cape', 'california').",
     )
-    category_name: str = Field(
-        ...,
+    category_name: Optional[str] = Field(
+        None,
         description="Industry category in snake_case (e.g., 'fishing', 'manufacturing', 'healthcare').",
     )
     subcategory: Optional[str] = Field(
@@ -130,3 +130,39 @@ class WhiteListQueryParameters(BaseModel):
         if not v:
             return "all"
         return v
+    
+
+class AddEntryResponse(BaseModel):
+    success: bool = Field(
+        ..., description="Whether the entry was successfully added to the database."
+    )
+    message: str = Field(
+        ..., description="A message indicating the success or failure of the operation."
+    )
+    response_document: Dict = Field(
+        ..., description="The document that was added to the database."
+    )
+    error: Optional[str] = Field(
+        None, description="An error message if the operation failed."
+    )
+
+
+class WhiteListQueryResponse(BaseModel):
+    country_present: bool = Field(
+        ..., 
+        description="Whether the country exists in the database"
+    )
+    filters_applied: Dict[str, bool] = Field(
+        ...,
+        description="Which filters were applied: {province: bool, category: bool, subcategory: bool}"
+    )
+    filters_matched: Dict[str, bool] = Field(
+        ...,
+        description="Which applied filters found matches: {province: bool, category: bool, subcategory: bool}"
+    )
+    query_parameters: WhiteListQueryParameters
+    result_doc: Dict = Field(
+        ...,
+        description="The document that was retrieved from mongoDB."
+    )
+    error: Optional[str] = Field(None, description="An error message if the operation failed.")
