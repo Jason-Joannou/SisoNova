@@ -8,11 +8,10 @@ from api.custom_exceptions.database import URLVerificationException
 from api.tools.database.utils import verify_website_exists
 from typing import List
 
-# Import your query functions
 from api.database.mongo_queries import (
     get_whitelist_collection_operation,
     add_new_entry_to_whitelist_operation,
-    query_white_list_collection_operation
+    query_white_list_collection_operation,
 )
 
 mongo_client = MongoDBClient()
@@ -40,7 +39,7 @@ mcp = FastMCP(
     name="add_url_to_whitelist_collection",
     description="""Add regulatory/compliance URLs to the whitelist for specific geographic and industry scopes.
 
-IMPORTANT: URLs will be validated to verify they exist and are accessible. Please provide correct, working HTTPS URLs only. Invalid or inaccessible URLs will be rejected.
+IMPORTANT: Make sure to validate URLs before attempting to add them to the whitelist.
 
 Scope Guidelines - CAREFULLY determine the correct scope:
 - If a URL applies to ALL industries in a country (e.g., general labor laws, tax regulations), set category to a broad category like 'general_regulations' or 'labor_laws' and subcategory to null
@@ -63,7 +62,6 @@ Requirements:
 - URLs must be accessible and return a valid response
 - All identifiers must be in snake_case format (e.g., 'south_africa', 'labor_laws')
 
-The tool will verify each URL before adding it to the whitelist. If verification fails, you will receive detailed error information.
 """,
 )
 async def add_url_to_whitelist_collection(
@@ -71,40 +69,6 @@ async def add_url_to_whitelist_collection(
 ) -> str:
     """Add URL entry to whitelist collection"""
     try:
-        verification_results = []
-        verified_urls = []
-        failed_url = None
-        failed_verification = None
-
-        # Verify each URL provided by the model
-        for url_entry in whitelist_entry_information.urls:
-            verification = await verify_website_exists(url_entry.url)
-
-            if verification.exists == False:
-                failed_url = url_entry.url
-                failed_verification = verification
-
-                verification_results.append(
-                    {
-                        "url": url_entry.url,
-                        "status": "failed",
-                        "verification": verification.model_dump(),
-                    }
-                )
-
-                raise URLVerificationException(
-                    f"URL verification failed for {url_entry.url}: {verification.reason}"
-                )
-
-            verification_results.append(
-                {
-                    "url": url_entry.url,
-                    "status": "verified",
-                    "verification": verification.model_dump(),
-                }
-            )
-
-            verified_urls.append(url_entry.url)
 
         # Once verified, add to the database using the query function
         add_result = await add_new_entry_to_whitelist_operation(
@@ -112,50 +76,14 @@ async def add_url_to_whitelist_collection(
         )
 
         return json.dumps(
-            {
-                "success": add_result.success,
-                "message": add_result.message,
-                "verified_urls": verified_urls,
-                "total_urls": len(whitelist_entry_information.urls),
-                "verified_count": len(verified_urls),
-                "verification_results": verification_results,
-                "database_response": add_result.model_dump(),
-            },
+            add_result.model_dump(),
             indent=2,
         )
 
-    except URLVerificationException as e:
-        print(f"URL verification exception: {e}")
-
-        return json.dumps(
-            {
-                "success": False,
-                "error_type": "URLVerificationException",
-                "failed_url": failed_url,
-                "verified_urls": verified_urls,
-                "total_urls": len(whitelist_entry_information.urls),
-                "verified_count": len(verified_urls),
-                "verification_results": verification_results,
-                "verification_details": (
-                    failed_verification.model_dump() if failed_verification else None
-                ),
-                "message": str(e),
-            },
-            indent=2,
-        )
     except Exception as e:
-        print(f"Unexpected error: {e}")
-        import traceback
-
-        traceback.print_exc()
 
         return json.dumps(
-            {
-                "success": False,
-                "error_type": type(e).__name__,
-                "message": f"An unexpected error occurred: {str(e)}",
-                "error": str(e),
-            },
+            add_result.model_dump(),
             indent=2,
         )
 
@@ -190,11 +118,13 @@ async def query_white_list_collection(
     """Query whitelist collection with flexible filtering"""
     try:
         # Use the query function from queries.py
-        result = await query_white_list_collection_operation(mongo_client, query_parameters)
+        result = await query_white_list_collection_operation(
+            mongo_client, query_parameters
+        )
 
-        return json.dumps(result.model_dump(),
+        return json.dumps(
+            result.model_dump(),
             indent=2,
-            default=str,
         )
 
     except Exception:
