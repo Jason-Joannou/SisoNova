@@ -9,13 +9,13 @@ from api.models.database import (
 from typing import List
 
 
-async def get_whitelist_collection(mongo_client: MongoDBClient) -> List:
+async def get_whitelist_collection_operation(mongo_client: MongoDBClient) -> List:
     async with mongo_client.get_db("ReguMatch") as db:
         collection = db["whitelist_urls"]
         return await collection.find().to_list(length=None)
 
 
-async def add_new_entry_to_whitelist(
+async def add_new_entry_to_whitelist_operation(
     mongo_client: MongoDBClient, entry: WhiteListURLData
 ) -> AddEntryResponse:
     async with mongo_client.get_db("ReguMatch") as db:
@@ -128,7 +128,7 @@ async def add_new_entry_to_whitelist(
             )
 
 
-async def query_white_list_collection(
+async def query_white_list_collection_operation(
     mongo_client: MongoDBClient, query_parameters: WhiteListQueryParameters
 ) -> WhiteListQueryResponse:
     """Query whitelist collection based on nested structure"""

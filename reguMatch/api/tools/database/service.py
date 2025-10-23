@@ -10,9 +10,9 @@ from typing import List
 
 # Import your query functions
 from api.database.mongo_queries import (
-    get_whitelist_collection as get_whitelist_collection_query,
-    add_new_entry_to_whitelist,
-    query_white_list_collection as query_whitelist_query
+    get_whitelist_collection_operation,
+    add_new_entry_to_whitelist_operation,
+    query_white_list_collection_operation
 )
 
 mongo_client = MongoDBClient()
@@ -107,7 +107,7 @@ async def add_url_to_whitelist_collection(
             verified_urls.append(url_entry.url)
 
         # Once verified, add to the database using the query function
-        add_result = await add_new_entry_to_whitelist(
+        add_result = await add_new_entry_to_whitelist_operation(
             mongo_client, whitelist_entry_information
         )
 
@@ -190,7 +190,7 @@ async def query_white_list_collection(
     """Query whitelist collection with flexible filtering"""
     try:
         # Use the query function from queries.py
-        result = await query_whitelist_query(mongo_client, query_parameters)
+        result = await query_white_list_collection_operation(mongo_client, query_parameters)
 
         return json.dumps(result.model_dump(),
             indent=2,
@@ -217,7 +217,7 @@ async def get_whitelist_collection() -> str:
     """Get the current whitelist collection from MongoDB"""
     try:
         # Use the query function from queries.py
-        documents = await get_whitelist_collection_query(mongo_client)
+        documents = await get_whitelist_collection_operation(mongo_client)
 
         if not documents:
             return json.dumps(
