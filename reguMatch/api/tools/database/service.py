@@ -1,12 +1,8 @@
 from fastmcp import FastMCP
-from api.utils.config import WHITELIST_URL_COLLECTION_SCHEMA
 from contextlib import asynccontextmanager
 import json
-from api.models.database import WhiteListURLData, WhiteListQueryParameters
+from api.tools.database.models import WhiteListURLData, WhiteListQueryParameters
 from api.database.mongo_client import MongoDBClient
-from api.custom_exceptions.database import URLVerificationException
-from api.tools.database.utils import verify_website_exists
-from typing import List
 
 from api.database.mongo_queries import (
     get_whitelist_collection_operation,
@@ -109,7 +105,6 @@ The response will show:
 - Which filters were applied
 - Which filters found matches
 - The filtered nested structure
-- Total number of URLs found
 """,
 )
 async def query_white_list_collection(
