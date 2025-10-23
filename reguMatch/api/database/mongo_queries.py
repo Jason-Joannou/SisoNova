@@ -10,7 +10,7 @@ from typing import List
 
 
 async def get_whitelist_collection(mongo_client: MongoDBClient) -> List:
-    async with mongo_client.get_db("reguMatch") as db:
+    async with mongo_client.get_db("ReguMatch") as db:
         collection = db["whitelist_urls"]
         return await collection.find().to_list(length=None)
 
@@ -18,7 +18,7 @@ async def get_whitelist_collection(mongo_client: MongoDBClient) -> List:
 async def add_new_entry_to_whitelist(
     mongo_client: MongoDBClient, entry: WhiteListURLData
 ) -> AddEntryResponse:
-    async with mongo_client.get_db("reguMatch") as db:
+    async with mongo_client.get_db("ReguMatch") as db:
         collection = db["whitelist_urls"]
 
         country_name = entry.country_information.country_name
@@ -138,7 +138,7 @@ async def query_white_list_collection(
     category_name = query_parameters.category_name
     subcategory_name = query_parameters.subcategory
 
-    async with mongo_client.get_db("reguMatch") as db:
+    async with mongo_client.get_db("ReguMatch") as db:
         collection = db["whitelist_urls"]
 
         try:
@@ -176,32 +176,38 @@ async def query_white_list_collection(
                 "subcategory": False,
             }
 
+            # Apply province filter
             if province_name:
-                result = {province_name: result.get(province_name, {})}
-
-            if category_name:
+                if province_name in result:
+                    result = {province_name: result[province_name]}
+                    filters_matched["province"] = True
+                else:
+                    result = {}
+            
+            # Apply category filter
+            if category_name and result:
                 filtered = {}
                 for prov, prov_data in result.items():
                     if category_name in prov_data:
                         filtered[prov] = {category_name: prov_data[category_name]}
+                        filters_matched["category"] = True
                 result = filtered
 
-            if subcategory_name:
+            # Apply subcategory filter
+            if subcategory_name and result:
                 filtered = {}
                 for prov, prov_data in result.items():
                     prov_filtered = {}
                     for cat, cat_data in prov_data.items():
                         if subcategory_name in cat_data:
-                            prov_filtered[cat] = {
-                                subcategory_name: cat_data[subcategory_name]
-                            }
+                            prov_filtered[cat] = {subcategory_name: cat_data[subcategory_name]}
+                            filters_matched["subcategory"] = True
                     if prov_filtered:
                         filtered[prov] = prov_filtered
                 result = filtered
 
-            has_results = bool(result)
-
             return WhiteListQueryResponse(
+                success=True,
                 country_present=True,
                 filters_applied=filters_applied,
                 filters_matched=filters_matched,
@@ -212,6 +218,7 @@ async def query_white_list_collection(
         except Exception as e:
             print(f"Error querying whitelist: {e}")
             return WhiteListQueryResponse(
+                success=False,
                 country_present=False,
                 filters_applied={
                     "province": bool(province_name),
@@ -225,6 +232,5 @@ async def query_white_list_collection(
                 },
                 query_parameters=query_parameters,
                 result_doc={},
-                total_urls_found=0,
                 error=str(e),
             )
