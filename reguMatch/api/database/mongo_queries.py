@@ -1,5 +1,5 @@
 from api.database.mongo_client import MongoDBClient
-from api.models.database import (
+from api.tools.database.models import (
     WhiteListURLData,
     WhiteListQueryParameters,
     URLEntry,
