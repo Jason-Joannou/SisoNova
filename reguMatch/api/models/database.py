@@ -148,6 +148,10 @@ class AddEntryResponse(BaseModel):
 
 
 class WhiteListQueryResponse(BaseModel):
+    success: bool = Field(
+        ..., 
+        description="Whether the query was successful"
+    )
     country_present: bool = Field(
         ..., 
         description="Whether the country exists in the database"
