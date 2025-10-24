@@ -3,11 +3,16 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
+import urllib
 from typing import List, Optional
-from googlesearch import search
+from ddgs import DDGS
+import time
+import random
 import urllib3
 import asyncio
 from playwright.async_api import async_playwright
+from api.tools.website_navigator.models import DuckDuckGoRequest
+from api.tools.website_navigator.utils import duck_duck_go_search_operation
 
 
 # Disable SSL warnings
@@ -19,11 +24,9 @@ mcp = FastMCP(
     instructions="Web scraping tools with JavaScript rendering support using Playwright for searching, opening websites, and navigating links"
 )
 
-# ============= 1. GOOGLE SEARCH =============
-
 @mcp.tool(
-    name="google_search",
-    description="""Search Google and get a list of results.
+    name="duck_duck_go_search",
+    description="""Search DuckDuckGo and get a list of results.
 
 Args:
     query: Search query (e.g., "South Africa fishing regulations")
@@ -32,26 +35,15 @@ Args:
 Returns a list of search results with titles, URLs, and snippets.
 """
 )
-async def google_search(query: str, num_results: int = 10) -> str:
-    """Search Google and return results"""
+async def duck_duck_go_search(query_parameters: DuckDuckGoRequest) -> str:
+    """Search the web using DuckDuckGo"""
     try:
-        results = []
-        for url in search(query, num_results=num_results, lang="en"):
-            results.append({"url": url})
-        
-        return json.dumps({
-            "success": True,
-            "query": query,
-            "results_count": len(results),
-            "results": results
-        }, indent=2)
+        results = duck_duck_go_search_operation(query_parameters=query_parameters)
+                
+        return json.dumps(results.model_dump(), indent=2)
         
     except Exception as e:
-        return json.dumps({
-            "success": False,
-            "error": str(e),
-            "message": "Failed to search Google. You may need to install: pip install googlesearch-python"
-        }, indent=2)
+        return json.dumps(results.model_dump(), indent=2)
 
 
 @mcp.tool(
@@ -74,15 +66,9 @@ async def open_website(url: str, use_javascript: bool = False, wait_seconds: int
     """Open a website and extract content"""
     
     # If JavaScript rendering is requested and Playwright is available
-    if use_javascript and PLAYWRIGHT_AVAILABLE:
+    if use_javascript:
         return await open_website_with_js(url, wait_seconds)
-    elif use_javascript and not PLAYWRIGHT_AVAILABLE:
-        return json.dumps({
-            "success": False,
-            "error": "Playwright not installed",
-            "message": "To use JavaScript rendering, install: pip install playwright && playwright install chromium",
-            "fallback": "Attempting basic scraping..."
-        }, indent=2)
+    
     
     # Basic scraping (no JavaScript)
     try:
@@ -378,4 +364,4 @@ async def extract_elements(url: str, selectors: dict, wait_seconds: int = 5) -> 
             "success": False,
             "error": str(e),
             "url": url
-        }, indent=2)
+        }, indent=2)    
