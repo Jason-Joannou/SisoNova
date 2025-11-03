@@ -1,6 +1,5 @@
 from fastmcp import FastMCP
 from fastmcp.server.auth.auth import TokenVerifier, AccessToken
-from api.tools.greetings import greeting_message
 from api.tools.database.service import mcp as database_mcp
 from api.tools.website_navigator.service import mcp as website_navigator_mcp
 from api.tools.central_knowledge_graph.service import mcp as central_knowledge_graph_mcp
