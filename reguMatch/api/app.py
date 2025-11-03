@@ -3,6 +3,7 @@ from fastmcp.server.auth.auth import TokenVerifier, AccessToken
 from api.tools.greetings import greeting_message
 from api.tools.database.service import mcp as database_mcp
 from api.tools.website_navigator.service import mcp as website_navigator_mcp
+from api.tools.central_knowledge_graph.service import mcp as central_knowledge_graph_mcp
 from dotenv import load_dotenv
 import os
 
@@ -46,6 +47,7 @@ def add(a: int, b: int) -> int:
 
 # mcp.mount(database_mcp, prefix="database", as_proxy=True)
 mcp.mount(website_navigator_mcp, prefix="website-navigator", as_proxy=True)
+mcp.mount(central_knowledge_graph_mcp, prefix="central-knowledge-graph", as_proxy=True)
 
 if __name__ == "__main__":
     mcp.run(transport='streamable-http')
