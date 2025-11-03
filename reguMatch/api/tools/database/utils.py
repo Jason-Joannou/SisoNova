@@ -291,6 +291,14 @@ async def add_regulation_node_operation(
                     if regulation_node.required_licenses
                     else []
                 ),
+                "required_certificates": (
+                    [
+                        certificate_info.model_dump()
+                        for certificate_info in regulation_node.required_certificates
+                    ]
+                    if regulation_node.required_certificates
+                    else []
+                ),
                 "regulatory_body": regulation_node.regulatory_body,
                 "regulatory_body_description": regulation_node.regulatory_body_description,
                 "business_criteria": regulation_node.business_criteria.model_dump(),
@@ -450,6 +458,7 @@ async def add_compliance_node_operation(
                 "compliance_pdf_urls": [url_info.model_dump() for url_info in compliance_node.compliance_pdf_urls] if compliance_node.compliance_pdf_urls else [],
                 "required_fields": [field_info.model_dump() for field_info in compliance_node.required_fields] if compliance_node.required_fields else [],
                 "required_licenses": [license_info.model_dump() for license_info in compliance_node.required_licenses] if compliance_node.required_licenses else [],
+                "required_certificates": [certificate_info.model_dump() for certificate_info in compliance_node.required_certificates] if compliance_node.required_certificates else [],
                 "business_criteria": compliance_node.business_criteria.model_dump(),
             }
 

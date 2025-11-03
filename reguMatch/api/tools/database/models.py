@@ -183,6 +183,10 @@ class RequiredLicenses(BaseModel):
     license_name: str = Field(..., description="The name of the license.")
     license_description: str = Field(..., description="The description of the license.")
 
+class RequiredCertificates(BaseModel):
+    certificate_name: str = Field(..., description="The name of the certificate.")
+    certificate_description: str = Field(..., description="The description of the certificate.")
+
 class RequiredFields(BaseModel):
     field_name: str = Field(..., description="The name of the field.")
     field_description: str = Field(..., description="The description of the field.")
@@ -199,6 +203,7 @@ class RegulationNode(BaseRegulationAndComplianceRequirements):
 
     required_fields: Optional[List[RequiredFields]] = Field(..., description="The fields required for this regulation.")
     required_licenses: Optional[List[RequiredLicenses]] = Field(None, description="The licenses required for this regulation.")
+    required_certificates: Optional[List[RequiredLicenses]] = Field(None, description="The certificates required for this regulation.")
 
     regulatory_body: str = Field(..., description="The name of the regulatory body.")
     regulatory_body_description: str = Field(..., description="The description of the regulatory body.")
@@ -213,3 +218,4 @@ class ComplianceNode(BaseRegulationAndComplianceRequirements):
 
     required_fields: Optional[List[RequiredFields]] = Field(..., description="The fields required for this compliance.")
     required_licenses: Optional[List[RequiredLicenses]] = Field(None, description="The licenses required for this compliance.")
+    required_certificates: Optional[List[RequiredLicenses]] = Field(None, description="The certificates required for this compliance.")
