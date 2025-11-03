@@ -10,3 +10,5 @@ playwright
 pymongo[srv]
 motor
 googlesearch-python
+paddleocr
+paddlepaddle
