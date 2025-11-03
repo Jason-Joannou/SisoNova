@@ -11,8 +11,11 @@ import random
 import urllib3
 import asyncio
 from playwright.async_api import async_playwright
-from api.tools.website_navigator.models import DuckDuckGoRequest
-from api.tools.website_navigator.utils import duck_duck_go_search_operation
+from api.tools.website_navigator.models import DuckDuckGoRequest, OpenWebsiteRequest
+from api.tools.website_navigator.utils import (
+    duck_duck_go_search_operation,
+    open_website_operation,
+)
 
 
 # Disable SSL warnings
@@ -21,8 +24,9 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 mcp = FastMCP(
     name="Web Scraper Service",
-    instructions="Web scraping tools with JavaScript rendering support using Playwright for searching, opening websites, and navigating links"
+    instructions="Web scraping tools with JavaScript rendering support using Playwright for searching, opening websites, and navigating links",
 )
+
 
 @mcp.tool(
     name="duck_duck_go_search",
@@ -33,335 +37,38 @@ Args:
     num_results: Number of results to return (default: 10)
 
 Returns a list of search results with titles, URLs, and snippets.
-"""
+""",
 )
 async def duck_duck_go_search(query_parameters: DuckDuckGoRequest) -> str:
     """Search the web using DuckDuckGo"""
-    try:
-        results = duck_duck_go_search_operation(query_parameters=query_parameters)
-                
-        return json.dumps(results.model_dump(), indent=2)
-        
-    except Exception as e:
-        return json.dumps(results.model_dump(), indent=2)
+
+    results = duck_duck_go_search_operation(query_parameters=query_parameters)
+
+    return json.dumps(results.model_dump(), indent=2)
 
 
 @mcp.tool(
     name="open_website",
-    description="""Open a website and extract its content. Supports JavaScript-heavy websites.
+    description="""
+Open ANY website and extract its content. Supports JavaScript-heavy websites.
+Use this for opening initial pages OR navigating to links.
 
 Args:
     url: The URL to open (must include https://)
-    use_javascript: Set to true for JavaScript-heavy websites (default: false)
-    wait_seconds: Seconds to wait for JavaScript to load (default: 5)
-
+    wait_seconds: Seconds to wait for JavaScript to load (default: 3)
+    default_timeout: Maximum time to wait for page load in milliseconds (default: 30000)
+    
 Returns:
     - Page title
     - Main text content
-    - All links found on the page
-    - Meta description
-"""
+    - All links found on the page (navigation and content links)
+""",
 )
-async def open_website(url: str, use_javascript: bool = False, wait_seconds: int = 5) -> str:
-    """Open a website and extract content"""
+async def open_website(parameters: OpenWebsiteRequest) -> str:
+    response = await open_website_operation(
+        url=parameters.url,
+        wait_seconds=parameters.wait_seconds,
+        default_timeout=parameters.default_timeout,
+    )
     
-    # If JavaScript rendering is requested and Playwright is available
-    if use_javascript:
-        return await open_website_with_js(url, wait_seconds)
-    
-    
-    # Basic scraping (no JavaScript)
-    try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.5",
-            "Accept-Encoding": "gzip, deflate",
-            "Connection": "keep-alive",
-            "Upgrade-Insecure-Requests": "1"
-        }
-        
-        session = requests.Session()
-        response = session.get(
-            url, 
-            headers=headers, 
-            timeout=30,
-            verify=False,
-            allow_redirects=True
-        )
-        response.raise_for_status()
-        
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        title = soup.title.string if soup.title else "No title"
-        
-        meta_desc = ""
-        meta_tag = soup.find('meta', attrs={'name': 'description'})
-        if meta_tag:
-            meta_desc = meta_tag.get('content', '')
-        
-        for script in soup(["script", "style", "nav", "footer", "header"]):
-            script.decompose()
-        
-        text = soup.get_text()
-        lines = (line.strip() for line in text.splitlines())
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        text = '\n'.join(chunk for chunk in chunks if chunk)
-        text = text[:10000]
-        
-        links = []
-        for link in soup.find_all('a', href=True):
-            href = link['href']
-            link_text = link.get_text(strip=True)
-            absolute_url = urljoin(url, href)
-            
-            if absolute_url.startswith(('http://', 'https://')):
-                links.append({
-                    "url": absolute_url,
-                    "text": link_text
-                })
-        
-        seen = set()
-        unique_links = []
-        for link in links:
-            if link['url'] not in seen:
-                seen.add(link['url'])
-                unique_links.append(link)
-        
-        # Check if content is empty (likely JavaScript site)
-        if len(text.strip()) < 100 and len(unique_links) < 5:
-            suggestion = "This website appears to use JavaScript. Try setting use_javascript=true"
-        else:
-            suggestion = None
-        
-        return json.dumps({
-            "success": True,
-            "url": url,
-            "method": "basic_scraping",
-            "title": title,
-            "meta_description": meta_desc,
-            "content": text,
-            "content_length": len(text),
-            "links_found": len(unique_links),
-            "links": unique_links[:50],
-            "suggestion": suggestion
-        }, indent=2)
-        
-    except Exception as e:
-        return json.dumps({
-            "success": False,
-            "error": str(e),
-            "url": url
-        }, indent=2)
-
-
-# ============= 2B. OPEN WEBSITE WITH JAVASCRIPT (PLAYWRIGHT) =============
-
-async def open_website_with_js(url: str, wait_seconds: int = 5) -> str:
-    """Open a website using Playwright for JavaScript rendering"""
-    try:
-        async with async_playwright() as p:
-            # Launch browser
-            browser = await p.chromium.launch(
-                headless=True,
-                args=[
-                    '--disable-blink-features=AutomationControlled',
-                    '--no-sandbox',
-                    '--disable-dev-shm-usage'
-                ]
-            )
-            
-            # Create context with custom settings
-            context = await browser.new_context(
-                viewport={'width': 1920, 'height': 1080},
-                user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                ignore_https_errors=True
-            )
-            
-            # Create page
-            page = await context.new_page()
-            
-            # Set longer timeout
-            page.set_default_timeout(30000)
-            
-            # Navigate to URL
-            await page.goto(url, wait_until='networkidle', timeout=30000)
-            
-            # Wait additional time for JavaScript to execute
-            await asyncio.sleep(wait_seconds)
-            
-            # Get page content
-            title = await page.title()
-            content = await page.content()
-            
-            # Parse with BeautifulSoup
-            soup = BeautifulSoup(content, 'html.parser')
-            
-            # Extract meta description
-            meta_desc = ""
-            meta_tag = soup.find('meta', attrs={'name': 'description'})
-            if meta_tag:
-                meta_desc = meta_tag.get('content', '')
-            
-            # Remove unwanted elements
-            for script in soup(["script", "style", "nav", "footer", "header"]):
-                script.decompose()
-            
-            # Get text content
-            text = soup.get_text()
-            lines = (line.strip() for line in text.splitlines())
-            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-            text = '\n'.join(chunk for chunk in chunks if chunk)
-            text = text[:15000]  # Increased limit for JS-rendered content
-            
-            # Extract all links
-            links = []
-            for link in soup.find_all('a', href=True):
-                href = link['href']
-                link_text = link.get_text(strip=True)
-                absolute_url = urljoin(url, href)
-                
-                if absolute_url.startswith(('http://', 'https://')):
-                    links.append({
-                        "url": absolute_url,
-                        "text": link_text
-                    })
-            
-            # Remove duplicate links
-            seen = set()
-            unique_links = []
-            for link in links:
-                if link['url'] not in seen:
-                    seen.add(link['url'])
-                    unique_links.append(link)
-            
-            # Close browser
-            await browser.close()
-            
-            return json.dumps({
-                "success": True,
-                "url": url,
-                "method": "playwright_javascript",
-                "title": title,
-                "meta_description": meta_desc,
-                "content": text,
-                "content_length": len(text),
-                "links_found": len(unique_links),
-                "links": unique_links[:100]  # Return more links for JS sites
-            }, indent=2)
-        
-    except Exception as e:
-        return json.dumps({
-            "success": False,
-            "error": str(e),
-            "url": url,
-            "method": "playwright_javascript",
-            "message": "Failed to render page with Playwright"
-        }, indent=2)
-
-
-# ============= 3. NAVIGATE TO LINK =============
-
-@mcp.tool(
-    name="navigate_to_link",
-    description="""Navigate to a specific link from a previously opened website.
-
-Args:
-    url: The URL to navigate to
-    use_javascript: Set to true for JavaScript-heavy websites
-    wait_seconds: Seconds to wait for JavaScript to load (default: 5)
-    context: Optional context about why you're navigating to this link
-
-Returns the content of the linked page.
-"""
-)
-async def navigate_to_link(url: str, use_javascript: bool = False, wait_seconds: int = 5, context: Optional[str] = None) -> str:
-    """Navigate to a link"""
-    result = await open_website.fn(url, use_javascript=use_javascript, wait_seconds=wait_seconds)
-    
-    result_dict = json.loads(result)
-    if context:
-        result_dict['navigation_context'] = context
-    
-    return json.dumps(result_dict, indent=2)
-
-
-# ============= 4. EXTRACT SPECIFIC ELEMENTS =============
-
-@mcp.tool(
-    name="extract_elements",
-    description="""Extract specific elements from a JavaScript-heavy website using CSS selectors.
-
-Args:
-    url: The URL to scrape
-    selectors: Dictionary of {name: css_selector} to extract specific elements
-    wait_seconds: Seconds to wait for page load (default: 5)
-
-Example selectors:
-    {"documents": "a[href*='.pdf']", "headings": "h1, h2, h3"}
-
-Returns extracted elements grouped by selector name.
-"""
-)
-async def extract_elements(url: str, selectors: dict, wait_seconds: int = 5) -> str:
-    """Extract specific elements using Playwright and CSS selectors"""
-    
-    if not PLAYWRIGHT_AVAILABLE:
-        return json.dumps({
-            "success": False,
-            "error": "Playwright not installed",
-            "message": "Install with: pip install playwright && playwright install chromium"
-        }, indent=2)
-    
-    try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(
-                headless=True,
-                args=['--disable-blink-features=AutomationControlled', '--no-sandbox']
-            )
-            
-            context = await browser.new_context(
-                viewport={'width': 1920, 'height': 1080},
-                user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                ignore_https_errors=True
-            )
-            
-            page = await context.new_page()
-            page.set_default_timeout(30000)
-            
-            await page.goto(url, wait_until='networkidle', timeout=30000)
-            await asyncio.sleep(wait_seconds)
-            
-            results = {}
-            
-            for name, selector in selectors.items():
-                elements = await page.query_selector_all(selector)
-                extracted = []
-                
-                for element in elements:
-                    text = await element.inner_text()
-                    href = await element.get_attribute('href')
-                    
-                    item = {"text": text.strip()}
-                    if href:
-                        item["url"] = urljoin(url, href)
-                    
-                    extracted.append(item)
-                
-                results[name] = extracted
-            
-            await browser.close()
-            
-            return json.dumps({
-                "success": True,
-                "url": url,
-                "method": "playwright_selector_extraction",
-                "results": results
-            }, indent=2)
-        
-    except Exception as e:
-        return json.dumps({
-            "success": False,
-            "error": str(e),
-            "url": url
-        }, indent=2)    
+    return json.dumps(response.model_dump(), indent=2)
