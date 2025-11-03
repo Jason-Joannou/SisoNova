@@ -8,6 +8,8 @@ from api.tools.database.utils import (
     get_whitelist_collection_operation,
     add_new_entry_to_whitelist_operation,
     query_white_list_collection_operation,
+    add_regulation_node_operation,
+    add_compliance_node_operation
 )
 
 mongo_client = MongoDBClient()
@@ -180,23 +182,67 @@ async def get_whitelist_collection() -> str:
         )
 
 @mcp.tool(name="add_compliance_node",
-          description="Add a new compliance node to the central knowledge graph",)
+          description="""Add a new compliance requirement to the knowledge graph database.
+
+Use this tool to store non-government compliance requirements such as:
+- Bank/financial institution requirements (e.g., ABSA Debtor Financing criteria)
+- Industry standards and best practices
+- Professional body requirements
+- Insurance company requirements
+- Trade association guidelines
+- Certification requirements (e.g., ISO standards)
+
+Structure: Country > Province > Industry Category > Sub-Category > COMPLIANCE
+
+Required information:
+- Location: country and province
+- Industry: category and subcategory (e.g., "Financial Services" > "Debtor Financing")
+- Compliance details: name, description, source webpage, issuing organization
+- Business criteria: which businesses this applies to (size, type, sector, custom criteria)
+- Required fields: what information/documentation is needed
+- Required licenses: any licenses or certifications needed
+
+Example: Adding "ABSA Debtor Financing Requirements" with minimum turnover R5m, 30-day debtor book criteria.
+
+Returns: Success confirmation with the path where the compliance requirement was stored.
+""")
 async def add_compliance_node(compliance_node: ComplianceNode) -> str:
-    print(json.dumps(compliance_node.model_dump(), indent=2))
-    return "success"
+    response = await add_compliance_node_operation(mongo_client, compliance_node)
+    return response.model_dump()
 
 @mcp.tool(name="add_regulation_node",
-          description="Add a new regulation node to the central knowledge graph",)
+          description="""Add a government regulation to the knowledge graph database.
+
+Use this tool to store regulations such as:
+- Acts and laws (e.g., Marine Living Resources Act)
+- Government-mandated requirements
+- Legal compliance obligations
+- Licensing requirements from government bodies
+
+Structure: Country > Province > Industry Category > Sub-Category > REGULATION
+
+Required information:
+- Location: country and province
+- Industry: category and subcategory (e.g., "Fishing" > "Commercial Fishing")
+- Regulation details: name, description, source webpage, regulatory body
+- Business criteria: which businesses this applies to (size, type, sector)
+- Required fields: what information businesses must provide
+- Required licenses: what licenses are needed
+
+Example: Adding "Marine Living Resources Act" for commercial fishing in Western Cape, South Africa.
+
+Returns: Success confirmation with the path where the regulation was stored.
+""")
 async def add_regulation_node(regulation_node: RegulationNode) -> str:
-    print(json.dumps(regulation_node.model_dump(), indent=2))
-    return "success"
+    response = await add_regulation_node_operation(mongo_client, regulation_node)
+    return response.model_dump()
 
-@mcp.tool(name="get_regulation_node",
-          description="Get a regulation node from the central knowledge graph",)
-async def get_regulation_node() -> str:
-    pass
+# @mcp.tool(name="get_regulation_node",
+#           description="Get a regulation node from the central knowledge graph",)
+# async def get_regulation_node() -> str:
+#     pass
 
-@mcp.tool(name="get_compliance_node",
-          description="Get a compliance node from the central knowledge graph",)
-async def get_compliance_node() -> str:
-    pass
+# @mcp.tool(name="get_compliance_node",
+#           description="Get a compliance node from the central knowledge graph",)
+# async def get_compliance_node() -> str:
+#     pass
