@@ -91,8 +91,10 @@ async def open_website_operation(url: str, wait_seconds: int = 3, default_timeou
             
             for element in soup(["header", "nav"]):
                 element.decompose()
-
-            page_content = soup.prettify()
+            
+            # Extract form content
+            forms_on_page = soup.find_all('form')
+            html_form_content = [form.prettify() for form in forms_on_page]
             
             
             await browser.close()
@@ -102,7 +104,7 @@ async def open_website_operation(url: str, wait_seconds: int = 3, default_timeou
                 message="Successfully rendered page with Playwright",
                 url=url,
                 page_title=title or "",
-                page_text=page_content,
+                page_form_content=html_form_content or [],
                 links=links
             )
         
@@ -112,7 +114,7 @@ async def open_website_operation(url: str, wait_seconds: int = 3, default_timeou
             message="Failed to render page with Playwright",
             page_title="",
             url=url,
-            page_text="",
+            page_form_content=[],
             links=[]
         )
 

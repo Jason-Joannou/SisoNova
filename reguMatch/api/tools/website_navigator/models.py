@@ -33,5 +33,5 @@ class OpenWebsiteRequest(BaseModel):
 class OpenWebsiteResponse(BaseResponse):
     url: str = Field(..., description="URL of the website")
     page_title: str = Field(..., description="Title of the website")
-    page_text: str = Field(..., description="Main text content of the website")
+    page_form_content: List[str] = Field(..., description="Form content on the website")
     links: List[WebsiteLinks] = Field(..., description="List of links on the website")
