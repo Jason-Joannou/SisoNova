@@ -4,7 +4,7 @@ import json
 from api.tools.database.models import WhiteListURLData, WhiteListQueryParameters, ComplianceNode, RegulationNode
 from api.database.mongo_client import MongoDBClient
 
-from api.database.mongo_queries import (
+from api.tools.database.utils import (
     get_whitelist_collection_operation,
     add_new_entry_to_whitelist_operation,
     query_white_list_collection_operation,
