@@ -1,16 +1,6 @@
 from fastmcp import FastMCP
 import json
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse
-import urllib
-from typing import List, Optional
-from ddgs import DDGS
-import time
-import random
 import urllib3
-import asyncio
-from playwright.async_api import async_playwright
 from api.tools.website_navigator.models import DuckDuckGoRequest, OpenWebsiteRequest
 from api.tools.website_navigator.utils import (
     duck_duck_go_search_operation,
@@ -95,23 +85,17 @@ Open a website and extract its forms and navigation links.
 **WHAT THIS RETURNS:**
 - Page title
 - All HTML forms found on the page (raw HTML of each form)
+- Page content in HTML
 - All links on the page with their text and URLs
 
 **WHAT THIS DOES NOT RETURN:**
-- Does NOT return the main page text/content
 - Does NOT parse form fields into structured data
-- Only returns forms and links for navigation
-
-**USE CASES:**
-- "What forms are on the ABSA debtor financing page?"
-- "What links are available on the SAMSA regulations page?"
-- "Does this page have an application form?"
-- "What other pages can I navigate to from here?"
 
 **WORKFLOW:**
 1. Use this to see what forms exist on a page
-2. Use the returned links to navigate to other relevant pages
-3. You may need to open multiple pages to find all information
+2. To see the content of the page in HTML
+3. Use the returned links to navigate to other relevant pages
+4. You may need to open multiple pages to find all information
 
 Args:
     url: Full URL to open (must start with https://)
@@ -120,6 +104,7 @@ Args:
 
 Returns:
 - page_title: The page title
+- page_content: The HTML content of the page
 - page_form_content: Array of HTML strings (one per form found)
 - links: Array of {link: url, text: link_text} objects
 
