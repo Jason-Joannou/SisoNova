@@ -305,10 +305,26 @@ class ComplianceNode(BaseRegulationAndComplianceRequirements):
         None, description="Suggested contacts for this compliance."
     )
 
+
 class AvailableKeysInCollectionResponse(BaseDatabaseResponse):
     keys: List[str] = Field(..., description="The available keys in the collection.")
 
+
+class GetNodeResponse(BaseDatabaseResponse):
+    """Response for getting a regulation or compliance node"""
+
+    nodes_found: int = Field(0, description="Number of nodes found matching the query")
+    nodes: List[Dict] = Field(
+        default_factory=list, description="List of matching regulation/compliance nodes"
+    )
+
+
 class DatabaseQueryParameters(BaseModel):
     location_information: CountryInformation = Field(
-        ..., description="The location where this regulation and compliance requirements apply."
+        ...,
+        description="The location where this regulation and compliance requirements apply.",
+    )
+    industry_information: Optional[CategoryInformation] = Field(
+        None,
+        description="The industry where this regulation and compliance requirements apply.",
     )

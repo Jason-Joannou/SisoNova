@@ -8,7 +8,8 @@ from api.tools.database.models import (
     RegulationNode,
     ComplianceNode,
     AvailableKeysInCollectionResponse,
-    DatabaseQueryParameters
+    DatabaseQueryParameters,
+    GetNodeResponse,
 )
 from typing import List, Dict
 from datetime import datetime
@@ -667,13 +668,12 @@ async def add_compliance_node_operation(
             response_document={},
             error=str(e),
         )
-    
+
 
 async def get_available_keys_in_regulation_collection_operation(
-    mongo_client: MongoDBClient,
-    query_parameters: DatabaseQueryParameters
+    mongo_client: MongoDBClient, query_parameters: DatabaseQueryParameters
 ) -> AvailableKeysInCollectionResponse:
-    
+
     try:
         async with mongo_client.get_db("ReguMatch") as db:
             collection = db["regulations"]
@@ -687,7 +687,7 @@ async def get_available_keys_in_regulation_collection_operation(
                     message=f"No collection found for country {country_name}",
                     keys=[],
                 )
-            
+
             flat_dict = flatdict.FlatDict(country_doc)
             available_keys = flat_dict.keys()
             if province_name:
@@ -698,7 +698,7 @@ async def get_available_keys_in_regulation_collection_operation(
                         message=f"No collection found for province {province_name}",
                         keys=available_keys,
                     )
-                
+
                 flat_dict = flatdict.FlatDict(province_doc)
                 available_keys = flat_dict.keys()
                 return AvailableKeysInCollectionResponse(
@@ -706,13 +706,13 @@ async def get_available_keys_in_regulation_collection_operation(
                     message=f"Collection found for province {province_name}",
                     keys=available_keys,
                 )
-            
+
             return AvailableKeysInCollectionResponse(
                 success=True,
                 message=f"Collection found for country {country_name}",
                 keys=available_keys,
             )
-                
+
     except Exception as e:
         return AvailableKeysInCollectionResponse(
             success=False,
@@ -720,12 +720,12 @@ async def get_available_keys_in_regulation_collection_operation(
             keys=[],
             error=str(e),
         )
-    
+
+
 async def get_available_keys_in_compliance_collection_operation(
-    mongo_client: MongoDBClient,
-    query_parameters: DatabaseQueryParameters
+    mongo_client: MongoDBClient, query_parameters: DatabaseQueryParameters
 ) -> AvailableKeysInCollectionResponse:
-    
+
     try:
         async with mongo_client.get_db("ReguMatch") as db:
             collection = db["compliances"]
@@ -739,7 +739,7 @@ async def get_available_keys_in_compliance_collection_operation(
                     message=f"No collection found for country {country_name}",
                     keys=[],
                 )
-            
+
             flat_dict = flatdict.FlatDict(country_doc)
             available_keys = flat_dict.keys()
             if province_name:
@@ -750,7 +750,7 @@ async def get_available_keys_in_compliance_collection_operation(
                         message=f"No collection found for province {province_name}",
                         keys=available_keys,
                     )
-                
+
                 flat_dict = flatdict.FlatDict(province_doc)
                 available_keys = flat_dict.keys()
                 return AvailableKeysInCollectionResponse(
@@ -758,13 +758,13 @@ async def get_available_keys_in_compliance_collection_operation(
                     message=f"Collection found for province {province_name}",
                     keys=available_keys,
                 )
-            
+
             return AvailableKeysInCollectionResponse(
                 success=True,
                 message=f"Collection found for country {country_name}",
                 keys=available_keys,
             )
-                
+
     except Exception as e:
         return AvailableKeysInCollectionResponse(
             success=False,
@@ -772,4 +772,161 @@ async def get_available_keys_in_compliance_collection_operation(
             keys=[],
             error=str(e),
         )
-    
+
+
+async def get_regulation_node_operation(
+    mongo_client: MongoDBClient, query_parameters: DatabaseQueryParameters
+) -> GetNodeResponse:
+    """
+    Get regulation nodes that exactly match the query parameters.
+    """
+    try:
+        async with mongo_client.get_db("ReguMatch") as db:
+            collection = db["regulations"]
+
+            # Extract query parameters
+            country_name = query_parameters.location_information.country_name
+            province = query_parameters.location_information.province or "all"
+
+            # Check if country exists
+            country_doc = await collection.find_one({"_id": country_name})
+
+            if not country_doc:
+                return GetNodeResponse(
+                    success=True,
+                    message=f"No regulations found for country: {country_name}",
+                    nodes_found=0,
+                    nodes=[],
+                )
+
+            # Navigate to province
+            if province not in country_doc:
+                return GetNodeResponse(
+                    success=True,
+                    message=f"No regulations found for province: {province}",
+                    nodes_found=0,
+                    nodes=[],
+                )
+
+            current_level = country_doc[province]
+
+            # Navigate to category and subcategory if specified
+            if query_parameters.industry_information:
+                category_name = query_parameters.industry_information.category_name
+                subcategory = query_parameters.industry_information.subcategory or "all"
+
+                if category_name not in current_level:
+                    return GetNodeResponse(
+                        success=True,
+                        message=f"No regulations found for category: {category_name}",
+                        nodes_found=0,
+                        nodes=[],
+                    )
+
+                if subcategory not in current_level[category_name]:
+                    return GetNodeResponse(
+                        success=True,
+                        message=f"No regulations found for subcategory: {subcategory}",
+                        nodes_found=0,
+                        nodes=[],
+                    )
+
+                current_level = current_level[category_name][subcategory]
+
+            # Extract regulation list
+            regulations = current_level.get("regulation", [])
+
+            return GetNodeResponse(
+                success=True,
+                message=f"Found {len(regulations)} regulation(s) matching query",
+                nodes_found=len(regulations),
+                nodes=regulations,
+            )
+
+    except Exception as e:
+        return GetNodeResponse(
+            success=False,
+            message=f"Error retrieving regulations: {str(e)}",
+            error=str(e),
+            nodes_found=0,
+            nodes=[],
+        )
+
+
+async def get_compliance_node_operation(
+    mongo_client: MongoDBClient, query_parameters: DatabaseQueryParameters
+) -> GetNodeResponse:
+    """
+    Get compliance nodes that exactly match the query parameters.
+    """
+    try:
+        async with mongo_client.get_db("ReguMatch") as db:
+            collection = db["compliances"]
+
+            # Extract query parameters
+            country_name = query_parameters.location_information.country_name
+            province = query_parameters.location_information.province or "all"
+
+            # Check if country exists
+            country_doc = await collection.find_one({"_id": country_name})
+
+            if not country_doc:
+                return GetNodeResponse(
+                    success=True,
+                    message=f"No compliance requirements found for country: {country_name}",
+                    nodes_found=0,
+                    nodes=[],
+                )
+
+            # Navigate to province
+            if province not in country_doc:
+                return GetNodeResponse(
+                    success=True,
+                    message=f"No compliance requirements found for province: {province}",
+                    nodes_found=0,
+                    nodes=[],
+                )
+
+            current_level = country_doc[province]
+
+            # Navigate to category and subcategory if specified
+            if query_parameters.industry_information:
+                category_name = query_parameters.industry_information.category_name
+                subcategory = query_parameters.industry_information.subcategory or "all"
+
+                if category_name not in current_level:
+                    return GetNodeResponse(
+                        success=True,
+                        message=f"No compliance requirements found for category: {category_name}",
+                        nodes_found=0,
+                        nodes=[],
+                    )
+
+                if subcategory not in current_level[category_name]:
+                    return GetNodeResponse(
+                        success=True,
+                        message=f"No compliance requirements found for subcategory: {subcategory}",
+                        nodes_found=0,
+                        nodes=[],
+                    )
+
+                current_level = current_level[category_name][subcategory]
+
+            # Extract compliance list
+            compliances = current_level.get("compliance", [])
+
+            return GetNodeResponse(
+                success=True,
+                message=f"Found {len(compliances)} compliance requirement(s) matching query",
+                nodes_found=len(compliances),
+                nodes=compliances,
+            )
+
+    except Exception as e:
+        return GetNodeResponse(
+            success=False,
+            message=f"Error retrieving compliance requirements: {str(e)}",
+            error=str(e),
+            nodes_found=0,
+            nodes=[],
+        )

@@ -6,7 +6,7 @@ from api.tools.database.models import (
     WhiteListQueryParameters,
     ComplianceNode,
     RegulationNode,
-    DatabaseQueryParameters
+    DatabaseQueryParameters,
 )
 from api.database.mongo_client import MongoDBClient
 
@@ -17,7 +17,9 @@ from api.tools.database.utils import (
     add_regulation_node_operation,
     add_compliance_node_operation,
     get_available_keys_in_compliance_collection_operation,
-    get_available_keys_in_regulation_collection_operation
+    get_available_keys_in_regulation_collection_operation,
+    get_compliance_node_operation,
+    get_regulation_node_operation,
 )
 
 mongo_client = MongoDBClient()
@@ -289,7 +291,9 @@ You can filter by any combination of:
 Always query available keys before adding new regulations to ensure naming consistency.
 """,
 )
-async def get_available_keys_in_regulation_collection(query_parameters: DatabaseQueryParameters) -> str:
+async def get_available_keys_in_regulation_collection(
+    query_parameters: DatabaseQueryParameters,
+) -> str:
     response = await get_available_keys_in_regulation_collection_operation(
         mongo_client, query_parameters
     )
@@ -333,19 +337,54 @@ You can filter by any combination of:
 Always query available keys before adding new compliance requirements to ensure naming consistency.
 """,
 )
-async def get_available_keys_in_regulation_collection(query_parameters: DatabaseQueryParameters) -> str:
+async def get_available_keys_in_regulation_collection(
+    query_parameters: DatabaseQueryParameters,
+) -> str:
     response = await get_available_keys_in_compliance_collection_operation(
         mongo_client, query_parameters
     )
     return json.dumps(response.model_dump(), indent=2)
 
 
-# @mcp.tool(name="get_regulation_node",
-#           description="Get a regulation node from the central knowledge graph",)
-# async def get_regulation_node() -> str:
-#     pass
+@mcp.tool(
+    name="get_regulation_node",
+    description="""
+Get regulation nodes from the knowledge graph at the specified path.
 
-# @mcp.tool(name="get_compliance_node",
-#           description="Get a compliance node from the central knowledge graph",)
-# async def get_compliance_node() -> str:
-#     pass
+**Parameters:**
+- location_information: country_name (required), province (optional, use "all" for country-wide)
+- industry_information: category_name, subcategory (optional, use "all" for category-wide)
+
+**Returns:**
+List of regulation objects with all details (name, description, required_fields, licenses, fees, contacts, etc.)
+
+**Examples:**
+- All fishing in Western Cape: province="western_cape", category="fishing", subcategory="all"
+- Commercial fishing in Western Cape: province="western_cape", category="fishing", subcategory="commercial_fishing"
+""",
+)
+async def get_regulation_node(query_parameters: DatabaseQueryParameters) -> str:
+    response = await get_regulation_node_operation(mongo_client, query_parameters)
+    return json.dumps(response.model_dump(), indent=2)
+
+
+@mcp.tool(
+    name="get_compliance_node",
+    description="""
+Get compliance requirement nodes from the knowledge graph at the specified path.
+
+**Parameters:**
+- location_information: country_name (required), province (optional, use "all" for country-wide)
+- industry_information: category_name, subcategory (optional, use "all" for category-wide)
+
+**Returns:**
+List of compliance objects with all details (name, description, required_fields, licenses, fees, contacts, business_criteria, etc.)
+
+**Examples:**
+- All financial services in Gauteng: province="gauteng", category="financial_services", subcategory="all"
+- Debtor financing in Gauteng: province="gauteng", category="financial_services", subcategory="debtor_financing"
+""",
+)
+async def get_compliance_node(query_parameters: DatabaseQueryParameters) -> str:
+    response = await get_compliance_node_operation(mongo_client, query_parameters)
+    return json.dumps(response.model_dump(), indent=2)
