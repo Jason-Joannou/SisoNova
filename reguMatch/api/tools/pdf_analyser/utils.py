@@ -6,6 +6,7 @@ from typing import Optional
 from paddleocr import PaddleOCR
 from pydantic import BaseModel, Field
 import asyncio
+import fitz
 
 
 class PDFDownloadRequest(BaseModel):
@@ -86,19 +87,83 @@ async def download_and_analyze_pdf(url: str) -> PDFAnalysisResponse:
     )
 
 
+async def extract_text_from_pdf(url: str) -> PDFAnalysisResponse:
+    """
+    Fast text extraction for PDFs with text layer (digital PDFs)
+    """
+    temp_dir = None
+    
+    temp_dir = tempfile.mkdtemp()
+    temp_path = Path(temp_dir)
+    
+    # Download PDF
+    async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
+        response = await client.get(url)
+        response.raise_for_status()
+        
+        filename = url.split("/")[-1].split("?")[0]
+        if not filename.endswith(".pdf"):
+            filename = "document.pdf"
+        
+        pdf_path = temp_path / filename
+        pdf_path.write_bytes(response.content)
+    
+    # Extract text with PyMuPDF
+    doc = fitz.open(str(pdf_path))
+    all_text = []
+    
+    page_count = len(doc)  # Store page count BEFORE closing
+    
+    for page_num in range(page_count):
+        page = doc[page_num]
+        text = page.get_text()
+        all_text.append(text)
+    
+    doc.close()
+    
+    full_text = "\n\n".join(all_text)
+    
+    # Limit text length
+    max_length = 50000
+    if len(full_text) > max_length:
+        full_text = full_text[:max_length] + "\n\n[Content truncated - PDF too long]"
+    
+    # Cleanup
+    pdf_path.unlink()
+    Path(temp_dir).rmdir()
+    
+    return PDFAnalysisResponse(
+        success=True,
+        message=f"Successfully extracted text from PDF ({page_count} page(s))",  # Use stored page_count
+        url=url,
+        filename=filename,
+        text_content=full_text
+    )
+
+
 async def test():
     pdf_url = "https://www.samsa.org.za/api/api/File/view/2kD0ao6TAdLtvYZXp4HlAA%3D%3D"
 
-    result = await download_and_analyze_pdf(pdf_url)
+    # result = await download_and_analyze_pdf(pdf_url)
 
-    print("Success:", result.success)
-    print("Message:", result.message)
-    print("Filename:", result.filename)
-    print("\n--- Extracted Text ---")
-    print(result.text_content)
+    # print("Success:", result.success)
+    # print("Message:", result.message)
+    # print("Filename:", result.filename)
+    # print("\n--- Extracted Text ---")
+    # print(result.text_content)
 
-    if result.error:
-        print("\nError:", result.error)
+    # if result.error:
+    #     print("\nError:", result.error)
+
+    # Test fast text extraction method
+    # pdf_url = "https://www.resbank.co.za/content/dam/sarb/what-we-do/financial-surveillance/general-public/Position%20paper%20no%20%2001_2018%20on%20%20the%20PFMIs.pdf"
+    print("=== Testing Fast Text Extraction Method ===")
+    result_text = await extract_text_from_pdf(pdf_url)
+    print("Success:", result_text.success)
+    print("Message:", result_text.message)
+    print("Filename:", result_text.filename)
+    print("\n--- Text Extracted (first 500 chars) ---")
+    print(result_text.text_content[:500])
 
 
 if __name__ == "__main__":

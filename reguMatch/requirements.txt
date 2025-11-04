@@ -10,5 +10,6 @@ playwright
 pymongo[srv]
 motor
 googlesearch-python
-paddleocr
+paddleocr[all]
 paddlepaddle
+PyMuPDF
