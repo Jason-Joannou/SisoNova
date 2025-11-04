@@ -6,7 +6,6 @@ from api.tools.pdf_analyser.service import mcp as pdf_analyser_mcp
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env file
 load_dotenv()
 
 API_KEY = os.getenv("API_KEY", "dev-api-key-12345")
@@ -26,25 +25,51 @@ class BearerTokenAuthProvider(TokenVerifier):
                 token=token,
                 client_id="api_client",
                 scopes=[],
-                expires_at=None,  # Tokens don't expire in this simple example
+                expires_at=None,
             )
         return None
 
 
-# Initialize auth provider
 auth_provider = BearerTokenAuthProvider([API_KEY])
 
-# Create FastMCP server with authentication
-mcp = FastMCP("Basic MCP Server with Bearer Token Authentication", auth=auth_provider)
+mcp = FastMCP(
+    name="ReguMatch Compliance Research Service",
+    auth=auth_provider,
+    instructions="""
+This MCP server provides tools for researching, extracting, and storing regulatory and compliance requirements.
 
+## AVAILABLE SERVICES:
 
-@mcp.tool
-def add(a: int, b: int) -> int:
-    """Add two numbers"""
-    return a + b
+**Web Research Service (website-navigator):**
+- duck_duck_go_search: Search for regulations and compliance information
+- open_website: Extract content, forms, and links from webpages
 
+**PDF Analysis Service (pdf-analyser):**
+- download_and_analyze_pdf: Extract text from regulatory PDFs
+- IMPORTANT: Only use URLs discovered through search or navigation - never construct URLs
 
-# mcp.mount(database_mcp, prefix="database", as_proxy=True)
+**Database Service (database):**
+- add_regulation_node: Store government regulations in knowledge graph
+- add_compliance_node: Store non-government compliance requirements
+- add_url_to_whitelist_collection: Track verified regulatory URLs
+- query_white_list_collection: Query URLs by location/industry
+- get_whitelist_collection: Retrieve all tracked URLs
+
+## STANDARD WORKFLOW:
+1. Search for official sources using duck_duck_go_search
+2. Navigate and extract content using open_website
+3. Extract PDF documents using download_and_analyze_pdf
+4. Structure and store information using add_regulation_node or add_compliance_node
+5. Track verified URLs using add_url_to_whitelist_collection
+
+## KEY RULES:
+- Always search for current, official sources
+- Never construct or guess URLs - only use discovered URLs
+- Structure information consistently in the knowledge graph
+- Prioritize official sources (government, regulatory bodies, financial institutions)
+""",
+)
+
 mcp.mount(website_navigator_mcp, prefix="website-navigator", as_proxy=True)
 mcp.mount(database_mcp, prefix="database", as_proxy=True)
 mcp.mount(pdf_analyser_mcp, prefix="pdf-analyser", as_proxy=True)
