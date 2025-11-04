@@ -208,7 +208,7 @@ Returns: Success confirmation with the path where the compliance requirement was
 """)
 async def add_compliance_node(compliance_node: ComplianceNode) -> str:
     response = await add_compliance_node_operation(mongo_client, compliance_node)
-    return response.model_dump()
+    return json.dumps(response.model_dump(), indent=2)
 
 @mcp.tool(name="add_regulation_node",
           description="""Add a government regulation to the knowledge graph database.
@@ -235,7 +235,7 @@ Returns: Success confirmation with the path where the regulation was stored.
 """)
 async def add_regulation_node(regulation_node: RegulationNode) -> str:
     response = await add_regulation_node_operation(mongo_client, regulation_node)
-    return response.model_dump()
+    return json.dumps(response.model_dump(), indent=2)
 
 # @mcp.tool(name="get_regulation_node",
 #           description="Get a regulation node from the central knowledge graph",)
