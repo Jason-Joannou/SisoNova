@@ -14,7 +14,7 @@ async def verify_url_exists(url: str, timeout: int = 10) -> Tuple[bool, str]:
     """
     try:
         async with httpx.AsyncClient(
-            timeout=timeout, follow_redirects=True, verify=False
+            timeout=60.0, follow_redirects=True, verify=False, max_redirects=20
         ) as client:
             response = await client.head(url)
 

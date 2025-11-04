@@ -304,3 +304,11 @@ class ComplianceNode(BaseRegulationAndComplianceRequirements):
     suggested_contacts: Optional[List[SuggestedContacts]] = Field(
         None, description="Suggested contacts for this compliance."
     )
+
+class AvailableKeysInCollectionResponse(BaseDatabaseResponse):
+    keys: List[str] = Field(..., description="The available keys in the collection.")
+
+class DatabaseQueryParameters(BaseModel):
+    location_information: CountryInformation = Field(
+        ..., description="The location where this regulation and compliance requirements apply."
+    )

@@ -7,9 +7,12 @@ from api.tools.database.models import (
     WhiteListQueryResponse,
     RegulationNode,
     ComplianceNode,
+    AvailableKeysInCollectionResponse,
+    DatabaseQueryParameters
 )
-from typing import List
+from typing import List, Dict
 from datetime import datetime
+import flatdict
 
 
 async def get_whitelist_collection_operation(mongo_client: MongoDBClient) -> List:
@@ -664,3 +667,109 @@ async def add_compliance_node_operation(
             response_document=None,
             error=str(e),
         )
+    
+
+async def get_available_keys_in_regulation_collection_operation(
+    mongo_client: MongoDBClient,
+    query_parameters: DatabaseQueryParameters
+) -> AvailableKeysInCollectionResponse:
+    
+    try:
+        async with mongo_client.get_db("ReguMatch") as db:
+            collection = db["regulations"]
+            country_name = query_parameters.location_information.country_name
+            province_name = query_parameters.location_information.province
+
+            country_doc = await collection.find_one({"_id": country_name})
+            if not country_doc:
+                return AvailableKeysInCollectionResponse(
+                    success=True,
+                    message=f"No collection found for country {country_name}",
+                    keys=[],
+                )
+            
+            flat_dict = flatdict.FlatDict(country_doc)
+            available_keys = flat_dict.keys()
+            if province_name:
+                province_doc = country_doc.get(province_name)
+                if not province_doc:
+                    return AvailableKeysInCollectionResponse(
+                        success=True,
+                        message=f"No collection found for province {province_name}",
+                        keys=available_keys,
+                    )
+                
+                flat_dict = flatdict.FlatDict(province_doc)
+                available_keys = flat_dict.keys()
+                return AvailableKeysInCollectionResponse(
+                    success=True,
+                    message=f"Collection found for province {province_name}",
+                    keys=available_keys,
+                )
+            
+            return AvailableKeysInCollectionResponse(
+                success=True,
+                message=f"Collection found for country {country_name}",
+                keys=available_keys,
+            )
+                
+    except Exception as e:
+        return AvailableKeysInCollectionResponse(
+            success=False,
+            message=f"Error: {str(e)}",
+            keys=[],
+            error=str(e),
+        )
+    
+async def get_available_keys_in_compliance_collection_operation(
+    mongo_client: MongoDBClient,
+    query_parameters: DatabaseQueryParameters
+) -> AvailableKeysInCollectionResponse:
+    
+    try:
+        async with mongo_client.get_db("ReguMatch") as db:
+            collection = db["compliances"]
+            country_name = query_parameters.location_information.country_name
+            province_name = query_parameters.location_information.province
+
+            country_doc = await collection.find_one({"_id": country_name})
+            if not country_doc:
+                return AvailableKeysInCollectionResponse(
+                    success=True,
+                    message=f"No collection found for country {country_name}",
+                    keys=[],
+                )
+            
+            flat_dict = flatdict.FlatDict(country_doc)
+            available_keys = flat_dict.keys()
+            if province_name:
+                province_doc = country_doc.get(province_name)
+                if not province_doc:
+                    return AvailableKeysInCollectionResponse(
+                        success=True,
+                        message=f"No collection found for province {province_name}",
+                        keys=available_keys,
+                    )
+                
+                flat_dict = flatdict.FlatDict(province_doc)
+                available_keys = flat_dict.keys()
+                return AvailableKeysInCollectionResponse(
+                    success=True,
+                    message=f"Collection found for province {province_name}",
+                    keys=available_keys,
+                )
+            
+            return AvailableKeysInCollectionResponse(
+                success=True,
+                message=f"Collection found for country {country_name}",
+                keys=available_keys,
+            )
+                
+    except Exception as e:
+        return AvailableKeysInCollectionResponse(
+            success=False,
+            message=f"Error: {str(e)}",
+            keys=[],
+            error=str(e),
+        )
+    

@@ -13,3 +13,4 @@ googlesearch-python
 paddleocr[all]
 paddlepaddle
 PyMuPDF
+flatdict

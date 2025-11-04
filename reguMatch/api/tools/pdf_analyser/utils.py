@@ -45,7 +45,9 @@ async def download_and_analyze_pdf(url: str) -> AnalysePDFResponse:
         temp_path = Path(temp_dir)
 
         # Download PDF
-        async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
+        async with httpx.AsyncClient(
+            timeout=60.0, follow_redirects=True, verify=False, max_redirects=20
+        ) as client:
             response = await client.get(url)
             response.raise_for_status()
 
@@ -115,7 +117,9 @@ async def extract_text_from_pdf(url: str) -> AnalysePDFResponse:
         temp_path = Path(temp_dir)
 
         # Download PDF
-        async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
+        async with httpx.AsyncClient(
+            timeout=60.0, follow_redirects=True, verify=False, max_redirects=20
+        ) as client:
             response = await client.get(url)
             response.raise_for_status()
 

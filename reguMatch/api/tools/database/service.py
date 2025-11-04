@@ -6,6 +6,7 @@ from api.tools.database.models import (
     WhiteListQueryParameters,
     ComplianceNode,
     RegulationNode,
+    DatabaseQueryParameters
 )
 from api.database.mongo_client import MongoDBClient
 
@@ -15,6 +16,8 @@ from api.tools.database.utils import (
     query_white_list_collection_operation,
     add_regulation_node_operation,
     add_compliance_node_operation,
+    get_available_keys_in_compliance_collection_operation,
+    get_available_keys_in_regulation_collection_operation
 )
 
 mongo_client = MongoDBClient()
@@ -246,6 +249,94 @@ Returns: Success confirmation with the path where the regulation was stored.
 )
 async def add_regulation_node(regulation_node: RegulationNode) -> str:
     response = await add_regulation_node_operation(mongo_client, regulation_node)
+    return json.dumps(response.model_dump(), indent=2)
+
+
+@mcp.tool(
+    name="get_available_keys_in_regulation_collection",
+    description="""
+Get all available keys (country, province, category, subcategory names) in the regulation collection.
+
+**PURPOSE:**
+- Discover what regulations are already stored in the database
+- Find existing keys to maintain consistency when adding new regulations
+- Avoid creating duplicate or similar keys (e.g., "commercial_fishing" vs "fishing_commercial")
+- Understand the current structure of the knowledge base
+
+**WHEN TO USE:**
+- BEFORE adding a new regulation node - check if similar keys already exist
+- When unsure about the correct naming convention for a location or industry
+- To explore what regulations are available in a specific scope
+- To maintain consistency across the knowledge base
+
+**QUERY PARAMETERS:**
+You can filter by any combination of:
+- country_name: Required - the country to query (e.g., "south_africa")
+- province: Optional - filter by specific province (e.g., "western_cape")
+
+**WHAT THIS RETURNS:**
+- All unique keys at each level of the hierarchy within your query scope
+- Available countries, provinces, categories, and subcategories
+- Helps you see what naming conventions are already in use
+
+**EXAMPLE WORKFLOW:**
+1. User wants to add "Cape Town fishing regulations"
+2. First check: get_available_keys(country="south_africa", province="western_cape")
+3. See existing keys: ["south_africa", "south_africa.western_cape", "south_africa.western_cape.fishing", "south_africa.western_cape.fishing.commercial_fishing"]
+4. Use consistent naming: province="western_cape", subcategory="commercial_fishing"
+
+**BEST PRACTICE:**
+Always query available keys before adding new regulations to ensure naming consistency.
+""",
+)
+async def get_available_keys_in_regulation_collection(query_parameters: DatabaseQueryParameters) -> str:
+    response = await get_available_keys_in_regulation_collection_operation(
+        mongo_client, query_parameters
+    )
+    return json.dumps(response.model_dump(), indent=2)
+
+
+@mcp.tool(
+    name="get_available_keys_in_compliance_collection",
+    description="""
+Get all available keys (country, province, category, subcategory names) in the compliance collection.
+
+**PURPOSE:**
+- Discover what compliance requirements are already stored in the database
+- Find existing keys to maintain consistency when adding new compliance requirements
+- Avoid creating duplicate or similar keys (e.g., "debtor_financing" vs "financing_debtor")
+- Understand the current structure of the compliance knowledge base
+
+**WHEN TO USE:**
+- BEFORE adding a new compliance node - check if similar keys already exist
+- When unsure about the correct naming convention for a location or industry
+- To explore what compliance requirements are available in a specific scope
+- To maintain consistency across the knowledge base
+
+**QUERY PARAMETERS:**
+You can filter by any combination of:
+- country_name: Required - the country to query (e.g., "south_africa")
+- province: Optional - filter by specific province (e.g., "gauteng")
+
+**WHAT THIS RETURNS:**
+- All unique keys at each level of the hierarchy within your query scope
+- Available countries, provinces, categories, and subcategories
+- Helps you see what naming conventions are already in use
+
+**EXAMPLE WORKFLOW:**
+1. User wants to add "Standard Bank business loan requirements"
+2. First check: get_available_keys(country="south_africa", province="gauteng)
+3. See existing keys: ["south_africa", "south_africa.gauteng", "south_africa.gauteng.financial_services", "south_africa.gauteng.financial_services.business_loans"]
+4. Use consistent naming: subcategory="business_loans"
+
+**BEST PRACTICE:**
+Always query available keys before adding new compliance requirements to ensure naming consistency.
+""",
+)
+async def get_available_keys_in_regulation_collection(query_parameters: DatabaseQueryParameters) -> str:
+    response = await get_available_keys_in_compliance_collection_operation(
+        mongo_client, query_parameters
+    )
     return json.dumps(response.model_dump(), indent=2)
 
 
