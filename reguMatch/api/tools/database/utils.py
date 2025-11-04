@@ -534,7 +534,7 @@ async def add_compliance_node_operation(
                 new_doc = {
                     "_id": country_name,
                     "country_name": country_name,
-                    "created_at": datetime.utcnow().isoformat().isoformat(),
+                    "created_at": datetime.utcnow().isoformat(),
                     "updated_at": datetime.utcnow().isoformat(),
                     province_name: {
                         "created_at": datetime.utcnow().isoformat(),

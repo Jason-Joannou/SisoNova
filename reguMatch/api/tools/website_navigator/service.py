@@ -6,6 +6,13 @@ from api.tools.website_navigator.utils import (
     duck_duck_go_search_operation,
     open_website_operation,
 )
+import logging
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
 
 
 # Disable SSL warnings
@@ -66,7 +73,11 @@ Returns: List of search results with titles, URLs, and descriptions.
 async def duck_duck_go_search(query_parameters: DuckDuckGoRequest) -> str:
     """Search the web using DuckDuckGo"""
 
+    logger.info("Searching the web using DuckDuckGo...")
     results = duck_duck_go_search_operation(query_parameters=query_parameters)
+    if not results.success:
+        logger.error(f"Failed to search the web using DuckDuckGo: {results.error}")
+        logger.error(f"Model dump: {results.model_dump()}")
 
     return json.dumps(results.model_dump(), indent=2)
 
@@ -112,10 +123,14 @@ Returns:
 """,
 )
 async def open_website(parameters: OpenWebsiteRequest) -> str:
+    logger.info("Opening website...")
     response = await open_website_operation(
         url=parameters.url,
         wait_seconds=parameters.wait_seconds,
         default_timeout=parameters.default_timeout,
     )
+    if not response.success:
+        logger.error(f"Failed to open website: {response.error}")
+        logger.error(f"Model dump: {response.model_dump()}")
 
     return json.dumps(response.model_dump(), indent=2)

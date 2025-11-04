@@ -3,6 +3,14 @@ from api.tools.pdf_analyser.models import AnalysePDFParameters
 from api.tools.pdf_analyser.utils import analyse_and_extract_text_from_pdf_operation
 import json
 
+import logging
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
+
 
 mcp = FastMCP(
     name="PDF Analysis Service",
@@ -82,5 +90,10 @@ Extract all text content from a PDF document.
 """,
 )
 async def download_and_analyze_pdf_tool(request: AnalysePDFParameters) -> str:
+    """Download and analyse a PDF"""
+    logger.info("Downloading and analyzing PDF...")
     response = await analyse_and_extract_text_from_pdf_operation(request)
+    if not response.success:
+        logger.error(f"Failed to download and analyze PDF: {response.error}")
+        logger.error(f"Model dump: {response.model_dump()}")
     return json.dumps(response.model_dump(), indent=2)

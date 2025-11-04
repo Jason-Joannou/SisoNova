@@ -21,6 +21,13 @@ from api.tools.database.utils import (
     get_compliance_node_operation,
     get_regulation_node_operation,
 )
+import logging
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
 
 mongo_client = MongoDBClient()
 
@@ -28,10 +35,10 @@ mongo_client = MongoDBClient()
 @asynccontextmanager
 async def database_lifespan(server):
     """Manage MongoDB connection lifecycle"""
-    print("Starting Database Service - Connecting to MongoDB...")
+    logger.info("Starting Database Service - Connecting to MongoDB...")
     await mongo_client.connect()
     yield {}
-    print("Shutting down Database Service - Disconnecting from MongoDB...")
+    logger.info("Shutting down Database Service - Disconnecting from MongoDB...")
     await mongo_client.disconnect()
 
 
@@ -79,17 +86,20 @@ async def add_url_to_whitelist_collection(
     try:
 
         # Once verified, add to the database using the query function
+        logger.info("Adding new entry to whitelist collection...")
         add_result = await add_new_entry_to_whitelist_operation(
             mongo_client, whitelist_entry_information
         )
 
+        logger.info("Entry added to whitelist collection")
         return json.dumps(
             add_result.model_dump(),
             indent=2,
         )
 
     except Exception as e:
-
+        logger.error(f"Error adding entry to whitelist collection: {e}")
+        logger.error(f"Model dump: {whitelist_entry_information.model_dump()}")
         return json.dumps(
             add_result.model_dump(),
             indent=2,
@@ -125,17 +135,20 @@ async def query_white_list_collection(
     """Query whitelist collection with flexible filtering"""
     try:
         # Use the query function from queries.py
+        logger.info("Querying whitelist collection...")
         result = await query_white_list_collection_operation(
             mongo_client, query_parameters
         )
 
+        logger.info("Query completed")
         return json.dumps(
             result.model_dump(),
             indent=2,
         )
 
-    except Exception:
-
+    except Exception as e:
+        logger.error(f"Error querying whitelist collection: {e}")
+        logger.error(f"Model dump: {query_parameters.model_dump()}")
         return json.dumps(
             result.model_dump(),
             indent=2,
@@ -154,9 +167,11 @@ async def get_whitelist_collection() -> str:
     """Get the current whitelist collection from MongoDB"""
     try:
         # Use the query function from queries.py
+        logger.info("Retrieving whitelist collection...")
         documents = await get_whitelist_collection_operation(mongo_client)
 
         if not documents:
+            logger.info("Whitelist collection is empty")
             return json.dumps(
                 {
                     "success": True,
@@ -166,7 +181,7 @@ async def get_whitelist_collection() -> str:
                 },
                 indent=2,
             )
-
+        logger.info("Retrieved whitelist collection")
         return json.dumps(
             {
                 "success": True,
@@ -179,7 +194,7 @@ async def get_whitelist_collection() -> str:
         )
 
     except Exception as e:
-        print(f"Error retrieving whitelist collection: {e}")
+        logger.error(f"Error retrieving whitelist collection: {e}")
 
         return json.dumps(
             {
@@ -220,7 +235,12 @@ Returns: Success confirmation with the path where the compliance requirement was
 """,
 )
 async def add_compliance_node(compliance_node: ComplianceNode) -> str:
+    """Add a new compliance requirement to the knowledge graph database"""
+    logger.info("Adding compliance node...")
     response = await add_compliance_node_operation(mongo_client, compliance_node)
+    if not response.success:
+        logger.error(f"Failed to add compliance node: {response.error}")
+        logger.error(f"Model dump: {compliance_node.model_dump()}")
     return json.dumps(response.model_dump(), indent=2)
 
 
@@ -250,7 +270,11 @@ Returns: Success confirmation with the path where the regulation was stored.
 """,
 )
 async def add_regulation_node(regulation_node: RegulationNode) -> str:
+    logger.info("Adding regulation node...")
     response = await add_regulation_node_operation(mongo_client, regulation_node)
+    if not response.success:
+        logger.error(f"Failed to add regulation node: {response.error}")
+        logger.error(f"Model dump: {regulation_node.model_dump()}")
     return json.dumps(response.model_dump(), indent=2)
 
 
@@ -294,9 +318,13 @@ Always query available keys before adding new regulations to ensure naming consi
 async def get_available_keys_in_regulation_collection(
     query_parameters: DatabaseQueryParameters,
 ) -> str:
+    logger.info("Getting available keys in regulation collection...")
     response = await get_available_keys_in_regulation_collection_operation(
         mongo_client, query_parameters
     )
+    if not response.success:
+        logger.error(f"Failed to get available keys in regulation collection: {response.error}")
+        logger.error(f"Model dump: {response.model_dump()}")
     return json.dumps(response.model_dump(), indent=2)
 
 
@@ -340,9 +368,13 @@ Always query available keys before adding new compliance requirements to ensure 
 async def get_available_keys_in_regulation_collection(
     query_parameters: DatabaseQueryParameters,
 ) -> str:
+    logger.info("Getting available keys in compliance collection...")
     response = await get_available_keys_in_compliance_collection_operation(
         mongo_client, query_parameters
     )
+    if not response.success:
+        logger.error(f"Failed to get available keys in compliance collection: {response.error}")
+        logger.error(f"Model dump: {response.model_dump()}")
     return json.dumps(response.model_dump(), indent=2)
 
 
@@ -364,7 +396,11 @@ List of regulation objects with all details (name, description, required_fields,
 """,
 )
 async def get_regulation_node(query_parameters: DatabaseQueryParameters) -> str:
+    logger.info("Getting regulation node...")
     response = await get_regulation_node_operation(mongo_client, query_parameters)
+    if not response.success:
+        logger.error(f"Failed to get regulation node: {response.error}")
+        logger.error(f"Model dump: {response.model_dump()}")
     return json.dumps(response.model_dump(), indent=2)
 
 
@@ -386,5 +422,9 @@ List of compliance objects with all details (name, description, required_fields,
 """,
 )
 async def get_compliance_node(query_parameters: DatabaseQueryParameters) -> str:
+    logger.info("Getting compliance node...")
     response = await get_compliance_node_operation(mongo_client, query_parameters)
+    if not response.success:
+        logger.error(f"Failed to get compliance node: {response.error}")
+        logger.error(f"Model dump: {response.model_dump()}")
     return json.dumps(response.model_dump(), indent=2)

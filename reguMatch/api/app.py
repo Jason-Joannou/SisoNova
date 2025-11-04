@@ -5,6 +5,13 @@ from api.tools.website_navigator.service import mcp as website_navigator_mcp
 from api.tools.pdf_analyser.service import mcp as pdf_analyser_mcp
 from dotenv import load_dotenv
 import os
+import logging
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -17,19 +24,23 @@ class BearerTokenAuthProvider(TokenVerifier):
     def __init__(self, valid_tokens: list[str]):
         super().__init__()
         self.valid_tokens = set(valid_tokens)
+        logger.info("Authentication provider initialized")
 
     async def verify_token(self, token: str) -> AccessToken | None:
         """Verify Bearer token."""
         if token in self.valid_tokens:
+            logger.info("Token verification successful")
             return AccessToken(
                 token=token,
                 client_id="api_client",
                 scopes=[],
                 expires_at=None,
             )
+        logger.info("Token verification failed")
         return None
 
 
+logger.info("Initializing FastMCP server")
 auth_provider = BearerTokenAuthProvider([API_KEY])
 
 mcp = FastMCP(
@@ -54,6 +65,8 @@ This MCP server provides tools for researching, extracting, and storing regulato
 - add_url_to_whitelist_collection: Track verified regulatory URLs
 - query_white_list_collection: Query URLs by location/industry
 - get_whitelist_collection: Retrieve all tracked URLs
+- get_regulation_node: Retrieve stored regulations
+- get_compliance_node: Retrieve stored compliance requirements
 
 ## STANDARD WORKFLOW:
 1. Search for official sources using duck_duck_go_search
@@ -70,9 +83,11 @@ This MCP server provides tools for researching, extracting, and storing regulato
 """,
 )
 
+logger.info("Mounting services")
 mcp.mount(website_navigator_mcp, prefix="website-navigator", as_proxy=True)
 mcp.mount(database_mcp, prefix="database", as_proxy=True)
 mcp.mount(pdf_analyser_mcp, prefix="pdf-analyser", as_proxy=True)
+logger.info("Services mounted")
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http")
