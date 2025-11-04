@@ -3,10 +3,16 @@ from datetime import datetime
 from typing import List, Optional, Dict
 from enum import Enum
 
+
 class BaseDatabaseResponse(BaseModel):
     success: bool = Field(..., description="Whether the operation was successful")
-    message: str = Field(..., description="A message indicating the success or failure of the operation")
-    error: Optional[str]= Field(None, description="An error message if the operation failed")
+    message: str = Field(
+        ..., description="A message indicating the success or failure of the operation"
+    )
+    error: Optional[str] = Field(
+        None, description="An error message if the operation failed"
+    )
+
 
 class CountryInformation(BaseModel):
     country_name: str = Field(
@@ -136,7 +142,7 @@ class WhiteListQueryParameters(BaseModel):
         if not v:
             return "all"
         return v
-    
+
 
 class AddEntryResponse(BaseDatabaseResponse):
     response_document: Dict = Field(
@@ -146,90 +152,155 @@ class AddEntryResponse(BaseDatabaseResponse):
 
 class WhiteListQueryResponse(BaseDatabaseResponse):
     country_present: bool = Field(
-        ..., 
-        description="Whether the country exists in the database"
+        ..., description="Whether the country exists in the database"
     )
     filters_applied: Dict[str, bool] = Field(
         ...,
-        description="Which filters were applied: {province: bool, category: bool, subcategory: bool}"
+        description="Which filters were applied: {province: bool, category: bool, subcategory: bool}",
     )
     filters_matched: Dict[str, bool] = Field(
         ...,
-        description="Which applied filters found matches: {province: bool, category: bool, subcategory: bool}"
+        description="Which applied filters found matches: {province: bool, category: bool, subcategory: bool}",
     )
     query_parameters: WhiteListQueryParameters
     result_doc: Dict = Field(
-        ...,
-        description="The document that was retrieved from mongoDB."
+        ..., description="The document that was retrieved from mongoDB."
     )
 
+
 class RegulationCompianceType(str, Enum):
-    REGULATION = "regulation" # Gov stuff
-    COMPLIANCE = "compliance" # Non-gov stuff
+    REGULATION = "regulation"  # Gov stuff
+    COMPLIANCE = "compliance"  # Non-gov stuff
+
 
 class RegulationAndComplianceBusinessCriteria(BaseModel):
-    business_size: str = Field(..., description="Which business sizes this applies to. e.g. ['Large', 'Enterprise']. If None, applies to all sizes.")
-    business_type: str = Field(..., description="Which business types this applies to. e.g. ['Pty Ltd', 'Public Company']. If None, applies to all types.")
-    business_sector: str = Field(..., description="The sector that this applies to. e.g. ['Commercial Fishing']. If None, applies to all activities.")
-    custom_criteria: Optional[Dict[str, str]] = Field(..., description="Custom criteria specific to the industry. e.g. {'vessel_length_meters': '>24', 'crew_size': '>20'}")
+    business_size: str = Field(
+        ...,
+        description="Which business sizes this applies to. e.g. ['Large', 'Enterprise']. If None, applies to all sizes.",
+    )
+    business_type: str = Field(
+        ...,
+        description="Which business types this applies to. e.g. ['Pty Ltd', 'Public Company']. If None, applies to all types.",
+    )
+    business_sector: str = Field(
+        ...,
+        description="The sector that this applies to. e.g. ['Commercial Fishing']. If None, applies to all activities.",
+    )
+    custom_criteria: Optional[Dict[str, str]] = Field(
+        ...,
+        description="Custom criteria specific to the industry. e.g. {'vessel_length_meters': '>24', 'crew_size': '>20'}",
+    )
+
 
 class BaseRegulationAndComplianceRequirements(BaseModel):
-    location_information: CountryInformation = Field(..., description="The location where this regulation and compliance requirements apply.")
-    industry_information: CategoryInformation = Field(..., description="The industry where this regulation and compliance requirements apply.")
-    business_criteria: RegulationAndComplianceBusinessCriteria = Field(..., description="The business criteria where this regulation and compliance requirements apply.")
-    regulation_compliance_type: RegulationCompianceType = Field(..., description="The type of regulation and compliance requirements. e.g. REGULATION or COMPLIANCE")
+    location_information: CountryInformation = Field(
+        ...,
+        description="The location where this regulation and compliance requirements apply.",
+    )
+    industry_information: CategoryInformation = Field(
+        ...,
+        description="The industry where this regulation and compliance requirements apply.",
+    )
+    business_criteria: RegulationAndComplianceBusinessCriteria = Field(
+        ...,
+        description="The business criteria where this regulation and compliance requirements apply.",
+    )
+    regulation_compliance_type: RegulationCompianceType = Field(
+        ...,
+        description="The type of regulation and compliance requirements. e.g. REGULATION or COMPLIANCE",
+    )
+
 
 class RequiredLicenses(BaseModel):
     license_name: str = Field(..., description="The name of the license.")
     license_description: str = Field(..., description="The description of the license.")
 
+
 class RequiredCertificates(BaseModel):
     certificate_name: str = Field(..., description="The name of the certificate.")
-    certificate_description: str = Field(..., description="The description of the certificate.")
+    certificate_description: str = Field(
+        ..., description="The description of the certificate."
+    )
+
 
 class RequiredFields(BaseModel):
     field_name: str = Field(..., description="The name of the field.")
     field_description: str = Field(..., description="The description of the field.")
 
+
 class PDFFields(BaseModel):
     pdf_name: str = Field(..., description="The name of the PDF.")
     pdf_url: str = Field(..., description="The URL of the PDF.")
 
+
 class SuggestedContacts(BaseModel):
     contact_name: str = Field(..., description="The name of the contact.")
     contact_email: Optional[str] = Field(None, description="The email of the contact.")
-    contact_phone: Optional[str] = Field(None, description="The phone number of the contact.")
+    contact_phone: Optional[str] = Field(
+        None, description="The phone number of the contact."
+    )
+
 
 class RequiredFees(BaseModel):
     fee_name: str = Field(..., description="The name of the fee.")
     fee_ammount: str = Field(..., description="The amount of the fee.")
     fee_description: str = Field(..., description="The description of the fee.")
 
+
 class RegulationNode(BaseRegulationAndComplianceRequirements):
     regulation_name: str = Field(..., description="The name of the regulation.")
-    regulation_description: str = Field(..., description="The description of the regulation.")
+    regulation_description: str = Field(
+        ..., description="The description of the regulation."
+    )
     regulation_webpage: str = Field(..., description="The webpage of the regulation.")
-    regulation_pdf_urls: Optional[List[PDFFields]] = Field(..., description="The PDF URLs of the regulation.")
+    regulation_pdf_urls: Optional[List[PDFFields]] = Field(
+        ..., description="The PDF URLs of the regulation."
+    )
 
-    required_fields: Optional[List[RequiredFields]] = Field(..., description="The fields required for this regulation.")
-    required_licenses: Optional[List[RequiredLicenses]] = Field(None, description="The licenses required for this regulation.")
-    required_certificates: Optional[List[RequiredLicenses]] = Field(None, description="The certificates required for this regulation.")
-    required_fees: Optional[List[RequiredFees]] = Field(None, description="The fees required for this regulation.")
-    suggested_contacts: Optional[List[SuggestedContacts]] = Field(None, description="Suggested contacts for this regulation.")
+    required_fields: Optional[List[RequiredFields]] = Field(
+        ..., description="The fields required for this regulation."
+    )
+    required_licenses: Optional[List[RequiredLicenses]] = Field(
+        None, description="The licenses required for this regulation."
+    )
+    required_certificates: Optional[List[RequiredLicenses]] = Field(
+        None, description="The certificates required for this regulation."
+    )
+    required_fees: Optional[List[RequiredFees]] = Field(
+        None, description="The fees required for this regulation."
+    )
+    suggested_contacts: Optional[List[SuggestedContacts]] = Field(
+        None, description="Suggested contacts for this regulation."
+    )
 
     regulatory_body: str = Field(..., description="The name of the regulatory body.")
-    regulatory_body_description: str = Field(..., description="The description of the regulatory body.")
-
+    regulatory_body_description: str = Field(
+        ..., description="The description of the regulatory body."
+    )
 
 
 class ComplianceNode(BaseRegulationAndComplianceRequirements):
     compliance_name: str = Field(..., description="The name of the compliance.")
-    compliance_description: str = Field(..., description="The description of the compliance.")
+    compliance_description: str = Field(
+        ..., description="The description of the compliance."
+    )
     compliance_webpage: str = Field(..., description="The webpage of the compliance.")
-    compliance_pdf_urls: Optional[List[PDFFields]] = Field(..., description="The PDF URLs of the compliance.")
+    compliance_pdf_urls: Optional[List[PDFFields]] = Field(
+        ..., description="The PDF URLs of the compliance."
+    )
 
-    required_fields: Optional[List[RequiredFields]] = Field(..., description="The fields required for this compliance.")
-    required_licenses: Optional[List[RequiredLicenses]] = Field(None, description="The licenses required for this compliance.")
-    required_certificates: Optional[List[RequiredLicenses]] = Field(None, description="The certificates required for this compliance.")
-    required_fees: Optional[List[RequiredFees]] = Field(None, description="The fees required for this compliance.")
-    suggested_contacts: Optional[List[SuggestedContacts]] = Field(None, description="Suggested contacts for this compliance.")
+    required_fields: Optional[List[RequiredFields]] = Field(
+        ..., description="The fields required for this compliance."
+    )
+    required_licenses: Optional[List[RequiredLicenses]] = Field(
+        None, description="The licenses required for this compliance."
+    )
+    required_certificates: Optional[List[RequiredLicenses]] = Field(
+        None, description="The certificates required for this compliance."
+    )
+    required_fees: Optional[List[RequiredFees]] = Field(
+        None, description="The fees required for this compliance."
+    )
+    suggested_contacts: Optional[List[SuggestedContacts]] = Field(
+        None, description="Suggested contacts for this compliance."
+    )

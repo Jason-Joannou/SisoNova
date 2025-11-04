@@ -1,7 +1,12 @@
 from fastmcp import FastMCP
 from contextlib import asynccontextmanager
 import json
-from api.tools.database.models import WhiteListURLData, WhiteListQueryParameters, ComplianceNode, RegulationNode
+from api.tools.database.models import (
+    WhiteListURLData,
+    WhiteListQueryParameters,
+    ComplianceNode,
+    RegulationNode,
+)
 from api.database.mongo_client import MongoDBClient
 
 from api.tools.database.utils import (
@@ -9,7 +14,7 @@ from api.tools.database.utils import (
     add_new_entry_to_whitelist_operation,
     query_white_list_collection_operation,
     add_regulation_node_operation,
-    add_compliance_node_operation
+    add_compliance_node_operation,
 )
 
 mongo_client = MongoDBClient()
@@ -181,8 +186,10 @@ async def get_whitelist_collection() -> str:
             indent=2,
         )
 
-@mcp.tool(name="add_compliance_node",
-          description="""Add a new compliance requirement to the knowledge graph database.
+
+@mcp.tool(
+    name="add_compliance_node",
+    description="""Add a new compliance requirement to the knowledge graph database.
 
 Use this tool to store non-government compliance requirements such as:
 - Bank/financial institution requirements (e.g., ABSA Debtor Financing criteria)
@@ -205,13 +212,16 @@ Required information:
 Example: Adding "ABSA Debtor Financing Requirements" with minimum turnover R5m, 30-day debtor book criteria.
 
 Returns: Success confirmation with the path where the compliance requirement was stored.
-""")
+""",
+)
 async def add_compliance_node(compliance_node: ComplianceNode) -> str:
     response = await add_compliance_node_operation(mongo_client, compliance_node)
     return json.dumps(response.model_dump(), indent=2)
 
-@mcp.tool(name="add_regulation_node",
-          description="""Add a government regulation to the knowledge graph database.
+
+@mcp.tool(
+    name="add_regulation_node",
+    description="""Add a government regulation to the knowledge graph database.
 
 Use this tool to store regulations such as:
 - Acts and laws (e.g., Marine Living Resources Act)
@@ -232,10 +242,12 @@ Required information:
 Example: Adding "Marine Living Resources Act" for commercial fishing in Western Cape, South Africa.
 
 Returns: Success confirmation with the path where the regulation was stored.
-""")
+""",
+)
 async def add_regulation_node(regulation_node: RegulationNode) -> str:
     response = await add_regulation_node_operation(mongo_client, regulation_node)
     return json.dumps(response.model_dump(), indent=2)
+
 
 # @mcp.tool(name="get_regulation_node",
 #           description="Get a regulation node from the central knowledge graph",)

@@ -32,6 +32,7 @@ Supports both digital PDFs and scanned image PDFs using PaddleOCR.
 """,
 )
 
+
 @mcp.tool(
     name="download_and_analyze_pdf",
     description="""
@@ -78,7 +79,7 @@ Extract all text content from a PDF document.
 3. You: Find PDF URL in search results
 4. You: Use download_and_analyze_pdf with that URL
 5. If verification fails: Search again with different terms
-"""
+""",
 )
 async def download_and_analyze_pdf_tool(request: AnalysePDFParameters) -> str:
     response = await analyse_and_extract_text_from_pdf_operation(request)

@@ -117,5 +117,5 @@ async def open_website(parameters: OpenWebsiteRequest) -> str:
         wait_seconds=parameters.wait_seconds,
         default_timeout=parameters.default_timeout,
     )
-    
+
     return json.dumps(response.model_dump(), indent=2)
