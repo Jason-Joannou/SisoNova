@@ -1,145 +1,169 @@
-import json
 from pathlib import Path
 import tempfile
 import httpx
-from typing import Optional
 from paddleocr import PaddleOCR
-from pydantic import BaseModel, Field
 import asyncio
 import fitz
+from api.tools.pdf_analyser.models import AnalysePDFParameters, AnalysePDFResponse
+from urllib.parse import urlparse, unquote
+import os
+import re
+
+def _extract_pdf_filename(url: str) -> str:
+    """
+    Extracts and cleans the PDF filename from any URL.
+    Falls back to a default name if extraction fails.
+    """
+    parsed = urlparse(url)
+    filename_encoded = os.path.basename(parsed.path)
+    filename = unquote(filename_encoded)
+    filename = re.split(r'[?#]', filename)[0]
+    filename = " ".join(filename.split())
+
+    # Ensure valid filename
+    if not filename or filename.strip() == "":
+        filename = "document.pdf"
+
+    # Ensure it ends with .pdf
+    if not filename.lower().endswith(".pdf"):
+        filename += ".pdf"
+
+    return filename
 
 
-class PDFDownloadRequest(BaseModel):
-    url: str = Field(..., description="URL of the PDF to download and analyze")
-
-
-class PDFAnalysisResponse(BaseModel):
-    success: bool
-    message: str
-    url: str
-    filename: str
-    text_content: str
-    error: Optional[str] = None
-
-
-async def download_and_analyze_pdf(url: str) -> PDFAnalysisResponse:
+async def download_and_analyze_pdf(url: str) -> AnalysePDFResponse:
     """
     Download a PDF and extract text using PaddleOCR
     """
-    temp_dir = None
+    try:
 
-    temp_dir = tempfile.mkdtemp()
-    temp_path = Path(temp_dir)
+        temp_dir = None
 
-    # Download PDF
-    async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
-        response = await client.get(url)
-        response.raise_for_status()
+        temp_dir = tempfile.mkdtemp()
+        temp_path = Path(temp_dir)
 
-        filename = url.split("/")[-1].split("?")[0]
-        if not filename.endswith(".pdf"):
-            filename = "document.pdf"
+        # Download PDF
+        async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
+            response = await client.get(url)
+            response.raise_for_status()
 
-        pdf_path = temp_path / filename
-        pdf_path.write_bytes(response.content)
+            filename = _extract_pdf_filename(url)
 
-    # Initialize PaddleOCR
-    ocr = PaddleOCR(
-        text_detection_model_name="PP-OCRv5_mobile_det",  # Faster detection
-        text_recognition_model_name="PP-OCRv5_mobile_rec",  # Faster recognition
-        use_doc_orientation_classify=False,
-        use_doc_unwarping=False,
-        use_textline_orientation=False,
-    )
+            pdf_path = temp_path / filename
+            pdf_path.write_bytes(response.content)
 
-    # Process the PDF
-    result = ocr.predict(str(pdf_path))
+        # Initialize PaddleOCR
+        ocr = PaddleOCR(
+            text_detection_model_name="PP-OCRv5_mobile_det",  # Faster detection
+            text_recognition_model_name="PP-OCRv5_mobile_rec",  # Faster recognition
+            use_doc_orientation_classify=False,
+            use_doc_unwarping=False,
+            use_textline_orientation=False,
+        )
 
-    # Extract text from results
-    all_text = []
+        # Process the PDF
+        result = ocr.predict(str(pdf_path))
 
-    for page_result in result:
-        # Access the rec_texts from the result
-        res_dict = page_result.res if hasattr(page_result, "res") else page_result
+        # Extract text from results
+        all_text = []
 
-        if isinstance(res_dict, dict) and "rec_texts" in res_dict:
-            rec_texts = res_dict["rec_texts"]
-            page_text = "\n".join(rec_texts)
-            all_text.append(page_text)
+        for page_result in result:
+            # Access the rec_texts from the result
+            res_dict = page_result.res if hasattr(page_result, "res") else page_result
 
-    full_text = "\n\n".join(all_text)
+            if isinstance(res_dict, dict) and "rec_texts" in res_dict:
+                rec_texts = res_dict["rec_texts"]
+                page_text = "\n".join(rec_texts)
+                all_text.append(page_text)
 
-    # Limit text length
-    max_length = 50000
-    if len(full_text) > max_length:
-        full_text = full_text[:max_length] + "\n\n[Content truncated - PDF too long]"
+        full_text = "\n".join(all_text)
 
-    # Cleanup
-    pdf_path.unlink()
-    Path(temp_dir).rmdir()
+        # Cleanup
+        pdf_path.unlink()
+        Path(temp_dir).rmdir()
 
-    return PDFAnalysisResponse(
-        success=True,
-        message=f"Successfully extracted text from PDF ({len(result)} page(s))",
-        url=url,
-        filename=filename,
-        text_content=full_text,
-    )
+        return AnalysePDFResponse(
+            success=True,
+            message=f"Successfully extracted text from PDF ({len(result)} page(s))",
+            url=url,
+            filename=filename,
+            text_content=full_text,
+        )
+
+    except Exception as e:
+        return AnalysePDFResponse(
+            success=False,
+            message=f"Failed to extract text from PDF: {str(e)}",
+            url=url,
+            error=str(e),
+            filename="",
+            text_content="",
+        )
 
 
-async def extract_text_from_pdf(url: str) -> PDFAnalysisResponse:
+async def extract_text_from_pdf(url: str) -> AnalysePDFResponse:
     """
     Fast text extraction for PDFs with text layer (digital PDFs)
     """
-    temp_dir = None
-    
-    temp_dir = tempfile.mkdtemp()
-    temp_path = Path(temp_dir)
-    
-    # Download PDF
-    async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
-        response = await client.get(url)
-        response.raise_for_status()
-        
-        filename = url.split("/")[-1].split("?")[0]
-        if not filename.endswith(".pdf"):
-            filename = "document.pdf"
-        
-        pdf_path = temp_path / filename
-        pdf_path.write_bytes(response.content)
-    
-    # Extract text with PyMuPDF
-    doc = fitz.open(str(pdf_path))
-    all_text = []
-    
-    page_count = len(doc)  # Store page count BEFORE closing
-    
-    for page_num in range(page_count):
-        page = doc[page_num]
-        text = page.get_text()
-        all_text.append(text)
-    
-    doc.close()
-    
-    full_text = "\n\n".join(all_text)
-    
-    # Limit text length
-    max_length = 50000
-    if len(full_text) > max_length:
-        full_text = full_text[:max_length] + "\n\n[Content truncated - PDF too long]"
-    
-    # Cleanup
-    pdf_path.unlink()
-    Path(temp_dir).rmdir()
-    
-    return PDFAnalysisResponse(
-        success=True,
-        message=f"Successfully extracted text from PDF ({page_count} page(s))",  # Use stored page_count
-        url=url,
-        filename=filename,
-        text_content=full_text
-    )
+    try:
 
+        temp_dir = None
+        
+        temp_dir = tempfile.mkdtemp()
+        temp_path = Path(temp_dir)
+        
+        # Download PDF
+        async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
+            response = await client.get(url)
+            response.raise_for_status()
+            
+            filename = _extract_pdf_filename(url)
+            
+            pdf_path = temp_path / filename
+            pdf_path.write_bytes(response.content)
+        
+        # Extract text with PyMuPDF
+        doc = fitz.open(str(pdf_path))
+        all_text = []
+        
+        page_count = len(doc)  # Store page count BEFORE closing
+        
+        for page_num in range(page_count):
+            page = doc[page_num]
+            text = page.get_text()
+            all_text.append(text)
+        
+        doc.close()
+        
+        full_text = "\n".join(all_text)
+        
+        # Cleanup
+        pdf_path.unlink()
+        Path(temp_dir).rmdir()
+        
+        return AnalysePDFResponse(
+            success=True,
+            message=f"Successfully extracted text from PDF ({page_count} page(s))",  # Use stored page_count
+            url=url,
+            filename=filename,
+            text_content=full_text
+        )
+    
+    except Exception as e:
+        return AnalysePDFResponse(
+            success=False,
+            message=f"Failed to extract text from PDF: {str(e)}",
+            error=str(e),
+            url=url,
+            filename="",
+            text_content=""
+        )
+
+async def analyse_and_extract_text_from_pdf_operation(parameters: AnalysePDFParameters) -> AnalysePDFResponse:
+    if parameters.use_ocr:
+        return await download_and_analyze_pdf(parameters.url)
+    
+    return await extract_text_from_pdf(parameters.url)
 
 async def test():
     pdf_url = "https://www.samsa.org.za/api/api/File/view/2kD0ao6TAdLtvYZXp4HlAA%3D%3D"

@@ -2,6 +2,7 @@ from fastmcp import FastMCP
 from fastmcp.server.auth.auth import TokenVerifier, AccessToken
 from api.tools.database.service import mcp as database_mcp
 from api.tools.website_navigator.service import mcp as website_navigator_mcp
+from api.tools.pdf_analyser.service import mcp as pdf_analyser_mcp
 from dotenv import load_dotenv
 import os
 
@@ -46,6 +47,7 @@ def add(a: int, b: int) -> int:
 # mcp.mount(database_mcp, prefix="database", as_proxy=True)
 mcp.mount(website_navigator_mcp, prefix="website-navigator", as_proxy=True)
 mcp.mount(database_mcp, prefix="database", as_proxy=True)
+mcp.mount(pdf_analyser_mcp, prefix="pdf-analyser", as_proxy=True)
 
 if __name__ == "__main__":
     mcp.run(transport='streamable-http')
