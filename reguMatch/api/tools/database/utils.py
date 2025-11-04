@@ -423,6 +423,7 @@ async def add_regulation_node_operation(
                     {
                         "$set": {
                             f"{province_name}.{category_name}.{subcategory_name}": new_doc,
+                            "updated_at": datetime.utcnow().isoformat(),
                         }
                     },
                 )
@@ -579,8 +580,7 @@ async def add_compliance_node_operation(
                 await collection.update_one(
                     {"_id": country_name},
                     {
-                        "$set": new_doc,
-                        "$set": {"updated_at": datetime.utcnow().isoformat()},
+                        "$set": {**new_doc, "updated_at": datetime.utcnow().isoformat()},
                     },
                 )
 
@@ -607,8 +607,7 @@ async def add_compliance_node_operation(
                 await collection.update_one(
                     {"_id": country_name},
                     {
-                        "$set": {f"{province_name}.{category_name}": new_doc},
-                        "$set": {"updated_at": datetime.utcnow().isoformat()},
+                        "$set": {f"{province_name}.{category_name}": new_doc, "updated_at": datetime.utcnow().isoformat()},
                     },
                 )
 
@@ -632,9 +631,9 @@ async def add_compliance_node_operation(
                     {"_id": country_name},
                     {
                         "$set": {
-                            f"{province_name}.{category_name}.{subcategory_name}": new_doc
+                            f"{province_name}.{category_name}.{subcategory_name}": new_doc,
+                            "updated_at": datetime.utcnow().isoformat(),
                         },
-                        "$set": {"updated_at": datetime.utcnow().isoformat()},
                     },
                 )
 
