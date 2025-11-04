@@ -193,7 +193,17 @@ class RequiredFields(BaseModel):
 
 class PDFFields(BaseModel):
     pdf_name: str = Field(..., description="The name of the PDF.")
-    pdf_url: str = Field(..., description="The URL of the PDF.") 
+    pdf_url: str = Field(..., description="The URL of the PDF.")
+
+class SuggestedContacts(BaseModel):
+    contact_name: str = Field(..., description="The name of the contact.")
+    contact_email: Optional[str] = Field(None, description="The email of the contact.")
+    contact_phone: Optional[str] = Field(None, description="The phone number of the contact.")
+
+class RequiredFees(BaseModel):
+    fee_name: str = Field(..., description="The name of the fee.")
+    fee_ammount: str = Field(..., description="The amount of the fee.")
+    fee_description: str = Field(..., description="The description of the fee.")
 
 class RegulationNode(BaseRegulationAndComplianceRequirements):
     regulation_name: str = Field(..., description="The name of the regulation.")
@@ -204,6 +214,8 @@ class RegulationNode(BaseRegulationAndComplianceRequirements):
     required_fields: Optional[List[RequiredFields]] = Field(..., description="The fields required for this regulation.")
     required_licenses: Optional[List[RequiredLicenses]] = Field(None, description="The licenses required for this regulation.")
     required_certificates: Optional[List[RequiredLicenses]] = Field(None, description="The certificates required for this regulation.")
+    required_fees: Optional[List[RequiredFees]] = Field(None, description="The fees required for this regulation.")
+    suggested_contacts: Optional[List[SuggestedContacts]] = Field(None, description="Suggested contacts for this regulation.")
 
     regulatory_body: str = Field(..., description="The name of the regulatory body.")
     regulatory_body_description: str = Field(..., description="The description of the regulatory body.")
@@ -219,3 +231,5 @@ class ComplianceNode(BaseRegulationAndComplianceRequirements):
     required_fields: Optional[List[RequiredFields]] = Field(..., description="The fields required for this compliance.")
     required_licenses: Optional[List[RequiredLicenses]] = Field(None, description="The licenses required for this compliance.")
     required_certificates: Optional[List[RequiredLicenses]] = Field(None, description="The certificates required for this compliance.")
+    required_fees: Optional[List[RequiredFees]] = Field(None, description="The fees required for this compliance.")
+    suggested_contacts: Optional[List[SuggestedContacts]] = Field(None, description="Suggested contacts for this compliance.")
