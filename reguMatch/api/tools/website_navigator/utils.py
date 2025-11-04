@@ -101,6 +101,9 @@ async def open_website_operation(
             html_form_content = [form.prettify() for form in forms_on_page]
 
             html_content = soup.prettify()
+            if len(html_content) > 100000:
+                html_content = html_content[:100000] + "\n\n [CONTENT TRUNCATED]"
+
 
             await page.close()
 

@@ -81,6 +81,9 @@ async def download_and_analyze_pdf(url: str) -> AnalysePDFResponse:
                 all_text.append(page_text)
 
         full_text = "\n".join(all_text)
+        
+        if len(full_text) > 100000:
+            full_text = full_text[:100000] + "\n\n [CONTENT TRUNCATED]"
 
         # Cleanup
         pdf_path.unlink()
@@ -142,6 +145,9 @@ async def extract_text_from_pdf(url: str) -> AnalysePDFResponse:
         doc.close()
 
         full_text = "\n".join(all_text)
+
+        if len(full_text) > 100000:
+            full_text = full_text[:100000] + "\n\n [CONTENT TRUNCATED]"
 
         # Cleanup
         pdf_path.unlink()

@@ -452,7 +452,7 @@ async def add_regulation_node_operation(
         return AddEntryResponse(
             success=False,
             message=f"Error: {str(e)}",
-            response_document=None,
+            response_document={},
             error=str(e),
         )
 
@@ -664,7 +664,7 @@ async def add_compliance_node_operation(
         return AddEntryResponse(
             success=False,
             message=f"Error: {str(e)}",
-            response_document=None,
+            response_document={},
             error=str(e),
         )
     
