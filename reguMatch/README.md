@@ -22,7 +22,7 @@ Starting a business in Africa is challenging. Entrepreneurs face a maze of:
 
 ---
 
-## 💡 The Solution: ReguMatch
+## The Solution: ReguMatch
 
 ReguMatch is an **MCP (Model Context Protocol) server** that aims to transform how African entrepreneurs access regulatory and compliance information. It's an AI-powered research assistant that:
 
