@@ -49,6 +49,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Invoice } from "@/lib/types/invoicing";
 import Link from "next/link";
+import { InvoiceStatsCard } from "./ui/invoice-stats-card";
 
 // Mock data for demonstration
 const mockInvoices: Invoice[] = [
@@ -188,92 +189,80 @@ export function InvoiceDashboard() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Total Revenue */}
-          <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
-                Total Revenue
-              </CardTitle>
-              <DollarSign className="h-5 w-5 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">
-                R{stats.total.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
-              </div>
-              <div className="flex items-center text-xs text-green-600 mt-2">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                <span>12.5% from last month</span>
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                {stats.count.total} total invoices
-              </p>
-            </CardContent>
-          </Card>
+          <InvoiceStatsCard
+            title="Total Revenue"
+            cardColour="blue-500"
+            textColour="text-slate-600"
+            titleIcon={<DollarSign className="h-5 w-5 text-blue-500" />}
+          >
+            <div className="text-2xl font-bold text-slate-900">
+              R{stats.total.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
+            </div>
+            <div className="flex items-center text-xs text-green-600 mt-2">
+              <ArrowUpRight className="h-3 w-3 mr-1" />
+              <span>12.5% from last month</span>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              {stats.count.total} total invoices
+            </p>
+          </InvoiceStatsCard>
 
           {/* Pending */}
-          <Card className="border-l-4 border-l-yellow-500 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
-                Pending Payment
-              </CardTitle>
-              <Clock className="h-5 w-5 text-yellow-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">
-                R{stats.pending.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
-              </div>
-              <div className="flex items-center text-xs text-slate-600 mt-2">
-                <FileText className="h-3 w-3 mr-1" />
-                <span>{stats.count.pending} invoices</span>
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                Awaiting payment
-              </p>
-            </CardContent>
-          </Card>
+          <InvoiceStatsCard
+            title="Pending Payment"
+            cardColour="yellow-500"
+            textColour="text-slate-600"
+            titleIcon={<Clock className="h-5 w-5 text-yellow-500" />}
+          >
+            <div className="text-2xl font-bold text-slate-900">
+              R{stats.pending.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
+            </div>
+            <div className="flex items-center text-xs text-slate-600 mt-2">
+              <FileText className="h-3 w-3 mr-1" />
+              <span>{stats.count.pending} invoices</span>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Awaiting payment
+            </p>
+          </InvoiceStatsCard>
 
           {/* Paid */}
-          <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
-                Paid Invoices
-              </CardTitle>
-              <CheckCircle className="h-5 w-5 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">
-                R{stats.paid.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
-              </div>
-              <div className="flex items-center text-xs text-green-600 mt-2">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                <span>8.2% increase</span>
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                {stats.count.paid} invoices paid
-              </p>
-            </CardContent>
-          </Card>
+          <InvoiceStatsCard
+            title="Paid Invoices"
+            cardColour="green-500"
+            textColour="text-slate-600"
+            titleIcon={<CheckCircle className="h-5 w-5 text-green-500" />}
+          >
+            <div className="text-2xl font-bold text-slate-900">
+              R{stats.paid.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
+            </div>
+            <div className="flex items-center text-xs text-green-600 mt-2">
+              <ArrowUpRight className="h-3 w-3 mr-1" />
+              <span>8.2% increase</span>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              {stats.count.paid} invoices paid
+            </p>
+          </InvoiceStatsCard>
 
           {/* Overdue */}
-          <Card className="border-l-4 border-l-red-500 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
-                Overdue
-              </CardTitle>
-              <AlertCircle className="h-5 w-5 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">
-                R{stats.overdue.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
-              </div>
-              <div className="flex items-center text-xs text-red-600 mt-2">
-                <ArrowDownRight className="h-3 w-3 mr-1" />
-                <span>Needs attention</span>
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                {stats.count.overdue} invoices overdue
-              </p>
-            </CardContent>
-          </Card>
+          <InvoiceStatsCard
+            title="Overdue"
+            cardColour="red-500"
+            textColour="text-slate-600"
+            titleIcon={<AlertCircle className="h-5 w-5 text-red-500" />}
+          >
+            <div className="text-2xl font-bold text-slate-900">
+              R{stats.overdue.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
+            </div>
+            <div className="flex items-center text-xs text-red-600 mt-2">
+              <ArrowDownRight className="h-3 w-3 mr-1" />
+              <span>Needs attention</span>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              {stats.count.overdue} invoices overdue
+            </p>
+          </InvoiceStatsCard>
         </div>
 
         {/* Filters and Search */}
