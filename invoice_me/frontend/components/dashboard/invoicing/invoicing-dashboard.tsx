@@ -295,20 +295,6 @@ export function InvoiceDashboard() {
                 </SelectContent>
               </Select>
 
-              {/* Service Filter */}
-              <Select value={serviceFilter} onValueChange={setServiceFilter}>
-                <SelectTrigger className="w-full md:w-[180px]">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Service" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Services</SelectItem>
-                  <SelectItem value="invoicing">Invoicing</SelectItem>
-                  <SelectItem value="financing">Financing</SelectItem>
-                  <SelectItem value="collections">Collections</SelectItem>
-                </SelectContent>
-              </Select>
-
               {/* Export Button */}
               <Button variant="outline" className="w-full md:w-auto">
                 <Download className="h-4 w-4 mr-2" />
@@ -335,7 +321,6 @@ export function InvoiceDashboard() {
                     <TableHead>Client</TableHead>
                     <TableHead>Amount</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Service</TableHead>
                     <TableHead>Due Date</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -373,11 +358,6 @@ export function InvoiceDashboard() {
                         </TableCell>
                         <TableCell>
                           <StatusBadge status={invoice.status} />
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="capitalize">
-                            {invoice.service}
-                          </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
