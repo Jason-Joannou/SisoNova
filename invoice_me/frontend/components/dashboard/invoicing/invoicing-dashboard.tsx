@@ -265,9 +265,15 @@ export function InvoiceDashboard() {
           </InvoiceStatsCard>
         </div>
 
-        {/* Filters and Search */}
+        {/* Invoices Table */}
         <Card>
-          <CardContent className="pt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-purple-600" />
+              Recent Invoices
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="flex flex-col md:flex-row gap-4">
               {/* Search */}
               <div className="flex-1 relative">
@@ -302,16 +308,6 @@ export function InvoiceDashboard() {
               </Button>
             </div>
           </CardContent>
-        </Card>
-
-        {/* Invoices Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-purple-600" />
-              Recent Invoices
-            </CardTitle>
-          </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <Table>
