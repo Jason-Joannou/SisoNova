@@ -2,44 +2,7 @@ from fastapi import FastAPI
 import os
 import uvicorn
 
-from routes import invoice, templates
-
-app = FastAPI(
-    title="SA Invoice Pro - Configurable Invoice Engine",
-    description="Fully configurable invoice generation backend for South African businesses",
-    version="3.0.0"
-)
-app.include_router(invoice.router, prefix="/api")
-app.include_router(templates.router, prefix="/api")
-
-
-# API Endpoints
-@app.get("/")
-async def root():
-    """API information"""
-    return {
-        "message": "SA Invoice Pro - Configurable Invoice Engine",
-        "tagline": "Fully configurable invoice generation for South African businesses",
-        "version": "3.0.0",
-        "features": [
-            "Fully configurable business profiles",
-            "Custom credit terms and payment options",
-            "Dynamic terms and conditions",
-            "Flexible item configurations",
-            "Multi-industry support",
-            "Payment provider integration ready"
-        ],
-        "configuration_endpoints": {
-            "business_profile_template": "/templates/business-profile",
-            "credit_terms_template": "/templates/credit-terms",
-            "payment_config_template": "/templates/payment-config",
-            "full_config_template": "/templates/full-invoice-config"
-        },
-        "generation_endpoints": {
-            "generate_invoice": "/generate-invoice (POST)",
-            "preview_config": "/preview-config (POST)"
-        }
-    }
+app = FastAPI()
 
 if __name__ == "__main__":
     uvicorn.run(

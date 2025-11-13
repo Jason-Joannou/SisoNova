@@ -1,13 +1,8 @@
 fastapi[all]
-dotenv
-sqlalchemy
 twilio
-pyyaml
-sqlalchemy[asyncio]
-aiosqlite 
-asyncpg
-boto3
 pandas
-jinja2
-weasyprint
 pymongo[srv]==3.12
+pydantic-ai-slim[mcp]
+pymongo[srv]
+httpx
+pydantic

@@ -1,3 +1,0 @@
-"""
-Invoice Creation Engine (ice)
-"""
