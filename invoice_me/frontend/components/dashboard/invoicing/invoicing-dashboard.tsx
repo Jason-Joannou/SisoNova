@@ -50,6 +50,7 @@ import {
 import { Invoice } from "@/lib/types/invoicing";
 import Link from "next/link";
 import { InvoiceStatsCard } from "./ui/invoice-stats-card";
+import { ViewInvoiceModal } from "./modals/view-invoice-modal";
 
 // Mock data for demonstration
 const mockInvoices: Invoice[] = [
@@ -57,7 +58,7 @@ const mockInvoices: Invoice[] = [
     id: "1",
     invoiceNumber: "INV-2024-001",
     buyerName: "Ridgeway Butchery",
-    amount: 15750.00,
+    amount: 15750.0,
     dueDate: "2024-11-15",
     status: "pending",
     service: "invoicing",
@@ -67,7 +68,7 @@ const mockInvoices: Invoice[] = [
     id: "2",
     invoiceNumber: "INV-2024-002",
     buyerName: "Tech Solutions Ltd",
-    amount: 28500.00,
+    amount: 28500.0,
     dueDate: "2024-11-20",
     status: "paid",
     service: "invoicing",
@@ -77,7 +78,7 @@ const mockInvoices: Invoice[] = [
     id: "3",
     invoiceNumber: "INV-2024-003",
     buyerName: "Green Energy Co",
-    amount: 12300.00,
+    amount: 12300.0,
     dueDate: "2024-10-25",
     status: "overdue",
     service: "invoicing",
@@ -87,7 +88,7 @@ const mockInvoices: Invoice[] = [
     id: "4",
     invoiceNumber: "INV-2024-004",
     buyerName: "Urban Developers",
-    amount: 45000.00,
+    amount: 45000.0,
     dueDate: "2024-11-30",
     status: "pending",
     service: "financing",
@@ -97,7 +98,7 @@ const mockInvoices: Invoice[] = [
     id: "5",
     invoiceNumber: "INV-2024-005",
     buyerName: "Retail Mart",
-    amount: 8900.00,
+    amount: 8900.0,
     dueDate: "2024-11-10",
     status: "paid",
     service: "invoicing",
@@ -109,6 +110,8 @@ export function InvoiceDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [serviceFilter, setServiceFilter] = useState<string>("all");
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   // Calculate statistics
   const stats = {
@@ -145,10 +148,22 @@ export function InvoiceDashboard() {
   // Status badge component
   const StatusBadge = ({ status }: { status: Invoice["status"] }) => {
     const variants = {
-      pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-200", icon: Clock },
-      paid: { color: "bg-green-100 text-green-800 border-green-200", icon: CheckCircle },
-      overdue: { color: "bg-red-100 text-red-800 border-red-200", icon: AlertCircle },
-      financed: { color: "bg-blue-100 text-blue-800 border-blue-200", icon: TrendingUp },
+      pending: {
+        color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+        icon: Clock,
+      },
+      paid: {
+        color: "bg-green-100 text-green-800 border-green-200",
+        icon: CheckCircle,
+      },
+      overdue: {
+        color: "bg-red-100 text-red-800 border-red-200",
+        icon: AlertCircle,
+      },
+      financed: {
+        color: "bg-blue-100 text-blue-800 border-blue-200",
+        icon: TrendingUp,
+      },
     };
 
     const variant = variants[status];
@@ -196,7 +211,10 @@ export function InvoiceDashboard() {
             titleIcon={<DollarSign className="h-5 w-5 text-blue-500" />}
           >
             <div className="text-2xl font-bold text-slate-900">
-              R{stats.total.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
+              R
+              {stats.total.toLocaleString("en-ZA", {
+                minimumFractionDigits: 2,
+              })}
             </div>
             <div className="flex items-center text-xs text-green-600 mt-2">
               <ArrowUpRight className="h-3 w-3 mr-1" />
@@ -215,15 +233,16 @@ export function InvoiceDashboard() {
             titleIcon={<Clock className="h-5 w-5 text-yellow-500" />}
           >
             <div className="text-2xl font-bold text-slate-900">
-              R{stats.pending.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
+              R
+              {stats.pending.toLocaleString("en-ZA", {
+                minimumFractionDigits: 2,
+              })}
             </div>
             <div className="flex items-center text-xs text-slate-600 mt-2">
               <FileText className="h-3 w-3 mr-1" />
               <span>{stats.count.pending} invoices</span>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Awaiting payment
-            </p>
+            <p className="text-xs text-slate-500 mt-1">Awaiting payment</p>
           </InvoiceStatsCard>
 
           {/* Paid */}
@@ -234,7 +253,8 @@ export function InvoiceDashboard() {
             titleIcon={<CheckCircle className="h-5 w-5 text-green-500" />}
           >
             <div className="text-2xl font-bold text-slate-900">
-              R{stats.paid.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
+              R
+              {stats.paid.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
             </div>
             <div className="flex items-center text-xs text-green-600 mt-2">
               <ArrowUpRight className="h-3 w-3 mr-1" />
@@ -253,7 +273,10 @@ export function InvoiceDashboard() {
             titleIcon={<AlertCircle className="h-5 w-5 text-red-500" />}
           >
             <div className="text-2xl font-bold text-slate-900">
-              R{stats.overdue.toLocaleString("en-ZA", { minimumFractionDigits: 2 })}
+              R
+              {stats.overdue.toLocaleString("en-ZA", {
+                minimumFractionDigits: 2,
+              })}
             </div>
             <div className="flex items-center text-xs text-red-600 mt-2">
               <ArrowDownRight className="h-3 w-3 mr-1" />
@@ -348,7 +371,8 @@ export function InvoiceDashboard() {
                           {invoice.buyerName}
                         </TableCell>
                         <TableCell className="font-semibold">
-                          R{invoice.amount.toLocaleString("en-ZA", {
+                          R
+                          {invoice.amount.toLocaleString("en-ZA", {
                             minimumFractionDigits: 2,
                           })}
                         </TableCell>
@@ -358,11 +382,15 @@ export function InvoiceDashboard() {
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-slate-400" />
-                            {new Date(invoice.dueDate).toLocaleDateString("en-ZA")}
+                            {new Date(invoice.dueDate).toLocaleDateString(
+                              "en-ZA"
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="text-slate-600">
-                          {new Date(invoice.createdAt).toLocaleDateString("en-ZA")}
+                          {new Date(invoice.createdAt).toLocaleDateString(
+                            "en-ZA"
+                          )}
                         </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
@@ -372,7 +400,12 @@ export function InvoiceDashboard() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedInvoice(invoice);
+                                  setIsViewModalOpen(true);
+                                }}
+                              >
                                 <Eye className="h-4 w-4 mr-2" />
                                 View
                               </DropdownMenuItem>
@@ -396,6 +429,14 @@ export function InvoiceDashboard() {
                   )}
                 </TableBody>
               </Table>
+              {selectedInvoice && (
+                <ViewInvoiceModal
+                  companyName={selectedInvoice.buyerName}
+                  invoiceNumber={selectedInvoice.invoiceNumber}
+                  open={isViewModalOpen}
+                  onOpenChange={setIsViewModalOpen}
+                />
+              )}
             </div>
           </CardContent>
         </Card>
@@ -409,7 +450,9 @@ export function InvoiceDashboard() {
                   <Plus className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">Create Invoice</h3>
+                  <h3 className="font-semibold text-slate-900">
+                    Create Invoice
+                  </h3>
                   <p className="text-sm text-slate-600">
                     Generate a new invoice
                   </p>
@@ -425,7 +468,9 @@ export function InvoiceDashboard() {
                   <Send className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">Send Reminders</h3>
+                  <h3 className="font-semibold text-slate-900">
+                    Send Reminders
+                  </h3>
                   <p className="text-sm text-slate-600">
                     Notify pending clients
                   </p>
@@ -441,7 +486,9 @@ export function InvoiceDashboard() {
                   <Download className="h-6 w-6 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">Export Report</h3>
+                  <h3 className="font-semibold text-slate-900">
+                    Export Report
+                  </h3>
                   <p className="text-sm text-slate-600">
                     Download financial data
                   </p>
