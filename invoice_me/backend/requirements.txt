@@ -2,7 +2,9 @@ fastapi[all]
 twilio
 pandas
 pymongo[srv]==3.12
-pydantic-ai-slim[mcp]
+pydantic-ai
 pymongo[srv]
 httpx
 pydantic
+pydantic-settings
+email-validator
