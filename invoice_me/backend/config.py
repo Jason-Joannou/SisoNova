@@ -8,6 +8,7 @@ class Secrets(BaseSettings):
     jwt_secret_key: str = Field(..., description="Secret key for JWT encoding and decoding")
     jwt_algorithm: str = Field(..., description="Algorithm used for JWT encoding and decoding")
     access_token_expire_minutes: int = Field(..., description="Expiration time for access tokens in minutes")
+    refresh_token_expire_minutes: int = Field(..., description="Expiration time for refresh tokens in minutes")
 
 
 
