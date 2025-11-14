@@ -5,6 +5,10 @@ from typing import Tuple, Type
 class Secrets(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False)
     mongo_db_connection_string: str
+    jwt_secret_key: str = Field(..., description="Secret key for JWT encoding and decoding")
+    jwt_algorithm: str = Field(..., description="Algorithm used for JWT encoding and decoding")
+    access_token_expire_minutes: int = Field(..., description="Expiration time for access tokens in minutes")
+
 
 
 class AppSettings(BaseSettings):
