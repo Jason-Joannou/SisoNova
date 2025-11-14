@@ -7,6 +7,9 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 from pydantic import BaseModel
+from models.auth import TokenResponse
+from config import Secrets
+from models.auth import TokenInfo, EntityAccessId, TokenAccessType
 
 password_hash = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -32,4 +35,41 @@ class AuthenticationService:
         return True
 
 class AuthorizationService:
-    pass
+    
+    @staticmethod
+    def create_access_token(subject_info: str, entity: EntityAccessId) -> str:
+        # Get Secrets
+        secrets = Secrets()
+        jwt_secret = secrets.jwt_secret_key
+        jwt_algorithm = secrets.jwt_algorithm
+        expire_minutes = secrets.access_token_expire_minutes
+        
+        # Prepare token info
+        sub = f"{entity.value}:{subject_info}" 
+        exp = int((datetime.now(timezone.utc) + timedelta(minutes=expire_minutes)).timestamp())
+        access_type = TokenAccessType.ACCESS.value
+        
+        token_info = TokenInfo(sub=sub, exp=exp, type=access_type)
+        to_encode = token_info.model_dump()
+        
+        encoded_jwt = jwt.encode(to_encode, jwt_secret, algorithm=jwt_algorithm)
+        return encoded_jwt
+
+    @staticmethod
+    def create_refresh_token(subject_info: str, entity: EntityAccessId) -> str:
+        # Get Secrets
+        secrets = Secrets()
+        jwt_secret = secrets.jwt_secret_key
+        jwt_algorithm = secrets.jwt_algorithm
+        expire_minutes = secrets.refresh_token_expire_minutes
+        
+        # Prepare token info
+        sub = f"{entity.value}:{subject_info}" 
+        exp = int((datetime.now(timezone.utc) + timedelta(minutes=expire_minutes)).timestamp())
+        access_type = TokenAccessType.REFRESH.value
+        
+        token_info = TokenInfo(sub=sub, exp=exp, type=access_type)
+        to_encode = token_info.model_dump()
+        
+        encoded_jwt = jwt.encode(to_encode, jwt_secret, algorithm=jwt_algorithm)
+        return encoded_jwt
