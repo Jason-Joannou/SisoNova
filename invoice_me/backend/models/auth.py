@@ -21,6 +21,12 @@ class UserBaseResponse(BaseModel):
     message: str = Field(..., description="A message indicating the success or failure of the operation")
     error: Optional[str] = Field(None, description="Error message if the operation failed")
 
+class TokenResponse(BaseModel):
+    access_token: str = Field(..., description="The access token for authentication")
+    token_type: str = Field(..., description="The type of the token, typically 'bearer'")
+    refresh_token: str = Field(..., description="The refresh token for obtaining new access tokens")
+
+
 
 
 
