@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
-from auth import AuthProvider
+from auth import AuthProvider, TokenResponse
 from models.business import BusinessProfile
 from enum import Enum
 
@@ -24,6 +24,8 @@ class VerifyUser(BaseModel):
 
 class UserProfile(BaseModel):
     email: str = Field(..., description="The user's email address")
-    business_profile: BusinessProfile = Field(..., description="The business profile associated with the user")
+    business_profile: Optional[BusinessProfile] = Field(None, description="The business profile associated with the user")
 
+class AuthenticatedUserResponse(TokenResponse):
+    user: UserProfile = Field(..., description="The authenticated user's profile")
 
