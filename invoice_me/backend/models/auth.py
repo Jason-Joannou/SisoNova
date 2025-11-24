@@ -44,7 +44,7 @@ class TokenInfo(BaseModel):
 
 class UserBaseParameters(BaseModel):
     email: EmailStr = Field(..., description="The user's email address")
-    password_hash: str = Field(..., description="The hashed password of the user")
+    password: str = Field(..., description="The password of the user")
 
 class UserLoginParameters(UserBaseParameters):
     pass
