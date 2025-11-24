@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
-from auth import AuthProvider, TokenResponse
+from models.auth import AuthProvider, TokenResponse
 from models.business import BusinessProfile
 from enum import Enum
 
