@@ -10,9 +10,12 @@ from pydantic import BaseModel
 from models.auth import TokenResponse
 from config import Secrets
 from models.auth import TokenInfo, EntityAccessId, TokenAccessType
+from database.mongo_client import MongoDBClient
+from database.mongo_operations import get_user_information
 
 password_hash = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+mongo_client = MongoDBClient()
 
 class AuthenticationService:
 
@@ -25,12 +28,11 @@ class AuthenticationService:
         return password_hash.hash(password)
     
     @staticmethod
-    def authenticate_user(email: str, password: str) -> bool:
-        # Placeholder for user retrieval logic
-        user = {"email": email, "password_hash": AuthenticationService.get_password_hash("example_password")}
+    async def authenticate_user(email: str, password: str) -> bool:
+        user = await get_user_information(mongo_client, email)
         if not user:
             return False
-        if not AuthenticationService.verify_password(password, user["password_hash"]):
+        if not AuthenticationService.verify_password(password, user.password_hash):
             return False
         return True
 
