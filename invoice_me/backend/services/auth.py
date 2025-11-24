@@ -30,12 +30,15 @@ class AuthenticationService:
 
     @staticmethod
     async def authenticate_user(email: str, password: str) -> bool:
-        user = await get_user_information(mongo_client, email)
-        if not user:
+        try:
+            user = await get_user_information(mongo_client, email)
+            if not user:
+                return False
+            if not AuthenticationService.verify_password(password, user.password_hash):
+                return False
+            return True
+        except Exception:
             return False
-        if not AuthenticationService.verify_password(password, user.password_hash):
-            return False
-        return True
 
     # For protected routes
     @staticmethod
