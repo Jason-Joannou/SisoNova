@@ -1,0 +1,43 @@
+from database.mongo_client import MongoDBClient
+from models.users import CreateNewUser, UserProfile, VerifyUser
+from models.business import BusinessProfile
+from config import Secrets
+from datetime import datetime
+
+secrets = Secrets()
+
+async def does_user_exist(mongo_client: MongoDBClient, email: str) -> bool:
+    """Check if a user with the given email exists in the database"""
+    async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        user = await db["users"].find_one({"email": email})
+        return user is not None
+    
+async def create_user(mongo_client: MongoDBClient, new_user_data: CreateNewUser) -> str:
+    """Create a new user in the database"""
+    async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        result = await db["users"].insert_one(new_user_data.model_dump())
+        return str(result.inserted_id)
+    
+
+async def update_user_business_profile(mongo_client: MongoDBClient, email: str, business_profile: BusinessProfile) -> bool:
+    """Update the business profile of a user"""
+    async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        result = await db["users"].update_one(
+            {"email": email},
+            {"$set": {"business_profile": business_profile.model_dump(), "updated_at": datetime.utcnow().isoformat()}}
+        )
+        return result.modified_count > 0
+    
+async def get_user_information(mongo_client: MongoDBClient, email: str) -> VerifyUser | None:
+    """Retrieve user information by email"""
+    async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        user_data = await db["users"].find_one({"email": email}, {"_id": 0}) # Exclude _id field, 1 would include it
+        return VerifyUser.model_validate(user_data) if user_data else None
+    
+async def get_user_profile(mongo_client: MongoDBClient, email: str) -> UserProfile | None:
+    """Retrieve the user profile by email"""
+    async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        user_data = await db["users"].find_one({"email": email})
+        if user_data:
+            return UserProfile.model_validate(user_data)
+        return None
