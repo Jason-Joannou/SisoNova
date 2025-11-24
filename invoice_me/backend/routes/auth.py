@@ -1,10 +1,10 @@
 from fastapi import APIRouter, status
 from fastapi.exceptions import HTTPException
 from models.auth import UserLoginParameters, TokenResponse, UserCreateParameters
-from models.users import CreateNewUser
+from models.users import CreateNewUser, AuthenticatedUserResponse, UserProfile
 from services.auth import AuthenticationService, AuthorizationService
 from models.auth import EntityAccessId
-from database.mongo_operations import does_user_exist, create_user
+from database.mongo_operations import does_user_exist, create_user, get_user_profile
 
 
 router = APIRouter(
@@ -12,10 +12,10 @@ router = APIRouter(
     tags=["auth"]
 )
 
-@router.post("/login", response_model=TokenResponse, description="Authenticate a user and return tokens", status_code=status.HTTP_200_OK)
-async def login(user: UserLoginParameters) -> TokenResponse:
+@router.post("/login", response_model=AuthenticatedUserResponse, description="Authenticate a user and return tokens", status_code=status.HTTP_200_OK)
+async def login(user: UserLoginParameters) -> AuthenticatedUserResponse:
     # Authenticate user
-    authenticated = AuthenticationService.authenticate_user(user.email, user.password)
+    authenticated = await AuthenticationService.authenticate_user(user.email, user.password)
     
     if not authenticated:
         raise HTTPException(
@@ -35,10 +35,17 @@ async def login(user: UserLoginParameters) -> TokenResponse:
         entity=EntityAccessId.USER
     )
     
-    return TokenResponse(
+    user_data = get_user_profile(user.email)
+    token_response = TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="bearer"
+    )
+
+    
+    return AuthenticatedUserResponse(
+        **token_response.model_dump(),
+        user=user_data
     )
 
 # routes/auth.py
@@ -68,7 +75,13 @@ async def register(user: UserCreateParameters) -> TokenResponse:
     )
 
     # Need try accepts for DB operations
-    await create_user(new_user)
+    response_id = await create_user(new_user)
+    if not response_id:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create user"
+        )
+    
     
     # Create tokens for the new user
     access_token = AuthorizationService.create_access_token(
@@ -80,11 +93,20 @@ async def register(user: UserCreateParameters) -> TokenResponse:
         subject_info=user.email,
         entity=EntityAccessId.USER
     )
-    
-    return TokenResponse(
+
+    token_response = TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="bearer"
+    )
+    user_profile = UserProfile(
+        email=user.email,
+        business_profile=None
+    )
+    
+    return AuthenticatedUserResponse(
+        **token_response.model_dump(),
+        user=user_profile
     )
 
 
