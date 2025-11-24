@@ -37,6 +37,7 @@ class AuthenticationService:
             return False
         return True
 
+    # For protected routes
     @staticmethod
     async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
         credentials_exception = HTTPException(
