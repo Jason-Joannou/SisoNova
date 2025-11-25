@@ -1,10 +1,13 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
 from fastapi.exceptions import HTTPException
 from models.auth import UserLoginParameters, TokenResponse, UserCreateParameters
 from models.users import CreateNewUser, AuthenticatedUserResponse, UserProfile
 from services.auth import AuthenticationService, AuthorizationService
 from models.auth import EntityAccessId
 from database.mongo_operations import does_user_exist, create_user, get_user_profile
+from database.mongo_dependencies import get_mongo_client
+from database.mongo_client import MongoDBClient
+from datetime import datetime
 
 
 router = APIRouter(
@@ -13,7 +16,7 @@ router = APIRouter(
 )
 
 @router.post("/login", response_model=AuthenticatedUserResponse, description="Authenticate a user and return tokens", status_code=status.HTTP_200_OK)
-async def login(user: UserLoginParameters) -> AuthenticatedUserResponse:
+async def login(user: UserLoginParameters, mongo_client: MongoDBClient = Depends(get_mongo_client)) -> AuthenticatedUserResponse:
     # Authenticate user
     authenticated = await AuthenticationService.authenticate_user(user.email, user.password)
     
@@ -35,7 +38,7 @@ async def login(user: UserLoginParameters) -> AuthenticatedUserResponse:
         entity=EntityAccessId.USER
     )
     
-    user_data = get_user_profile(user.email)
+    user_data = await get_user_profile(email=user.email, mongo_client=mongo_client)
     token_response = TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
@@ -51,12 +54,12 @@ async def login(user: UserLoginParameters) -> AuthenticatedUserResponse:
 # routes/auth.py
 
 @router.post("/register", response_model=TokenResponse, description="Register a new user and return tokens", status_code=status.HTTP_201_CREATED)
-async def register(user: UserCreateParameters) -> TokenResponse:
+async def register(user: UserCreateParameters, mongo_client: MongoDBClient = Depends(get_mongo_client)) -> TokenResponse:
     """
     Register a new user account
     """
     
-    existing_user = does_user_exist(user.email)
+    existing_user = await does_user_exist(email=user.email, mongo_client=mongo_client)
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -71,11 +74,13 @@ async def register(user: UserCreateParameters) -> TokenResponse:
         email=user.email,
         password_hash=hashed_password,
         auth_provider="local",  # Assuming local auth for registration
-        subscription_tier="free"  # Default subscription tier
+        subscription_tier="free",  # Default subscription tier
+        created_at=datetime.utcnow().isoformat(),
+        updated_at=datetime.utcnow().isoformat()
     )
 
     # Need try accepts for DB operations
-    response_id = await create_user(new_user)
+    response_id = await create_user(new_user_data=new_user, mongo_client=mongo_client)
     if not response_id:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
