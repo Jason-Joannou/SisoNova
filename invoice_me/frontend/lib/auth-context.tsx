@@ -14,10 +14,9 @@ import {
   AuthenticatedUser,
   UserProfile,
 } from "./types/user-information";
+import { API_ROUTES } from "./utility/api/routes";
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -37,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (credentials: UserAuthentication) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(`${API_ROUTES.login}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (userData: UserAuthentication) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await fetch(`${API_ROUTES.register}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
