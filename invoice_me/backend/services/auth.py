@@ -42,12 +42,7 @@ class AuthenticationService:
 
     # For protected routes
     @staticmethod
-    async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
-        credentials_exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> TokenInfo:
 
         try:
             secrets = Secrets()
@@ -59,7 +54,11 @@ class AuthenticationService:
 
             # Check if token is an access token
             if token_info.type != TokenAccessType.ACCESS.value:
-                raise credentials_exception
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Could not validate credentials",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
 
             # Check if token is expired
             if token_info.exp < int(datetime.now(timezone.utc).timestamp()):
@@ -72,7 +71,11 @@ class AuthenticationService:
             return token_info
 
         except InvalidTokenError:
-            raise credentials_exception
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
 
 class AuthorizationService:
