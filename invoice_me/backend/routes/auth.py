@@ -115,3 +115,12 @@ async def register(user: UserCreateParameters, mongo_client: MongoDBClient = Dep
     )
 
 
+
+@router.get("/verify", response_model=TokenInfo, description="Verify the validity of an access token", status_code=status.HTTP_200_OK)
+async def verify_token(token: TokenInfo = Depends(AuthenticationService.get_current_user)) -> TokenInfo:
+    """
+    Verify the provided access token
+    """
+
+    return token
+
