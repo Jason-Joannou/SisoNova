@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, EmailStr
-from typing import Optional
+from typing import Optional, List
 from models.auth import AuthProvider, TokenResponse
 from models.business import BusinessProfile
 from enum import Enum
@@ -16,7 +16,7 @@ class CreateNewUser(BaseModel):
     subscription_tier: UserSubscriptionTier = Field(..., description="The subscription tier of the user")
     created_at: Optional[str] = Field(None, description="The timestamp when the user was created")
     updated_at: Optional[str] = Field(None, description="The timestamp when the user was last updated")
-    business_profile: Optional[BusinessProfile] = Field(None, description="The business profile associated with the user")
+    business_profile: List[BusinessProfile] = Field([], description="The business profile associated with the user")
 
 class VerifyUser(BaseModel):
     email: EmailStr = Field(..., description="The user's email address")
