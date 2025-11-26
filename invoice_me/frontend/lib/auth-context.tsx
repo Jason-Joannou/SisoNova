@@ -54,6 +54,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("access_token", access_token);
       localStorage.setItem("refresh_token", refresh_token);
 
+      // Add to cookies for middleware access
+      document.cookie = `access_token=${access_token}; path=/`;
+      document.cookie = `refresh_token=${refresh_token}; path=/`;
+
       setUser(user);
       setIsAuthenticated(true);
 
@@ -84,6 +88,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       localStorage.setItem("access_token", access_token);
       localStorage.setItem("refresh_token", refresh_token);
+
+      // Add to cookies for middleware access
+      document.cookie = `access_token=${access_token}; path=/`;
+      document.cookie = `refresh_token=${refresh_token}; path=/`;
 
       setUser(user);
       setIsAuthenticated(true);
