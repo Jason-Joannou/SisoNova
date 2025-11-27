@@ -124,3 +124,22 @@ async def verify_token(token: TokenInfo = Depends(AuthenticationService.get_curr
 
     return token
 
+@router.get("/refresh", response_model=TokenResponse, description="Refresh access token using a refresh token", status_code=status.HTTP_200_OK)
+async def refresh_token(token: TokenInfo = Depends(AuthenticationService.get_current_user)) -> TokenResponse:
+    """
+    Refresh the access token using a valid refresh token
+    """
+
+    # Create new access token
+    new_access_token = AuthorizationService.create_access_token(
+        subject_info=token.sub,
+        entity=EntityAccessId.USER
+    )
+    
+    return TokenResponse(
+        access_token=new_access_token,
+        refresh_token=token.refresh_token,
+        token_type="bearer"
+    )
+
+

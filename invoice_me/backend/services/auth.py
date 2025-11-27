@@ -121,3 +121,49 @@ class AuthorizationService:
 
         encoded_jwt = jwt.encode(to_encode, jwt_secret, algorithm=jwt_algorithm)
         return encoded_jwt
+    
+    @staticmethod
+    def refresh_access_token(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
+        try:
+            secrets = Secrets()
+            payload = jwt.decode(
+                token, secrets.jwt_secret_key, algorithms=[secrets.jwt_algorithm]
+            )
+
+            token_info = TokenInfo(**payload)
+
+            # Check if token is a refresh token
+            if token_info.type != TokenAccessType.REFRESH.value:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Could not validate credentials",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+
+            # Check if token is expired
+            if token_info.exp < int(datetime.now(timezone.utc).timestamp()):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token has expired",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+
+            # Extract subject info
+            sub_parts = token_info.sub.split(":")
+            entity = EntityAccessId(int(sub_parts[0]))
+            subject_info = sub_parts[1]
+
+            # Create new access token
+            new_access_token = AuthorizationService.create_access_token(
+                subject_info=subject_info,
+                entity=entity
+            )
+
+            return new_access_token
+
+        except InvalidTokenError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
