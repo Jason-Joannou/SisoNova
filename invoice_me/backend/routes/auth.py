@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, Depends
 from fastapi.exceptions import HTTPException
-from models.auth import UserLoginParameters, TokenResponse, UserCreateParameters
-from models.users import CreateNewUser, AuthenticatedUserResponse, UserProfile
+from models.auth import UserLoginParameters, TokenResponse, UserCreateParameters, TokenInfo
+from models.users import User, AuthenticatedUserResponse, UserProfile
 from services.auth import AuthenticationService, AuthorizationService
 from models.auth import EntityAccessId
 from database.mongo_operations import does_user_exist, create_user, get_user_profile
@@ -70,7 +70,7 @@ async def register(user: UserCreateParameters, mongo_client: MongoDBClient = Dep
     hashed_password = AuthenticationService.get_password_hash(user.password)
     
     # Create user in database
-    new_user = CreateNewUser(
+    new_user = User(
         email=user.email,
         password_hash=hashed_password,
         auth_provider="local",  # Assuming local auth for registration
