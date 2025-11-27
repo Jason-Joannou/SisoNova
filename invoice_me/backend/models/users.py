@@ -9,7 +9,7 @@ class UserSubscriptionTier(str, Enum):
     BASIC = "basic"
     PREMIUM = "premium"
 
-class CreateNewUser(BaseModel):
+class User(BaseModel):
     email: EmailStr = Field(..., description="The user's email address")
     password_hash: Optional[str] = Field(..., description="The hashed password of the user")
     auth_provider: AuthProvider = Field(..., description="The authentication provider for the user")
@@ -18,14 +18,25 @@ class CreateNewUser(BaseModel):
     updated_at: Optional[str] = Field(None, description="The timestamp when the user was last updated")
     business_profile: List[BusinessProfile] = Field([], description="The business profile associated with the user")
 
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    password_hash: Optional[str] = None
+    auth_provider: Optional[str] = None
+    subscription_tier: Optional[str] = None
+
 class VerifyUser(BaseModel):
     email: EmailStr = Field(..., description="The user's email address")
     password_hash: str = Field(..., description="The hashed password of the user")
 
 class UserProfile(BaseModel):
     email: str = Field(..., description="The user's email address")
-    business_profile: Optional[BusinessProfile] = Field(None, description="The business profile associated with the user")
+    business_profile: List[BusinessProfile] = Field([], description="The business profile associated with the user")
 
 class AuthenticatedUserResponse(TokenResponse):
     user: UserProfile = Field(..., description="The authenticated user's profile")
+
+class BaseResponseModel(BaseModel):
+    success: bool = Field(..., description="Indicates whether the operation was successful or not")
+    message: str = Field(..., description="A message indicating the result of the operation")
+    error: Optional[str] = Field(None, description="Error message if the operation failed")
 
