@@ -27,11 +27,52 @@ import { StatsCardData } from "@/lib/types/user-interface";
 import { Invoice } from "@/lib/types/invoicing";
 import { ServiceCardData } from "@/lib/types/user-interface";
 import { ServiceCard } from "../ui/service-card";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { BusinessProfileModal } from "../modals/ui/business-profile";
+import { BusinessProfile } from "@/lib/types/invoicing";
+import { API_ROUTES } from "@/lib/utility/api/routes";
+import { apiClient } from "@/lib/api-client";
 
 // Dummy data
 
 export function DashboardOverview() {
-  const router = useRouter()
+  const router = useRouter();
+  const { user, refreshUser } = useAuth(); // Assuming you have an updateUser function
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
+  useEffect(() => {
+    if (user?.business_profile.length === 0) {
+      console.log("THIS IS USER")
+      console.log(user)
+      setShowProfileModal(true);
+    }
+  }, [user?.business_profile]);
+
+  const handleBusinessProfileSubmit = async (data: BusinessProfile) => {
+    try {
+      // Call your API to save the business profile
+      const response = await apiClient(API_ROUTES.addBusinessProfile, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API error response:", errorText);
+        throw new Error("Failed to save business profile");
+      }
+
+      // Update the user context
+      await refreshUser();
+
+      setShowProfileModal(false);
+    } catch (error) {
+      console.error("Error saving business profile:", error);
+      // Handle error (show toast, etc.)
+    }
+  };
+
   const dashboardStats: DashboardStats = {
     totalInvoices: 156,
     totalFinanced: 89,
@@ -134,7 +175,7 @@ export function DashboardOverview() {
           buttonHoverColor: "bg-emerald-50",
           onClick: () => {
             // Push to Financing page
-            router.push("/dashboard/financing")
+            router.push("/dashboard/financing");
           },
         },
       ],
@@ -180,7 +221,7 @@ export function DashboardOverview() {
           buttonHoverColor: "bg-blue-50",
           onClick: () => {
             console.log("View All Collections");
-            router.push("/dashboard/collections")
+            router.push("/dashboard/collections");
           },
         },
       ],
@@ -226,7 +267,7 @@ export function DashboardOverview() {
           buttonHoverColor: "bg-purple-50",
           onClick: () => {
             console.log("View All Invoices");
-            router.push("/dashboard/invoicing")
+            router.push("/dashboard/invoicing");
           },
         },
       ],
@@ -271,6 +312,15 @@ export function DashboardOverview() {
   ];
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <BusinessProfileModal
+        open={showProfileModal}
+        onOpenChange={setShowProfileModal}
+        onSubmit={handleBusinessProfileSubmit}
+        title="Complete Your Business Profile"
+        description="Before you can access your dashboard, we need some information about your business."
+        submitButtonText="Complete Setup"
+        allowClose={false} // Don't let them close it during onboarding
+      />
       <div className="space-y-6 p-6">
         {/* Welcome Header */}
         <div className="mb-8">
