@@ -76,7 +76,7 @@ async def register(user: UserCreateParameters, mongo_client: MongoDBClient = Dep
         auth_provider="local",  # Assuming local auth for registration
         subscription_tier="free",  # Default subscription tier
         created_at=datetime.utcnow().isoformat(),
-        updated_at=datetime.utcnow().isoformat()
+        updated_at=datetime.utcnow().isoformat(),
     )
 
     # Need try accepts for DB operations
@@ -106,7 +106,7 @@ async def register(user: UserCreateParameters, mongo_client: MongoDBClient = Dep
     )
     user_profile = UserProfile(
         email=user.email,
-        business_profile=None
+        business_profile=new_user.business_profile
     )
     
     return AuthenticatedUserResponse(
