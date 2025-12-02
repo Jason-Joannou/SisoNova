@@ -83,8 +83,11 @@ async def add_business_profile_operation(mongo_client: MongoDBClient, email: str
         async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
             result = await db["users"].update_one(
                 {"email": email},
-                {"$push" : {"business_profile": business_profile.model_dump()}},
-                {"$set": {"updated_at": datetime.utcnow().isoformat()}}
+                {
+                    "$push": {"business_profile": business_profile.model_dump()},
+                    "$set": {"updated_at": datetime.utcnow().isoformat()}
+                },
+                upsert=False  # or True if you want to create the user if it doesn't exist
             )
             return result.modified_count > 0
     except Exception as e:
