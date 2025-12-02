@@ -21,7 +21,7 @@ router = APIRouter(prefix="/user", tags=["user"])
 
 
 @router.get(
-    "/me",
+    "/",
     response_model=UserProfile,
     description="Get user profile",
     status_code=status.HTTP_200_OK,
@@ -47,7 +47,7 @@ async def user_profile(
 
 
 @router.patch(
-    "/me",
+    "/",
     response_model=UserProfile,
     description="Update user profile",
     status_code=status.HTTP_200_OK,
@@ -86,7 +86,7 @@ async def update_user_profile(
 
 
 @router.get(
-    "/me/business-profile",
+    "/business-profile",
     response_model=List[BusinessProfile],
     description="Get business profile",
     status_code=status.HTTP_200_OK,
@@ -112,9 +112,9 @@ async def get_business_profile(
 
 
 @router.post(
-    "/me/business-profile",
+    "/business-profile",
     response_model=BaseResponseModel,
-    description="Update business profile",
+    description="Add business profile",
     status_code=status.HTTP_200_OK,
 )
 async def add_business_profile(
@@ -150,7 +150,7 @@ async def add_business_profile(
         "message": "Business profile added successfully",
     }
 
-@router.patch("/me/business-profile/{company_name}", response_model=BaseResponseModel, description="Update business profile", status_code=status.HTTP_200_OK)
+@router.patch("/business-profile/{company_name}", response_model=BaseResponseModel, description="Update business profile", status_code=status.HTTP_200_OK)
 async def update_business_profile(
     business_profile: UpdateBusinessProfile,
     company_name: str = Path(..., description="The name of the company"),
