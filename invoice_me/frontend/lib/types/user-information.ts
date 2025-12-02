@@ -1,7 +1,7 @@
 import { BusinessInformation } from "./business-information"
 export interface UserProfile {
     email: string
-    business_profile: BusinessInformation
+    business_profile: BusinessInformation[]
 }
 
 export interface UserAuthentication {

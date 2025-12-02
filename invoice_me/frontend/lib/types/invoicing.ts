@@ -33,16 +33,16 @@ export interface BusinessProfile {
   trading_name?: string
   address_line_1: string
   address_line_2?: string
+  country: string
   city: string
   province: string
   postal_code: string
   vat_number?: string
   company_registration?: string
-  email: string
-  phone: string
-  website?: string
-  logo_url?: string
-  industry: string
+  tax_registration?: string
+  contact_email: string
+  contact_phone?: string
+  industry_type: string
 }
 
 export interface ClientDetails {
