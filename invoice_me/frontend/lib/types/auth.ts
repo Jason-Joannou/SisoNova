@@ -4,6 +4,7 @@ export interface AuthContextProps {
     user: UserProfile | null;
     login: (credentials: UserAuthentication) => Promise<void>;
     register: (details: UserAuthentication) => Promise<void>;
+    refreshUser: () => Promise<void>;
     logout: () => void;
     isAuthenticated: boolean;
     loading: boolean;
