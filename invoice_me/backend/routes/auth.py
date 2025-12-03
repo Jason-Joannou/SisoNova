@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, Response, Request
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from models.auth import (
@@ -15,23 +15,24 @@ from database.mongo_operations import does_user_exist, create_user, get_user_pro
 from database.mongo_dependencies import get_mongo_client
 from database.mongo_client import MongoDBClient
 from datetime import datetime, timezone
+from config import AppSettings
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
+settings = AppSettings()
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post(
     "/login",
-    response_model=AuthenticatedUserResponse,
+    response_model=UserProfile,
     description="Authenticate a user and return tokens",
     status_code=status.HTTP_200_OK,
 )
 async def login(
-    user: UserLoginParameters, mongo_client: MongoDBClient = Depends(get_mongo_client)
-) -> AuthenticatedUserResponse:
+    user: UserLoginParameters, response: Response, mongo_client: MongoDBClient = Depends(get_mongo_client)
+) -> UserProfile:
     # Authenticate user
     authenticated = await AuthenticationService.authenticate_user(
         user.email, user.password
@@ -54,12 +55,29 @@ async def login(
         subject_info=user.email, entity=EntityAccessId.USER
     )
 
-    user_data = await get_user_profile(email=user.email, mongo_client=mongo_client)
-    token_response = TokenResponse(
-        access_token=access_token, refresh_token=refresh_token, token_type="bearer"
+    user_profile = await get_user_profile(email=user.email, mongo_client=mongo_client)
+
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=False,
+        path="/",
+        secure=True if settings.environment == "production" else False,
+        samesite="lax",
     )
 
-    return AuthenticatedUserResponse(**token_response.model_dump(), user=user_data)
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        path="/",
+        secure=True if settings.environment == "production" else False,
+        samesite="lax",
+    )
+
+    
+
+    return user_profile
 
 
 # routes/auth.py
@@ -67,13 +85,13 @@ async def login(
 
 @router.post(
     "/register",
-    response_model=TokenResponse,
+    response_model=UserProfile,
     description="Register a new user and return tokens",
     status_code=status.HTTP_201_CREATED,
 )
 async def register(
-    user: UserCreateParameters, mongo_client: MongoDBClient = Depends(get_mongo_client)
-) -> TokenResponse:
+    user: UserCreateParameters, response: Response, mongo_client: MongoDBClient = Depends(get_mongo_client)
+) -> UserProfile:
     """
     Register a new user account
     """
@@ -114,14 +132,29 @@ async def register(
         subject_info=user.email, entity=EntityAccessId.USER
     )
 
-    token_response = TokenResponse(
-        access_token=access_token, refresh_token=refresh_token, token_type="bearer"
-    )
     user_profile = UserProfile(
-        email=user.email, business_profile=new_user.business_profile
+        email=user.email, business_profile=new_user.business_profile)
+
+
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=False,
+        path="/",
+        secure=True if settings.environment == "production" else False,
+        samesite="lax",
     )
 
-    return AuthenticatedUserResponse(**token_response.model_dump(), user=user_profile)
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        path="/",
+        secure=True if settings.environment == "production" else False,
+        samesite="lax",
+    )
+
+    return user_profile
 
 
 @router.get(
