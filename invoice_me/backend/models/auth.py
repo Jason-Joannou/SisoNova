@@ -60,7 +60,6 @@ class UserBaseResponse(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str = Field(..., description="The access token for authentication")
     token_type: str = Field(..., description="The type of the token, typically 'bearer'")
-    refresh_token: str = Field(..., description="The refresh token for obtaining new access tokens")
 
 
 
