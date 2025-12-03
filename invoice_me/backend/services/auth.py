@@ -81,7 +81,7 @@ class AuthenticationService:
 
     @staticmethod
     async def get_refresh_user(
-        token: Annotated[str, Depends(oauth2_scheme)],
+        token: str,
     ) -> TokenInfo:
 
         try:

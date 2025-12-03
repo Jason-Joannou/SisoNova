@@ -180,9 +180,11 @@ async def verify_token(
     status_code=status.HTTP_200_OK,
 )
 async def refresh_token(
-    token: TokenInfo = Depends(AuthenticationService.get_refresh_user),
-    raw_token: str = Depends(oauth2_scheme),
+    request: Request,
 ) -> TokenResponse:
+    
+    raw_token = request.cookies.get("refresh_token")
+    token = await AuthenticationService.get_refresh_user(token=raw_token)
 
     # Create new access token
     new_access_token = AuthorizationService.create_access_token(
@@ -192,6 +194,5 @@ async def refresh_token(
 
     return TokenResponse(
         access_token=new_access_token,
-        refresh_token=raw_token,
         token_type="bearer",
     )
