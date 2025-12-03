@@ -18,6 +18,7 @@ class AppSettings(BaseSettings):
     app_name: str = Field(..., description="The name of the application")
     app_description: str = Field(..., description="A brief description of the application")
     app_version: str = Field(..., description="The version of the application")
+    environment: str = Field(..., description="The environment the application is running in")
 
     # Needed to read from JSON file
     @classmethod
