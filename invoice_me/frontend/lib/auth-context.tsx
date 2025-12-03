@@ -16,6 +16,7 @@ import {
   UserUpdate,
 } from "./types/user-information";
 import { API_ROUTES } from "./utility/api/routes";
+import { getCookie, deleteCookie } from "./utils";
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
@@ -27,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const token = localStorage.getItem("access_token");
+      const token = getCookie("access_token");
 
       if (token) {
         // Token exists, fetch user profile
@@ -42,7 +43,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           if (response.ok) {
             const userData = await response.json();
-            console.log("User data:", userData);
             setUser(userData);
             setIsAuthenticated(true);
           } else {
@@ -69,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(credentials),
       });
 
@@ -77,16 +78,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
         throw new Error(data.detail || "Login failed");
       }
-
-      const { access_token, refresh_token, user } = data as AuthenticatedUser;
-
-      localStorage.setItem("access_token", access_token);
-      localStorage.setItem("refresh_token", refresh_token);
-
-      // Add to cookies for middleware access
-      document.cookie = `access_token=${access_token}; path=/`;
-      document.cookie = `refresh_token=${refresh_token}; path=/`;
-
+      
+      const user = data as UserProfile;
       setUser(user);
       setIsAuthenticated(true);
       setLoading(false);
@@ -107,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(userData),
       });
 
@@ -116,15 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(data.detail || "Registration failed");
       }
 
-      const { access_token, refresh_token, user } = data as AuthenticatedUser;
-
-      localStorage.setItem("access_token", access_token);
-      localStorage.setItem("refresh_token", refresh_token);
-
-      // Add to cookies for middleware access
-      document.cookie = `access_token=${access_token}; path=/`;
-      document.cookie = `refresh_token=${refresh_token}; path=/`;
-
+      const user = data as UserProfile;
       setUser(user);
       setIsAuthenticated(true);
       setLoading(false);
@@ -139,11 +125,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setLoading(true);
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
     setUser(null);
     setIsAuthenticated(false);
     setLoading(false);
+
+    deleteCookie("access_token");
+
     router.push("/login");
   };
 
@@ -155,7 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${getCookie("access_token")}`,
         },
       });
 
@@ -165,8 +152,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(JSON.stringify(data));
       }
 
-      const { email, business_profile } = data as UserProfile;
-      setUser({ email, business_profile });
+      const user = data as UserProfile;
+      setUser(user);
       setIsAuthenticated(true);
       setLoading(false);
     } catch (error) {
