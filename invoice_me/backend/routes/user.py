@@ -1,6 +1,7 @@
 from fastapi import APIRouter, status, Depends, Path
 from fastapi.exceptions import HTTPException
-from models.users import UserProfile, UserUpdate, BaseResponseModel
+from models.users import UserProfile, UserUpdate
+from models.base import BaseResponseModel
 from models.auth import TokenInfo
 from models.business import BusinessProfile, UpdateBusinessProfile
 from typing import List

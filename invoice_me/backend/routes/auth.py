@@ -8,6 +8,7 @@ from models.auth import (
     TokenInfo,
     TokenAccessType,
 )
+from models.base import BaseResponseModel
 from models.users import User, AuthenticatedUserResponse, UserProfile
 from services.auth import AuthenticationService, AuthorizationService
 from models.auth import EntityAccessId
@@ -159,7 +160,7 @@ async def register(
 
 @router.get(
     "/verify",
-    response_model=TokenInfo,
+    response_model=BaseResponseModel,
     description="Verify the validity of an access token",
     status_code=status.HTTP_200_OK,
 )
@@ -170,7 +171,10 @@ async def verify_token(
     Verify the provided access token
     """
 
-    return token
+    return BaseResponseModel(
+        success=True,
+        message="Token is valid",
+    )
 
 
 @router.get(
@@ -180,6 +184,7 @@ async def verify_token(
     status_code=status.HTTP_200_OK,
 )
 async def refresh_token(
+    response: Response,
     request: Request,
 ) -> TokenResponse:
     
@@ -192,7 +197,16 @@ async def refresh_token(
         entity=EntityAccessId.USER,
     )
 
-    return TokenResponse(
-        access_token=new_access_token,
-        token_type="bearer",
+    response.set_cookie(
+        key="access_token",
+        value=new_access_token,
+        httponly=False,
+        path="/",
+        secure=True if settings.environment == "production" else False,
+        samesite="lax",
+    )
+
+    return BaseResponseModel(
+        success=True,
+        message="Access token refreshed successfully",
     )
