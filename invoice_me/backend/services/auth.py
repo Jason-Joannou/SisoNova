@@ -42,7 +42,9 @@ class AuthenticationService:
 
     # For protected routes
     @staticmethod
-    async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> TokenInfo:
+    async def get_current_user(
+        token: Annotated[str, Depends(oauth2_scheme)],
+    ) -> TokenInfo:
 
         try:
             secrets = Secrets()
@@ -65,6 +67,43 @@ class AuthenticationService:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Token has expired",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+
+            return token_info
+
+        except InvalidTokenError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+    @staticmethod
+    async def get_refresh_user(
+        token: Annotated[str, Depends(oauth2_scheme)],
+    ) -> TokenInfo:
+
+        try:
+            secrets = Secrets()
+            payload = jwt.decode(
+                token, secrets.jwt_secret_key, algorithms=[secrets.jwt_algorithm]
+            )
+            token_info = TokenInfo(**payload)
+
+            # Validate REFRESH token
+            if token_info.type != TokenAccessType.REFRESH.value:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid token type",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+
+            # Check expiry
+            if token_info.exp < int(datetime.now(timezone.utc).timestamp()):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token expired",
                     headers={"WWW-Authenticate": "Bearer"},
                 )
 
@@ -121,7 +160,7 @@ class AuthorizationService:
 
         encoded_jwt = jwt.encode(to_encode, jwt_secret, algorithm=jwt_algorithm)
         return encoded_jwt
-    
+
     @staticmethod
     def refresh_access_token(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
         try:
@@ -155,8 +194,7 @@ class AuthorizationService:
 
             # Create new access token
             new_access_token = AuthorizationService.create_access_token(
-                subject_info=subject_info,
-                entity=entity
+                subject_info=subject_info, entity=entity
             )
 
             return new_access_token

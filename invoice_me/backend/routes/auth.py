@@ -1,74 +1,92 @@
 from fastapi import APIRouter, status, Depends
 from fastapi.exceptions import HTTPException
-from models.auth import UserLoginParameters, TokenResponse, UserCreateParameters, TokenInfo
+from fastapi.security import OAuth2PasswordBearer
+from models.auth import (
+    UserLoginParameters,
+    TokenResponse,
+    UserCreateParameters,
+    TokenInfo,
+    TokenAccessType,
+)
 from models.users import User, AuthenticatedUserResponse, UserProfile
 from services.auth import AuthenticationService, AuthorizationService
 from models.auth import EntityAccessId
 from database.mongo_operations import does_user_exist, create_user, get_user_profile
 from database.mongo_dependencies import get_mongo_client
 from database.mongo_client import MongoDBClient
-from datetime import datetime
+from datetime import datetime, timezone
 
 
-router = APIRouter(
-    prefix="/auth",
-    tags=["auth"]
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+@router.post(
+    "/login",
+    response_model=AuthenticatedUserResponse,
+    description="Authenticate a user and return tokens",
+    status_code=status.HTTP_200_OK,
 )
-
-@router.post("/login", response_model=AuthenticatedUserResponse, description="Authenticate a user and return tokens", status_code=status.HTTP_200_OK)
-async def login(user: UserLoginParameters, mongo_client: MongoDBClient = Depends(get_mongo_client)) -> AuthenticatedUserResponse:
+async def login(
+    user: UserLoginParameters, mongo_client: MongoDBClient = Depends(get_mongo_client)
+) -> AuthenticatedUserResponse:
     # Authenticate user
-    authenticated = await AuthenticationService.authenticate_user(user.email, user.password)
-    
+    authenticated = await AuthenticationService.authenticate_user(
+        user.email, user.password
+    )
+
     if not authenticated:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Create tokens
     access_token = AuthorizationService.create_access_token(
         subject_info=user.email,
-        entity=EntityAccessId.USER  # Adjust based on your EntityAccessId enum
-    )
-    
-    refresh_token = AuthorizationService.create_refresh_token(
-        subject_info=user.email,
-        entity=EntityAccessId.USER
-    )
-    
-    user_data = await get_user_profile(email=user.email, mongo_client=mongo_client)
-    token_response = TokenResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        token_type="bearer"
+        entity=EntityAccessId.USER,  # Adjust based on your EntityAccessId enum
     )
 
-    
-    return AuthenticatedUserResponse(
-        **token_response.model_dump(),
-        user=user_data
+    refresh_token = AuthorizationService.create_refresh_token(
+        subject_info=user.email, entity=EntityAccessId.USER
     )
+
+    user_data = await get_user_profile(email=user.email, mongo_client=mongo_client)
+    token_response = TokenResponse(
+        access_token=access_token, refresh_token=refresh_token, token_type="bearer"
+    )
+
+    return AuthenticatedUserResponse(**token_response.model_dump(), user=user_data)
+
 
 # routes/auth.py
 
-@router.post("/register", response_model=TokenResponse, description="Register a new user and return tokens", status_code=status.HTTP_201_CREATED)
-async def register(user: UserCreateParameters, mongo_client: MongoDBClient = Depends(get_mongo_client)) -> TokenResponse:
+
+@router.post(
+    "/register",
+    response_model=TokenResponse,
+    description="Register a new user and return tokens",
+    status_code=status.HTTP_201_CREATED,
+)
+async def register(
+    user: UserCreateParameters, mongo_client: MongoDBClient = Depends(get_mongo_client)
+) -> TokenResponse:
     """
     Register a new user account
     """
-    
+
     existing_user = await does_user_exist(email=user.email, mongo_client=mongo_client)
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
         )
-    
+
     # Hash the password
     hashed_password = AuthenticationService.get_password_hash(user.password)
-    
+
     # Create user in database
     new_user = User(
         email=user.email,
@@ -84,62 +102,63 @@ async def register(user: UserCreateParameters, mongo_client: MongoDBClient = Dep
     if not response_id:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create user"
+            detail="Failed to create user",
         )
-    
-    
+
     # Create tokens for the new user
     access_token = AuthorizationService.create_access_token(
-        subject_info=user.email,
-        entity=EntityAccessId.USER
+        subject_info=user.email, entity=EntityAccessId.USER
     )
-    
+
     refresh_token = AuthorizationService.create_refresh_token(
-        subject_info=user.email,
-        entity=EntityAccessId.USER
+        subject_info=user.email, entity=EntityAccessId.USER
     )
 
     token_response = TokenResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        token_type="bearer"
+        access_token=access_token, refresh_token=refresh_token, token_type="bearer"
     )
     user_profile = UserProfile(
-        email=user.email,
-        business_profile=new_user.business_profile
-    )
-    
-    return AuthenticatedUserResponse(
-        **token_response.model_dump(),
-        user=user_profile
+        email=user.email, business_profile=new_user.business_profile
     )
 
+    return AuthenticatedUserResponse(**token_response.model_dump(), user=user_profile)
 
 
-@router.get("/verify", response_model=TokenInfo, description="Verify the validity of an access token", status_code=status.HTTP_200_OK)
-async def verify_token(token: TokenInfo = Depends(AuthenticationService.get_current_user)) -> TokenInfo:
+@router.get(
+    "/verify",
+    response_model=TokenInfo,
+    description="Verify the validity of an access token",
+    status_code=status.HTTP_200_OK,
+)
+async def verify_token(
+    token: TokenInfo = Depends(AuthenticationService.get_current_user),
+) -> TokenInfo:
     """
     Verify the provided access token
     """
 
     return token
 
-@router.get("/refresh", response_model=TokenResponse, description="Refresh access token using a refresh token", status_code=status.HTTP_200_OK)
-async def refresh_token(token: TokenInfo = Depends(AuthenticationService.get_current_user)) -> TokenResponse:
-    """
-    Refresh the access token using a valid refresh token
-    """
+
+@router.get(
+    "/refresh",
+    response_model=TokenResponse,
+    description="Refresh access token using a refresh token",
+    status_code=status.HTTP_200_OK,
+)
+async def refresh_token(
+    token: TokenInfo = Depends(AuthenticationService.get_refresh_user),
+    raw_token: str = Depends(oauth2_scheme),
+) -> TokenResponse:
 
     # Create new access token
     new_access_token = AuthorizationService.create_access_token(
         subject_info=token.sub,
-        entity=EntityAccessId.USER
+        entity=EntityAccessId.USER,
     )
-    
+
     return TokenResponse(
         access_token=new_access_token,
-        refresh_token=token.refresh_token,
-        token_type="bearer"
+        refresh_token=raw_token,
+        token_type="bearer",
     )
-
-
