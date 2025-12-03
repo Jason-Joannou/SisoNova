@@ -1,15 +1,19 @@
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { TokenResponse } from "./lib/types/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-async function refreshAccessToken(refreshToken: string): Promise<Response> {
+async function refreshAccessToken(): Promise<Response> {
   const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refresh_token: refreshToken }),
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
+
   return response;
 }
 
@@ -25,7 +29,6 @@ async function verifyToken(token: string): Promise<Response> {
 
 export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("access_token")?.value;
-  const refreshToken = request.cookies.get("refresh_token")?.value;
 
   const protectedRoutes = ["/dashboard"];
   const authRoutes = ["/login", "/register"];
@@ -46,15 +49,18 @@ export async function middleware(request: NextRequest) {
       // Valid token - redirect to dashboard
       console.log("Valid token, redirecting to dashboard");
       return NextResponse.redirect(new URL("/dashboard", request.url));
-    } else if (verifyResponse.status === 401 && refreshToken) {
+    } else if (verifyResponse.status === 401) {
       // Try to refresh
       console.log("Token expired, trying to refresh...");
-      const refreshResponse = await refreshAccessToken(refreshToken);
+      const refreshResponse = await refreshAccessToken();
 
       if (refreshResponse.ok) {
         // Refresh successful - redirect to dashboard
         console.log("Refresh successful, redirecting to dashboard");
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+
+        return NextResponse.redirect(
+          new URL("/dashboard", request.url)
+        );
       }
     }
 
@@ -62,7 +68,6 @@ export async function middleware(request: NextRequest) {
     console.log("Token invalid, clearing cookies");
     const response = NextResponse.next();
     response.cookies.delete("access_token");
-    response.cookies.delete("refresh_token");
     return response;
   }
 
@@ -90,31 +95,14 @@ export async function middleware(request: NextRequest) {
     }
 
     // Token invalid/expired - try to refresh
-    if (verifyResponse.status === 401 && refreshToken) {
+    if (verifyResponse.status === 401) {
       console.log("Token expired, trying to refresh...");
-      const refreshResponse = await refreshAccessToken(refreshToken);
+      const refreshResponse = await refreshAccessToken();
 
       if (refreshResponse.ok) {
         // Refresh successful - set new tokens and allow access
         console.log("Refresh successful, setting new tokens");
-        const data = await refreshResponse.json();
-        const responseNext = NextResponse.next();
-
-        responseNext.cookies.set("access_token", data.access_token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 86400, // 24 hours
-        });
-
-        responseNext.cookies.set("refresh_token", data.refresh_token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 604800, // 7 days
-        });
-
-        return responseNext;
+        return NextResponse.next();
       }
     }
 
@@ -123,7 +111,6 @@ export async function middleware(request: NextRequest) {
     const loginUrl = new URL("/login", request.url);
     const response = NextResponse.redirect(loginUrl);
     response.cookies.delete("access_token");
-    response.cookies.delete("refresh_token");
     return response;
   }
 
