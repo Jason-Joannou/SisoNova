@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Shield } from "lucide-react"
+import { LoadingOverlay } from "./loading";
 
 export function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -40,9 +41,9 @@ export function RegisterForm() {
 
     try {
       await register(formData)
+      return;
     } catch (err: any) {
       setError(err.message || "Registration failed")
-    } finally {
       setLoading(false)
     }
   }
@@ -55,6 +56,8 @@ export function RegisterForm() {
   }
 
   return (
+    <>
+    {loading && <LoadingOverlay message="Signing you up..." />}
     <Card className="shadow-lg border-0">
       <CardHeader className="text-center pb-6">
         <div className="flex items-center justify-center mb-4">
@@ -144,5 +147,6 @@ export function RegisterForm() {
         </form>
       </CardContent>
     </Card>
+    </>
   )
 }
