@@ -1,7 +1,6 @@
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { TokenResponse } from "./lib/types/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -57,10 +56,7 @@ export async function middleware(request: NextRequest) {
       if (refreshResponse.ok) {
         // Refresh successful - redirect to dashboard
         console.log("Refresh successful, redirecting to dashboard");
-
-        return NextResponse.redirect(
-          new URL("/dashboard", request.url)
-        );
+        return NextResponse.redirect(new URL("/dashboard", request.url));
       }
     }
 
@@ -73,6 +69,7 @@ export async function middleware(request: NextRequest) {
 
   // Allow access to auth routes without token
   if (isAuthRoute) {
+    console.log("Auth route without token, allowing access");
     return NextResponse.next();
   }
 
@@ -100,8 +97,8 @@ export async function middleware(request: NextRequest) {
       const refreshResponse = await refreshAccessToken();
 
       if (refreshResponse.ok) {
-        // Refresh successful - set new tokens and allow access
-        console.log("Refresh successful, setting new tokens");
+        // Refresh successful - allow access
+        console.log("Refresh successful, allowing access");
         return NextResponse.next();
       }
     }
@@ -118,18 +115,11 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// THIS IS CRITICAL - Without this, middleware won't run!
+// SIMPLIFIED MATCHER - Only run on specific routes
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (images, etc)
-     */
     "/dashboard/:path*",
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.svg).*)",
+    "/login",
+    "/register",
   ],
 };
