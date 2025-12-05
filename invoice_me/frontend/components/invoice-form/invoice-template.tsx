@@ -89,10 +89,10 @@ export const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({
               {config.business_profile.postal_code}
             </p>
             <p className="mt-2">
-              <strong>Email:</strong> {config.business_profile.email}
+              <strong>Email:</strong> {config.business_profile.contact_email}
             </p>
             <p>
-              <strong>Phone:</strong> {config.business_profile.phone}
+              <strong>Phone:</strong> {config.business_profile?.contact_phone || ""}
             </p>
             {config.business_profile.vat_number && (
               <p>
@@ -643,10 +643,10 @@ export const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({
             <strong>{config.business_profile.company_name}</strong>
           </div>
           <div className="text-sm">
-            <span>{config.business_profile.email}</span>
+            <span>{config.business_profile.contact_email}</span>
           </div>
           <div className="text-sm">
-            <span>{config.business_profile.phone}</span>
+            <span>{config.business_profile?.contact_phone || ""}</span>
           </div>
         </div>
         <div className="border-t border-gray-600 mt-4 pt-4">
