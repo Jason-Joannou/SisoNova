@@ -11,7 +11,9 @@ from database.mongo_operations import (
     get_user_profile,
     update_user_information,
     add_business_profile_operation,
-    update_business_profile_operation
+    update_business_profile_operation,
+    get_business_profile_with_company_name,
+    get_user_business_profile_company_names,
 )
 from database.mongo_client import MongoDBClient
 from database.mongo_dependencies import get_mongo_client
@@ -88,28 +90,37 @@ async def update_user_profile(
 
 @router.get(
     "/business-profile",
-    response_model=List[BusinessProfile],
-    description="Get business profile",
+    response_model=List[str],
+    description="Get business profile names",
     status_code=status.HTTP_200_OK,
 )
 async def get_business_profile(
     token: TokenInfo = Depends(AuthenticationService.get_current_user),
     mongo_client: MongoDBClient = Depends(get_mongo_client),
-) -> List[BusinessProfile]:
+) -> List[str]:
     """
-    Get the business profile for the authenticated user
+    Get the business profile names for the authenticated user
     """
 
     _, email = token.sub.split(":", 1)
 
-    user_profile = await get_user_profile(email=email, mongo_client=mongo_client)
+    exists = await does_user_exist(email=email, mongo_client=mongo_client)
 
-    if not user_profile:
+    if not exists:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found"
         )
 
-    return user_profile.business_profile
+    business_profiles = await get_user_business_profile_company_names(
+        email=email, mongo_client=mongo_client
+    )
+
+    if not business_profiles:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Business profile not found"
+        )
+
+    return business_profiles
 
 
 @router.post(
@@ -145,13 +156,68 @@ async def add_business_profile(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error updating business profile",
         )
+    
+    # Update user's preferred business profile
+    updated = await update_user_information(
+        email=email,
+        user_update=UserUpdate(preferred_business_profile=business_profile.company_name),
+        mongo_client=mongo_client
+    )
+
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error updating user information",
+        )
 
     return {
         "success": True,
         "message": "Business profile added successfully",
     }
 
-@router.patch("/business-profile/{company_name}", response_model=BaseResponseModel, description="Update business profile", status_code=status.HTTP_200_OK)
+
+@router.get(
+    "/business-profile/{company_name}",
+    response_model=BusinessProfile,
+    description="Get business profile",
+    status_code=status.HTTP_200_OK,
+)
+async def get_business_profile(
+    company_name: str = Path(..., description="The name of the company"),
+    token: TokenInfo = Depends(AuthenticationService.get_current_user),
+    mongo_client: MongoDBClient = Depends(get_mongo_client),
+) -> BusinessProfile:
+    """
+    Get the business profile for the authenticated user
+    """
+
+    _, email = token.sub.split(":", 1)
+
+    exists = await does_user_exist(email=email, mongo_client=mongo_client)
+
+    if not exists:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found"
+        )
+
+    business_profile = await get_business_profile_with_company_name(
+        email=email, company_name=company_name, mongo_client=mongo_client
+    )
+
+    if not business_profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Business profile not found"
+        )
+
+    return business_profile
+
+
+@router.patch(
+    "/business-profile/{company_name}",
+    response_model=BaseResponseModel,
+    description="Update business profile",
+    status_code=status.HTTP_200_OK,
+)
 async def update_business_profile(
     business_profile: UpdateBusinessProfile,
     company_name: str = Path(..., description="The name of the company"),
@@ -172,7 +238,10 @@ async def update_business_profile(
         )
 
     updated = await update_business_profile_operation(
-        email=email, business_profile=business_profile, mongo_client=mongo_client, company_name=company_name
+        email=email,
+        business_profile=business_profile,
+        mongo_client=mongo_client,
+        company_name=company_name,
     )
 
     if not updated:
@@ -185,3 +254,9 @@ async def update_business_profile(
         "success": True,
         "message": "Business profile updated successfully",
     }
+
+
+# Each Business profile can have different services
+# Ie one profile can have invoicing and collections enabled
+# The other can have Ai agents and collecions enabled
+# Each profile can be billed on usage
