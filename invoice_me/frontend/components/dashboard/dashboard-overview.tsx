@@ -33,18 +33,6 @@ import { BusinessProfile } from "@/lib/types/invoicing";
 import { API_ROUTES } from "@/lib/utility/api/routes";
 import { apiClient } from "@/lib/api-client";
 
-// Types
-interface FinancialSnapshot {
-  cashOnHand: number;
-  moneyOwedToYou: number;
-  overduePayments: number;
-  nextPaymentDue: {
-    amount: number;
-    daysUntil: number;
-    customerName: string;
-  } | null;
-}
-
 interface AvailableService {
   id: string;
   name: string;
@@ -78,10 +66,10 @@ export function DashboardOverview() {
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
-    if (user?.business_profile.length === 0) {
+    if (user?.preferred_business_profile === null) {
       setShowProfileModal(true);
     }
-  }, [user?.business_profile]);
+  }, [user?.preferred_business_profile]);
 
   const handleBusinessProfileSubmit = async (data: BusinessProfile) => {
     try {
@@ -101,15 +89,6 @@ export function DashboardOverview() {
     } catch (error) {
       console.error("Error saving business profile:", error);
     }
-  };
-
-  const businessHealth: BusinessHealth = {
-    score: 72,
-    factors: [
-      { label: "Payment patterns", status: "good", value: "Good" },
-      { label: "Cash flow", status: "good", value: "Stable" },
-      { label: "Growth", status: "good", value: "+12%" },
-    ],
   };
 
   const financialServices: AvailableService[] = [
@@ -186,22 +165,6 @@ export function DashboardOverview() {
     },
   ];
 
-  const getHealthScoreColor = (score: number) => {
-    if (score >= 70) return "text-emerald-500";
-    if (score >= 50) return "text-amber-500";
-    return "text-red-500";
-  };
-
-  const getFactorColor = (status: "good" | "fair" | "poor") => {
-    switch (status) {
-      case "good":
-        return "text-emerald-600";
-      case "fair":
-        return "text-amber-600";
-      case "poor":
-        return "text-red-600";
-    }
-  };
 
   const getTrendIcon = (trend?: "up" | "down" | "neutral") => {
     if (!trend) return null;
@@ -227,7 +190,7 @@ export function DashboardOverview() {
         {/* Welcome Header */}
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Welcome back, {user?.business_profile[0]?.company_name || "there"}
+            Welcome back, {user?.preferred_business_profile || "there"}
           </h1>
           <p className="text-slate-600 text-sm">Your available services</p>
         </div>
