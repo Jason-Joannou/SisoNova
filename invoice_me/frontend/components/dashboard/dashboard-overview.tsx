@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+import { ComingSoon } from "../ui/coming-soon";
 import { useRouter } from "next/navigation";
 import {
   AlertCircle,
@@ -53,6 +54,7 @@ interface AvailableService {
   bgColor: string;
   borderColor: string;
   isActive: boolean;
+  comingSoon?: boolean;
   summary: {
     label: string;
     value: string | number;
@@ -120,6 +122,7 @@ export function DashboardOverview() {
       bgColor: "bg-purple-50",
       borderColor: "border-purple-200",
       isActive: true,
+      comingSoon: false,
       summary: [
         { label: "Sent this month", value: 12, trend: "up" },
         { label: "Total outstanding", value: "R45k" },
@@ -135,7 +138,8 @@ export function DashboardOverview() {
       color: "text-emerald-600",
       bgColor: "bg-emerald-50",
       borderColor: "border-emerald-200",
-      isActive: true,
+      isActive: false,
+      comingSoon: true,
       summary: [
         { label: "Available to finance", value: "R8.5k" },
         { label: "Active advances", value: 2 },
@@ -151,7 +155,8 @@ export function DashboardOverview() {
       color: "text-blue-600",
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200",
-      isActive: true,
+      isActive: false,
+      comingSoon: true,
       summary: [
         { label: "Overdue invoices", value: 8 },
         { label: "Total overdue", value: "R15k" },
@@ -171,6 +176,7 @@ export function DashboardOverview() {
       bgColor: "bg-indigo-50",
       borderColor: "border-indigo-200",
       isActive: true,
+      comingSoon: false,
       summary: [
         { label: "Active agents", value: 4 },
         { label: "Insights today", value: 6 },
@@ -238,58 +244,74 @@ export function DashboardOverview() {
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {financialServices.map((service) => (
-              <Card
-                key={service.id}
-                className={`border-2 ${service.borderColor} hover:shadow-lg transition-all cursor-pointer group`}
-                onClick={() => router.push(service.route)}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between mb-3">
-                    <div
-                      className={`p-3 rounded-lg ${service.bgColor} ${service.color} group-hover:scale-110 transition-transform`}
-                    >
-                      <service.icon className="h-6 w-6" />
-                    </div>
-                    {service.isActive && (
-                      <Badge className="bg-emerald-100 text-emerald-800 text-xs">
-                        Active
-                      </Badge>
-                    )}
-                  </div>
-                  <CardTitle className="text-base">{service.name}</CardTitle>
-                  <CardDescription className="text-xs">
-                    {service.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2.5">
-                    {service.summary.map((item, idx) => (
+              <div key={service.id} className="relative">
+                <Card
+                  className={`border-2 ${service.borderColor} ${
+                    service.comingSoon
+                      ? "cursor-not-allowed"
+                      : "hover:shadow-lg cursor-pointer"
+                  } transition-all group`}
+                  onClick={() => !service.comingSoon && router.push(service.route)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between mb-3">
                       <div
-                        key={idx}
-                        className="flex items-center justify-between"
+                        className={`p-3 rounded-lg ${service.bgColor} ${
+                          service.color
+                        } ${
+                          !service.comingSoon && "group-hover:scale-110"
+                        } transition-transform`}
                       >
-                        <span className="text-xs text-slate-600">
-                          {item.label}
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <span className="text-sm font-semibold text-slate-900">
-                            {item.value}
-                          </span>
-                          {getTrendIcon(item.trend)}
-                        </div>
+                        <service.icon className="h-6 w-6" />
                       </div>
-                    ))}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full mt-3 group-hover:bg-slate-100 text-xs"
-                  >
-                    View Details
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </CardContent>
-              </Card>
+                      {service.isActive && (
+                        <Badge className="bg-emerald-100 text-emerald-800 text-xs">
+                          Active
+                        </Badge>
+                      )}
+                    </div>
+                    <CardTitle className="text-base">{service.name}</CardTitle>
+                    <CardDescription className="text-xs">
+                      {service.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2.5">
+                      {service.summary.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between"
+                        >
+                          <span className="text-xs text-slate-600">
+                            {item.label}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm font-semibold text-slate-900">
+                              {item.value}
+                            </span>
+                            {getTrendIcon(item.trend)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full mt-3 group-hover:bg-slate-100 text-xs"
+                      disabled={service.comingSoon}
+                    >
+                      View Details
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </CardContent>
+                </Card>
+                {service.comingSoon && (
+                  <ComingSoon
+                    featureName={service.name}
+                    message="This feature is currently in development and will be available soon"
+                  />
+                )}
+              </div>
             ))}
           </div>
         </div>
@@ -306,58 +328,74 @@ export function DashboardOverview() {
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {aiAssistants.map((service) => (
-              <Card
-                key={service.id}
-                className={`border-2 ${service.borderColor} hover:shadow-lg transition-all cursor-pointer group`}
-                onClick={() => router.push(service.route)}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between mb-3">
-                    <div
-                      className={`p-3 rounded-lg ${service.bgColor} ${service.color} group-hover:scale-110 transition-transform`}
-                    >
-                      <service.icon className="h-6 w-6" />
-                    </div>
-                    {service.isActive && (
-                      <Badge className="bg-emerald-100 text-emerald-800 text-xs">
-                        Active
-                      </Badge>
-                    )}
-                  </div>
-                  <CardTitle className="text-base">{service.name}</CardTitle>
-                  <CardDescription className="text-xs">
-                    {service.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2.5">
-                    {service.summary.map((item, idx) => (
+              <div key={service.id} className="relative">
+                <Card
+                  className={`border-2 ${service.borderColor} ${
+                    service.comingSoon
+                      ? "cursor-not-allowed"
+                      : "hover:shadow-lg cursor-pointer"
+                  } transition-all group`}
+                  onClick={() => !service.comingSoon && router.push(service.route)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between mb-3">
                       <div
-                        key={idx}
-                        className="flex items-center justify-between"
+                        className={`p-3 rounded-lg ${service.bgColor} ${
+                          service.color
+                        } ${
+                          !service.comingSoon && "group-hover:scale-110"
+                        } transition-transform`}
                       >
-                        <span className="text-xs text-slate-600">
-                          {item.label}
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <span className="text-sm font-semibold text-slate-900">
-                            {item.value}
-                          </span>
-                          {getTrendIcon(item.trend)}
-                        </div>
+                        <service.icon className="h-6 w-6" />
                       </div>
-                    ))}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full mt-3 group-hover:bg-slate-100 text-xs"
-                  >
-                    View Details
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </CardContent>
-              </Card>
+                      {service.isActive && (
+                        <Badge className="bg-emerald-100 text-emerald-800 text-xs">
+                          Active
+                        </Badge>
+                      )}
+                    </div>
+                    <CardTitle className="text-base">{service.name}</CardTitle>
+                    <CardDescription className="text-xs">
+                      {service.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2.5">
+                      {service.summary.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between"
+                        >
+                          <span className="text-xs text-slate-600">
+                            {item.label}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-sm font-semibold text-slate-900">
+                              {item.value}
+                            </span>
+                            {getTrendIcon(item.trend)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full mt-3 group-hover:bg-slate-100 text-xs"
+                      disabled={service.comingSoon}
+                    >
+                      View Details
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </CardContent>
+                </Card>
+                {service.comingSoon && (
+                  <ComingSoon
+                    featureName={service.name}
+                    message="This feature is currently in development and will be available soon"
+                  />
+                )}
+              </div>
             ))}
           </div>
         </div>
