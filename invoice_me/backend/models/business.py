@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from typing import Optional, List
 
 class BusinessProfile(BaseModel):
     company_name: str = Field(..., description="The name of the company")
@@ -33,3 +33,8 @@ class UpdateBusinessProfile(BaseModel):
     contact_email: Optional[EmailStr] = Field(None, description="The contact email address for the company")
     contact_phone: Optional[str] = Field(None, description="The contact phone number for the company")
     industry_type: Optional[str] = Field(None, description="The industry type of the company")
+
+
+class BusinessProfileCollection(BaseModel):
+    email: EmailStr = Field(..., description="The user's email address")
+    business_profiles: List[BusinessProfile] = Field([], description="The business profiles associated with the user")
