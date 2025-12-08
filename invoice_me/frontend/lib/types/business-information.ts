@@ -1,4 +1,4 @@
-export interface BusinessInformation {
+export interface BusinessProfile {
     company_name: string
     trading_name?: string
     address_line_1: string

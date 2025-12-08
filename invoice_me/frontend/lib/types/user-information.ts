@@ -1,7 +1,8 @@
-import { BusinessInformation } from "./business-information"
+import { BusinessProfile } from "./business-information"
 export interface UserProfile {
     email: string
-    business_profile: BusinessInformation[]
+    preferred_business_profile: string
+    business_profile: BusinessProfile
 }
 
 export interface UserAuthentication {
@@ -11,7 +12,6 @@ export interface UserAuthentication {
 
 export interface AuthenticatedUser {
     access_token: string
-    refresh_token: string
     token_type: string
     user: UserProfile
 }
