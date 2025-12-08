@@ -111,6 +111,7 @@ async def register(
         email=user.email,
         password_hash=hashed_password,
         auth_provider="local",  # Assuming local auth for registration
+        preferred_business_profile=None, # Will be updated on dashboard page
         subscription_tier="free",  # Default subscription tier
         created_at=datetime.utcnow().isoformat(),
         updated_at=datetime.utcnow().isoformat(),
@@ -134,7 +135,7 @@ async def register(
     )
 
     user_profile = UserProfile(
-        email=user.email, business_profile=new_user.business_profile)
+        email=user.email, preferred_business_profile=None, business_profile=None)
 
 
     response.set_cookie(
