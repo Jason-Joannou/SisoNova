@@ -9,24 +9,22 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { StatsGrid } from "../ui/stats-cards";
 import { useRouter } from "next/navigation";
 import {
-  CalendarDays,
-  CreditCard,
-  FileText,
+  AlertCircle,
   TrendingUp,
-  Plus,
-  Eye,
-  Zap,
-  Smartphone,
+  DollarSign,
   ArrowUpRight,
+  Wallet,
+  Zap,
+  CreditCard,
+  Smartphone,
+  Clock,
+  Activity,
+  MessageSquare,
+  Brain,
+  ChevronRight,
 } from "lucide-react";
-import { DashboardStats, DashboardKPIs } from "@/lib/types/dashboard";
-import { StatsCardData } from "@/lib/types/user-interface";
-import { Invoice } from "@/lib/types/invoicing";
-import { ServiceCardData } from "@/lib/types/user-interface";
-import { ServiceCard } from "../ui/service-card";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { BusinessProfileModal } from "../modals/ui/business-profile";
@@ -34,24 +32,57 @@ import { BusinessProfile } from "@/lib/types/invoicing";
 import { API_ROUTES } from "@/lib/utility/api/routes";
 import { apiClient } from "@/lib/api-client";
 
-// Dummy data
+// Types
+interface FinancialSnapshot {
+  cashOnHand: number;
+  moneyOwedToYou: number;
+  overduePayments: number;
+  nextPaymentDue: {
+    amount: number;
+    daysUntil: number;
+    customerName: string;
+  } | null;
+}
+
+interface AvailableService {
+  id: string;
+  name: string;
+  description: string;
+  icon: any;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+  isActive: boolean;
+  summary: {
+    label: string;
+    value: string | number;
+    trend?: "up" | "down" | "neutral";
+  }[];
+  route: string;
+}
+
+interface BusinessHealth {
+  score: number;
+  factors: {
+    label: string;
+    status: "good" | "fair" | "poor";
+    value: string;
+  }[];
+}
 
 export function DashboardOverview() {
   const router = useRouter();
-  const { user, refreshUser } = useAuth(); // Assuming you have an updateUser function
+  const { user, refreshUser } = useAuth();
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
     if (user?.business_profile.length === 0) {
-      console.log("THIS IS USER")
-      console.log(user)
       setShowProfileModal(true);
     }
   }, [user?.business_profile]);
 
   const handleBusinessProfileSubmit = async (data: BusinessProfile) => {
     try {
-      // Call your API to save the business profile
       const response = await apiClient(API_ROUTES.addBusinessProfile, {
         method: "POST",
         body: JSON.stringify(data),
@@ -63,253 +94,118 @@ export function DashboardOverview() {
         throw new Error("Failed to save business profile");
       }
 
-      // Update the user context
       await refreshUser();
-
       setShowProfileModal(false);
     } catch (error) {
       console.error("Error saving business profile:", error);
-      // Handle error (show toast, etc.)
     }
   };
 
-  const dashboardStats: DashboardStats = {
-    totalInvoices: 156,
-    totalFinanced: 89,
-    totalCollected: 234000,
-    pendingAmount: 145000,
-    monthlyGrowth: 12.5,
+  const businessHealth: BusinessHealth = {
+    score: 72,
+    factors: [
+      { label: "Payment patterns", status: "good", value: "Good" },
+      { label: "Cash flow", status: "good", value: "Stable" },
+      { label: "Growth", status: "good", value: "+12%" },
+    ],
   };
 
-  const recentInvoices: Invoice[] = [
+  const financialServices: AvailableService[] = [
     {
-      id: "1",
-      invoiceNumber: "INV-001",
-      buyerName: "Ridgeway Butchery",
-      amount: 15000,
-      dueDate: "2025-09-15",
-      status: "pending",
-      service: "financing",
-      createdAt: "2025-08-25",
-    },
-    {
-      id: "2",
-      invoiceNumber: "INV-002",
-      buyerName: "De Abreu Essop Inc",
-      amount: 8500,
-      dueDate: "2025-09-10",
-      status: "overdue",
-      service: "collections",
-      createdAt: "2025-08-20",
-    },
-    {
-      id: "3",
-      invoiceNumber: "INV-003",
-      buyerName: "WLDF SA",
-      amount: 12000,
-      dueDate: "2025-09-20",
-      status: "financed",
-      service: "financing",
-      createdAt: "2025-08-28",
-    },
-  ];
-
-  // Quick stats for each service
-  const serviceStats: DashboardKPIs = {
-    financing: {
-      active: 12,
-      totalAdvanced: 145000,
-      avgProcessingTime: "2.3 hours",
-    },
-    collections: {
-      active: 34,
-      collectionRate: 94.2,
-      avgDaysToPayment: 18,
-    },
-    invoicing: {
-      thisMonth: 67,
-      paidOnTime: 89.5,
-      avgAmount: 8750,
-    },
-  };
-
-  const serviceCardData: ServiceCardData[] = [
-    {
-      title: "Pay-Me-Now Financing",
-      description: "Get instant cash for your invoices",
-      serviceClassColor: "border-emerald-200",
-      quickStatsColor: "bg-emerald-50",
-      icon: Zap,
-      inconColor: "text-emerald-600",
-      serviceStats: [
-        {
-          serviceTilte: "Active",
-          serviceValue: serviceStats.financing.active,
-        },
-        {
-          serviceTilte: "Total Advanced",
-          serviceValue: serviceStats.financing.totalAdvanced,
-          serviceValueAffix: "R",
-          affixPosition: "prefix",
-        },
-      ],
-      buttonInformation: [
-        {
-          buttonText: "New Request",
-          buttonIcon: Plus,
-          buttonVariant: "default",
-          buttonSize: "sm",
-          buttonColor: "bg-emerald-600",
-          buttonHoverColor: "bg-emerald-700",
-          onClick: () => {
-            console.log("New Financing Request");
-          },
-        },
-        {
-          buttonText: "View All",
-          buttonIcon: Eye,
-          buttonVariant: "outline",
-          buttonSize: "sm",
-          buttonColor: "border-emerald-200",
-          buttonTextColor: "text-emerald-700",
-          buttonHoverColor: "bg-emerald-50",
-          onClick: () => {
-            // Push to Financing page
-            router.push("/dashboard/financing");
-          },
-        },
-      ],
-    },
-    {
-      title: "Smart Collections",
-      description: "Automated payment collection",
-      serviceClassColor: "border-blue-200",
-      quickStatsColor: "bg-blue-50",
-      icon: CreditCard,
-      inconColor: "text-blue-600",
-      serviceStats: [
-        {
-          serviceTilte: "Active",
-          serviceValue: serviceStats.collections.active,
-        },
-        {
-          serviceTilte: "Success Rate",
-          serviceValue: serviceStats.collections.collectionRate,
-          serviceValueAffix: "%",
-          affixPosition: "suffix",
-        },
-      ],
-      buttonInformation: [
-        {
-          buttonText: "Setup Collection",
-          buttonIcon: Plus,
-          buttonVariant: "default",
-          buttonSize: "sm",
-          buttonColor: "bg-blue-600",
-          buttonHoverColor: "bg-blue-700",
-          onClick: () => {
-            console.log("Setup Collection");
-          },
-        },
-        {
-          buttonText: "View All",
-          buttonIcon: Eye,
-          buttonVariant: "outline",
-          buttonSize: "sm",
-          buttonColor: "border-blue-200",
-          buttonTextColor: "text-emerald-700",
-          buttonHoverColor: "bg-blue-50",
-          onClick: () => {
-            console.log("View All Collections");
-            router.push("/dashboard/collections");
-          },
-        },
-      ],
-    },
-    {
-      title: "Mobile Invoicing",
-      description: "Create & send invoices instantly",
-      serviceClassColor: "border-purple-200",
-      quickStatsColor: "bg-purple-50",
+      id: "invoicing",
+      name: "Invoicing",
+      description: "Create and manage professional invoices",
       icon: Smartphone,
-      inconColor: "text-purple-600",
-      serviceStats: [
-        {
-          serviceTilte: "This month",
-          serviceValue: serviceStats.invoicing.thisMonth,
-        },
-        {
-          serviceTilte: "On time rate",
-          serviceValue: serviceStats.invoicing.paidOnTime,
-          serviceValueAffix: "%",
-          affixPosition: "suffix",
-        },
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+      borderColor: "border-purple-200",
+      isActive: true,
+      summary: [
+        { label: "Sent this month", value: 12, trend: "up" },
+        { label: "Total outstanding", value: "R45k" },
+        { label: "Paid on time", value: "85%", trend: "up" },
       ],
-      buttonInformation: [
-        {
-          buttonText: "Create Invoice",
-          buttonIcon: Plus,
-          buttonVariant: "default",
-          buttonSize: "sm",
-          buttonColor: "bg-purple-600",
-          buttonHoverColor: "bg-purple-700",
-          onClick: () => {
-            console.log("Create Invoice");
-          },
-        },
-        {
-          buttonText: "View All",
-          buttonIcon: Eye,
-          buttonVariant: "outline",
-          buttonSize: "sm",
-          buttonColor: "border-purple-200",
-          buttonTextColor: "text-purple-700",
-          buttonHoverColor: "bg-purple-50",
-          onClick: () => {
-            console.log("View All Invoices");
-            router.push("/dashboard/invoicing");
-          },
-        },
+      route: "/dashboard/invoicing",
+    },
+    {
+      id: "financing",
+      name: "Invoice Financing",
+      description: "Get paid immediately for your invoices",
+      icon: Zap,
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
+      borderColor: "border-emerald-200",
+      isActive: true,
+      summary: [
+        { label: "Available to finance", value: "R8.5k" },
+        { label: "Active advances", value: 2 },
+        { label: "Total financed", value: "R145k" },
       ],
+      route: "/dashboard/financing",
+    },
+    {
+      id: "collections",
+      name: "Collections",
+      description: "Track and collect overdue payments",
+      icon: CreditCard,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200",
+      isActive: true,
+      summary: [
+        { label: "Overdue invoices", value: 8 },
+        { label: "Total overdue", value: "R15k" },
+        { label: "Success rate", value: "92%", trend: "up" },
+      ],
+      route: "/dashboard/collections",
     },
   ];
 
-  const dashboardStatsData: StatsCardData[] = [
+  const aiAssistants: AvailableService[] = [
     {
-      title: "Total Invoices",
-      value: dashboardStats.totalInvoices,
-      subtitle: `+${dashboardStats.monthlyGrowth}% from last month`,
-      icon: FileText,
-      iconColor: "text-slate-500",
-      subtitleColor: "text-emerald-600 font-medium",
-    },
-    {
-      title: "Financed",
-      value: dashboardStats.totalFinanced,
-      subtitle: "Active financing agreements",
-      icon: CreditCard,
-      iconColor: "text-emerald-600",
-      subtitleColor: "text-slate-500",
-    },
-    {
-      title: "Collected",
-      value: dashboardStats.totalCollected.toLocaleString(),
-      subtitle: "Total collected this month",
-      icon: TrendingUp,
-      iconColor: "text-emerald-600",
-      subtitleColor: "text-emerald-600 font-medium",
-      valuePrefix: "R",
-    },
-    {
-      title: "Pending",
-      value: dashboardStats.pendingAmount.toLocaleString(),
-      subtitle: "Awaiting payment",
-      icon: CalendarDays,
-      iconColor: "text-slate-500",
-      subtitleColor: "text-slate-500",
-      valuePrefix: "R",
+      id: "ai-agents",
+      name: "AI Agents",
+      description: "Get personalized insights and recommendations",
+      icon: Brain,
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50",
+      borderColor: "border-indigo-200",
+      isActive: true,
+      summary: [
+        { label: "Active agents", value: 4 },
+        { label: "Insights today", value: 6 },
+        { label: "Actions suggested", value: 3 },
+      ],
+      route: "/dashboard/agents",
     },
   ];
+
+  const getHealthScoreColor = (score: number) => {
+    if (score >= 70) return "text-emerald-500";
+    if (score >= 50) return "text-amber-500";
+    return "text-red-500";
+  };
+
+  const getFactorColor = (status: "good" | "fair" | "poor") => {
+    switch (status) {
+      case "good":
+        return "text-emerald-600";
+      case "fair":
+        return "text-amber-600";
+      case "poor":
+        return "text-red-600";
+    }
+  };
+
+  const getTrendIcon = (trend?: "up" | "down" | "neutral") => {
+    if (!trend) return null;
+    if (trend === "up")
+      return <TrendingUp className="h-3 w-3 text-emerald-600" />;
+    if (trend === "down")
+      return <TrendingUp className="h-3 w-3 text-red-600 rotate-180" />;
+    return null;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <BusinessProfileModal
@@ -319,113 +215,152 @@ export function DashboardOverview() {
         title="Complete Your Business Profile"
         description="Before you can access your dashboard, we need some information about your business."
         submitButtonText="Complete Setup"
-        allowClose={false} // Don't let them close it during onboarding
+        allowClose={false}
       />
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-6 max-w-7xl mx-auto">
         {/* Welcome Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Welcome back to SisoNova
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">
+            Welcome back, {user?.business_profile[0]?.company_name || "there"}
           </h1>
-          <p className="text-slate-600">
-            Manage your receivables and track your cashflow
-          </p>
+          <p className="text-slate-600 text-sm">Your available services</p>
         </div>
 
-        {/* Stats Cards */}
-        <StatsGrid
-          cards={dashboardStatsData}
-          columns={{ md: 4, lg: 4 }}
-          className="mb-8"
-        />
-
-        {/* Service Cards */}
-        <div className="grid gap-6 md:grid-cols-3">
-          {serviceCardData.map((service: ServiceCardData) => (
-            <ServiceCard key={service.title} data={service} />
-          ))}
-        </div>
-
-        {/* Recent Invoices */}
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-slate-900">Recent Invoices</CardTitle>
-              <CardDescription className="text-slate-600">
-                Your latest invoice activity across all services
-              </CardDescription>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-slate-600 hover:text-slate-900"
-            >
-              View All
-              <ArrowUpRight className="h-4 w-4 ml-2" />
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentInvoices.map((invoice) => (
-                <div
-                  key={invoice.id}
-                  className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-4">
-                    <div>
-                      <p className="font-medium text-slate-900">
-                        {invoice.invoiceNumber}
-                      </p>
-                      <p className="text-sm text-slate-600">
-                        {invoice.buyerName}
-                      </p>
+        {/* Financial Services */}
+        <div>
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-slate-900">
+              Financial Services
+            </h2>
+            <p className="text-sm text-slate-600">
+              Digital services that help you grow your business
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {financialServices.map((service) => (
+              <Card
+                key={service.id}
+                className={`border-2 ${service.borderColor} hover:shadow-lg transition-all cursor-pointer group`}
+                onClick={() => router.push(service.route)}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between mb-3">
+                    <div
+                      className={`p-3 rounded-lg ${service.bgColor} ${service.color} group-hover:scale-110 transition-transform`}
+                    >
+                      <service.icon className="h-6 w-6" />
                     </div>
-                    <Badge
-                      variant={
-                        invoice.status === "paid"
-                          ? "default"
-                          : invoice.status === "overdue"
-                          ? "destructive"
-                          : invoice.status === "financed"
-                          ? "secondary"
-                          : "outline"
-                      }
-                      className={
-                        invoice.status === "paid"
-                          ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-100"
-                          : invoice.status === "financed"
-                          ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-100"
-                          : ""
-                      }
-                    >
-                      {invoice.status}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className={
-                        invoice.service === "financing"
-                          ? "border-emerald-200 text-emerald-700"
-                          : invoice.service === "collections"
-                          ? "border-blue-200 text-blue-700"
-                          : "border-purple-200 text-purple-700"
-                      }
-                    >
-                      {invoice.service}
-                    </Badge>
+                    {service.isActive && (
+                      <Badge className="bg-emerald-100 text-emerald-800 text-xs">
+                        Active
+                      </Badge>
+                    )}
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium text-slate-900">
-                      R{invoice.amount.toLocaleString()}
-                    </p>
-                    <p className="text-sm text-slate-500">
-                      Due: {invoice.dueDate}
-                    </p>
+                  <CardTitle className="text-base">{service.name}</CardTitle>
+                  <CardDescription className="text-xs">
+                    {service.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2.5">
+                    {service.summary.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between"
+                      >
+                        <span className="text-xs text-slate-600">
+                          {item.label}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm font-semibold text-slate-900">
+                            {item.value}
+                          </span>
+                          {getTrendIcon(item.trend)}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full mt-3 group-hover:bg-slate-100 text-xs"
+                  >
+                    View Details
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* AI-Powered Insights */}
+        <div>
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-slate-900">
+              AI-Powered Insights
+            </h2>
+            <p className="text-sm text-slate-600">
+              Smart recommendations to help grow your business
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {aiAssistants.map((service) => (
+              <Card
+                key={service.id}
+                className={`border-2 ${service.borderColor} hover:shadow-lg transition-all cursor-pointer group`}
+                onClick={() => router.push(service.route)}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between mb-3">
+                    <div
+                      className={`p-3 rounded-lg ${service.bgColor} ${service.color} group-hover:scale-110 transition-transform`}
+                    >
+                      <service.icon className="h-6 w-6" />
+                    </div>
+                    {service.isActive && (
+                      <Badge className="bg-emerald-100 text-emerald-800 text-xs">
+                        Active
+                      </Badge>
+                    )}
+                  </div>
+                  <CardTitle className="text-base">{service.name}</CardTitle>
+                  <CardDescription className="text-xs">
+                    {service.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2.5">
+                    {service.summary.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between"
+                      >
+                        <span className="text-xs text-slate-600">
+                          {item.label}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm font-semibold text-slate-900">
+                            {item.value}
+                          </span>
+                          {getTrendIcon(item.trend)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full mt-3 group-hover:bg-slate-100 text-xs"
+                  >
+                    View Details
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
