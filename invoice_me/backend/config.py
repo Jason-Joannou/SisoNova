@@ -6,10 +6,9 @@ class Secrets(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False)
     mongo_db_connection_string: str = Field(..., description="MongoDB connection string")
     mongo_db_database_name: str = Field(..., description="MongoDB database name")
-    jwt_secret_key: str = Field(..., description="Secret key for JWT encoding and decoding")
-    jwt_algorithm: str = Field(..., description="Algorithm used for JWT encoding and decoding")
-    access_token_expire_minutes: int = Field(..., description="Expiration time for access tokens in minutes")
-    refresh_token_expire_minutes: int = Field(..., description="Expiration time for refresh tokens in minutes")
+    supabase_jwks_url: str = Field(..., description="Supabase JWKS URL")
+    supabase_issuer: str = Field(..., description="Supabase auth URL")
+    supabase_audience: str = Field(..., description="Supabase auth audience")
 
 
 
