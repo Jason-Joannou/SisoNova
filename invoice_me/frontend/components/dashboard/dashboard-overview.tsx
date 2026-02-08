@@ -32,6 +32,7 @@ import { BusinessProfileModal } from "../modals/ui/business-profile";
 import { BusinessProfile } from "@/lib/types/invoicing";
 import { API_ROUTES } from "@/lib/utility/api/routes";
 import { apiClient } from "@/lib/api-client";
+import { useAppUser } from "@/lib/use-app-user";
 
 interface AvailableService {
   id: string;
@@ -62,7 +63,8 @@ interface BusinessHealth {
 
 export function DashboardOverview() {
   const router = useRouter();
-  const { user, refreshUser } = useAuth();
+  const { user, session } = useAuth();
+  const { appUser, loading, refreshAppUser } = useAppUser();
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
@@ -84,7 +86,7 @@ export function DashboardOverview() {
         throw new Error("Failed to save business profile");
       }
 
-      await refreshUser();
+      await refreshAppUser();
       setShowProfileModal(false);
     } catch (error) {
       console.error("Error saving business profile:", error);
