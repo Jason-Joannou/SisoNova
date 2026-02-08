@@ -68,10 +68,10 @@ export function DashboardOverview() {
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
-    if (user?.preferred_business_profile === null) {
+    if (appUser?.preferred_business_profile === null) {
       setShowProfileModal(true);
     }
-  }, [user?.preferred_business_profile]);
+  }, [appUser?.preferred_business_profile]);
 
   const handleBusinessProfileSubmit = async (data: BusinessProfile) => {
     try {
@@ -192,7 +192,7 @@ export function DashboardOverview() {
         {/* Welcome Header */}
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Welcome back, {user?.preferred_business_profile || "there"}
+            Welcome back, {appUser?.preferred_business_profile || "there"}
           </h1>
           <p className="text-slate-600 text-sm">Your available services</p>
         </div>
