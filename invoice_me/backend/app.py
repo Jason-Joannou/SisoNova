@@ -6,15 +6,29 @@ import logging
 from fastapi.middleware.cors import CORSMiddleware
 from routes.auth import router as auth_router
 from routes.user import router as user_router
+from contextlib import asynccontextmanager
+from database.mongo_client import MongoDBClient
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    mongo = MongoDBClient()
+    await mongo.connect()
+
+    app.state.mongo = mongo
+    yield
+
+    await mongo.disconnect()
+
 
 app_settings = AppSettings()
 app = FastAPI(
     title=app_settings.app_name,
     description=app_settings.app_description,
-    version=app_settings.app_version
+    version=app_settings.app_version,
+    lifespan=lifespan
 )
 
 app.add_middleware(
