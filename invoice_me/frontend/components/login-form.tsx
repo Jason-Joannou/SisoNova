@@ -40,7 +40,7 @@ export function LoginForm({
     setLoading(true);
 
     try {
-      await login({ email, password });
+      await login(email, password);
       return;
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
