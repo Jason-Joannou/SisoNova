@@ -10,9 +10,9 @@ class UserSubscriptionTier(str, Enum):
     PREMIUM = "premium"
 
 class User(BaseModel):
+    supabase_id: str = Field(..., description="The Supabase ID of the user")
     email: EmailStr = Field(..., description="The user's email address")
-    password_hash: Optional[str] = Field(..., description="The hashed password of the user")
-    auth_provider: AuthProvider = Field(..., description="The authentication provider for the user")
+    auth_provider: str = Field(..., description="The authentication provider for the user")
     subscription_tier: UserSubscriptionTier = Field(..., description="The subscription tier of the user")
     preferred_business_profile: Optional[str] = Field(None, description="The preferred business profile for the user")
     created_at: Optional[str] = Field(None, description="The timestamp when the user was created")
