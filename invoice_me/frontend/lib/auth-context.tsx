@@ -1,177 +1,96 @@
 "use client";
 
-import { AuthContextProps } from "./types/auth";
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import {
-  UserAuthentication,
-  AuthenticatedUser,
-  UserProfile,
-  UserUpdate,
-} from "./types/user-information";
-import { API_ROUTES } from "./utility/api/routes";
-import { getCookie, deleteCookie } from "./utils";
+import { supabase } from "@/lib/supabase/client";
+
+type AuthContextProps = {
+  user: any | null;
+  session: any | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+};
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<any | null>(null);
+  const [session, setSession] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      const token = getCookie("access_token");
-
-      if (token) {
-        // Token exists, fetch user profile
-        try {
-          const response = await fetch(`${API_ROUTES.userProfile}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (response.ok) {
-            const userData = await response.json();
-            setUser(userData);
-            setIsAuthenticated(true);
-          } else {
-            // Token is invalid, clear everything
-            logout();
-          }
-        } catch (error) {
-          console.error("Error fetching user profile:", error);
-          logout();
-        }
-      }
-
+    // Load initial session
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
       setLoading(false);
-    };
+    });
 
-    initializeAuth();
+    // Listen for auth changes
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
-  const login = async (credentials: UserAuthentication) => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_ROUTES.login}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(credentials),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        setLoading(false);
-        throw new Error(data.detail || "Login failed");
-      }
-      
-      const user = data as UserProfile;
-      setUser(user);
-      setIsAuthenticated(true);
-      setLoading(false);
-
-      // Redirect to dashboard
-      router.push("/dashboard");
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
-    }
-  };
-
-  const register = async (userData: UserAuthentication) => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_ROUTES.register}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(userData),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        setLoading(false);
-        throw new Error(data.detail || "Registration failed");
-      }
-
-      const user = data as UserProfile;
-      setUser(user);
-      setIsAuthenticated(true);
-      setLoading(false);
-
-      // Redirect to dashboard
-      router.push("/dashboard");
-    } catch (error) {
-      console.error("Registration error:", error);
-      throw error;
-    }
-  };
-
-  const logout = () => {
+  const login = async (email: string, password: string) => {
     setLoading(true);
-    setUser(null);
-    setIsAuthenticated(false);
-    setLoading(false);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-    deleteCookie("access_token");
+    if (error) {
+      setLoading(false);
+      throw error;
+    }
 
-    router.push("/login");
+    router.push("/dashboard");
   };
 
-  const refreshUser = async () => {
-    try {
-      setLoading(true);
+  const register = async (email: string, password: string) => {
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-      const response = await fetch(`${API_ROUTES.userProfile}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getCookie("access_token")}`,
-        },
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        console.log("Failed to fetch user profile");
-        throw new Error(JSON.stringify(data));
-      }
-
-      const user = data as UserProfile;
-      setUser(user);
-      setIsAuthenticated(true);
+    if (error) {
       setLoading(false);
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      setLoading(false);
+      throw error;
     }
+
+    router.push("/dashboard");
+  };
+
+  const logout = async () => {
+    setLoading(true);
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+    setLoading(false);
+    router.push("/login");
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated,
+        session,
+        loading,
         login,
         register,
         logout,
-        loading,
-        refreshUser,
       }}
     >
       {children}
@@ -181,8 +100,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 }
