@@ -4,7 +4,6 @@ import uvicorn
 from config import AppSettings
 import logging
 from fastapi.middleware.cors import CORSMiddleware
-from routes.auth import router as auth_router
 from routes.user import router as user_router
 from contextlib import asynccontextmanager
 from database.mongo_client import MongoDBClient
@@ -48,7 +47,6 @@ logger.info(f"Application description: {app_settings.app_description}")
 logger.info(f"Application version: {app_settings.app_version}")
 
 
-app.include_router(auth_router)
 app.include_router(user_router)
 @app.get("/")
 async def root():

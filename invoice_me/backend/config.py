@@ -3,7 +3,7 @@ from pydantic import Field
 from typing import Tuple, Type
 
 class Secrets(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False)
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore")
     mongo_db_connection_string: str = Field(..., description="MongoDB connection string")
     mongo_db_database_name: str = Field(..., description="MongoDB database name")
     supabase_jwks_url: str = Field(..., description="Supabase JWKS URL")
