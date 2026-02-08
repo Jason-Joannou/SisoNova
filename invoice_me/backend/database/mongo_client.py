@@ -1,21 +1,19 @@
 import asyncio
-import os
 from contextlib import asynccontextmanager
 from typing import Optional
 
-from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
-
-load_dotenv()
+from config import Secrets
 
 
 class MongoDBClient:
     """Async MongoDB client with context manager support for FastMCP"""
 
     def __init__(self) -> None:
+        self.secrets = Secrets()
         self.client: Optional[AsyncIOMotorClient] = None
-        self.connection_string = os.getenv("MONGO_DB_CONNECTION_STRING", None)
+        self.connection_string = self.secrets.mongo_db_connection_string
 
         if not self.connection_string:
             raise ValueError(
