@@ -37,12 +37,13 @@ export function ViewInvoiceModal(props: InvoicePreviewModalProps) {
     business_profile: {
       company_name: props.companyName,
       address_line_1: "123 Business St, City, Country",
-      email: "billing@SisoNova.co.za",
+      contact_email: "billing@SisoNova.co.za",
       city: "Johannesburg",
       province: "Gauteng",
+      country: "South Africa",
       postal_code: "2000",
-      phone: "+27 21 123 4567",
-      industry: "Technology",
+      contact_phone: "+27 21 123 4567",
+      industry_type: "Technology",
     },
     client_details: {
       company_name: "Client Company",
