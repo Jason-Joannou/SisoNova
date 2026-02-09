@@ -21,7 +21,7 @@ async def create_user(mongo_client: MongoDBClient, new_user_data: User) -> User:
     """Create a new user in the database"""
     try:
         print(new_user_data.model_dump())
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             result = await db["users"].insert_one(new_user_data.model_dump())
             return new_user_data
     except Exception as e:
@@ -32,7 +32,7 @@ async def create_user(mongo_client: MongoDBClient, new_user_data: User) -> User:
     
 async def get_user_by_supabase_id(mongo_client: MongoDBClient, supabase_id: str) -> User:
     try:
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             user_data = await db["users"].find_one(
                 {"supabase_id": supabase_id}, {"_id": 0}
             )  # Exclude _id field, 1 would include it
@@ -48,7 +48,7 @@ async def create_business_profile(
 ) -> str:
     """Create a new business profile in the database"""
     try:
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             result = await db["business_profiles"].insert_one(
                 user_business_profile_collection.model_dump()
             )
@@ -63,7 +63,7 @@ async def update_user_business_profile(
 ) -> bool:
     """Update the business profile of a user"""
     try:
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             result = await db["users"].update_one(
                 {"email": email},
                 {
@@ -84,7 +84,7 @@ async def get_user_information(
 ) -> VerifyUser | None:
     """Retrieve user information by email"""
     try:
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             user_data = await db["users"].find_one(
                 {"email": email}, {"_id": 0}
             )  # Exclude _id field, 1 would include it
@@ -99,7 +99,7 @@ async def get_user_profile(
 ) -> UserProfile | None:
     """Retrieve the user profile by email"""
     try:
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             # User data does not include business profile any more
             user_data = await db["users"].find_one({"email": email})
             preferred_business_profile = await db["business_profiles"].find_one(
@@ -132,7 +132,7 @@ async def get_user_business_profile_company_names(
     mongo_client: MongoDBClient, supabase_id: str
 ) -> List[str] | None:
     try:
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             business_profiles = await db["business_profiles"].find(
                 {"supabase_id": supabase_id}, {"_id": 0}
             )  # Exclude _id field, 1 would include it
@@ -146,7 +146,7 @@ async def get_user_business_profiles(
     mongo_client: MongoDBClient, email: str
 ) -> List[BusinessProfile] | None:
     try:
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             business_profiles = await db["business_profiles"].find_one(
                 {"email": email}, {"_id": 0}
             )  # Exclude _id field, 1 would include it
@@ -160,7 +160,7 @@ async def get_business_profile_with_company_name(
     mongo_client: MongoDBClient, supabase_id: str, company_name: str
 ) -> BusinessProfile | None:
     try:
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             business_profiles = await db["business_profiles"].find_one(
                 {"supabase_id": supabase_id, "company_name": company_name}, {"_id": 0}
             )  # Exclude _id field, 1 would include it
@@ -176,7 +176,7 @@ async def update_user_information(
     """Update base user information in the database"""
 
     try:
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             result = await db["users"].update_one(
                 {"supabase_id": supabase_id}, {"$set": user_update.model_dump(exclude_unset=True)}
             )
@@ -190,7 +190,7 @@ async def add_business_profile_operation(
     mongo_client: MongoDBClient, supabase_id: str, business_profile: BusinessProfile
 ):
     try:
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             result = await db["business_profiles"].update_one(
                 {"supabase_id": supabase_id},
                 {
@@ -211,7 +211,7 @@ async def update_business_profile_operation(
     business_profile: UpdateBusinessProfile,
 ):
     try:
-        async with mongo_client.get_db(secrets.mongo_db_database_name) as db:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
             result = await db["users"].update_one(
                 {"supabase_id": supabase_id, "business_profile.company_name": company_name},
                 {

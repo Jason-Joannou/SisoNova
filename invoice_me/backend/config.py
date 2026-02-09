@@ -5,7 +5,8 @@ from typing import Tuple, Type
 class Secrets(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore")
     mongo_db_connection_string: str = Field(..., description="MongoDB connection string")
-    mongo_db_database_name: str = Field(..., description="MongoDB database name")
+    mongo_db_prod_database_name: str = Field(..., description="MongoDB prod database name")
+    mongo_db_staging_database_name: str = Field(..., description="MongoDB staging database name")
     supabase_jwks_url: str = Field(..., description="Supabase JWKS URL")
     supabase_issuer: str = Field(..., description="Supabase auth URL")
     supabase_audience: str = Field(..., description="Supabase auth audience")
@@ -18,6 +19,7 @@ class AppSettings(BaseSettings):
     app_description: str = Field(..., description="A brief description of the application")
     app_version: str = Field(..., description="The version of the application")
     environment: str = Field(..., description="The environment the application is running in")
+    allowed_origins: list[str] = Field(default=["http://localhost:3000"], description="A list of allowed origins for CORS")
 
     # Needed to read from JSON file
     @classmethod

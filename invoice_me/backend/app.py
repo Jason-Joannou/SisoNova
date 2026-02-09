@@ -32,10 +32,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],  # Or list your frontend origins
+    allow_origins=app_settings.allowed_origins,  # Or list your frontend origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,6 +42,8 @@ app.add_middleware(
 logger.info(f"Application name: {app_settings.app_name}")
 logger.info(f"Application description: {app_settings.app_description}")
 logger.info(f"Application version: {app_settings.app_version}")
+logger.info(f"Environment: {app_settings.environment}")
+logger.info(f"Allowed origins: {app_settings.allowed_origins}")
 
 
 app.include_router(user_router)

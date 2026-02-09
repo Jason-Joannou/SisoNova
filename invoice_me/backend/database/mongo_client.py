@@ -5,6 +5,7 @@ from typing import Optional
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
 from config import Secrets
+from config import AppSettings
 
 
 class MongoDBClient:
@@ -14,11 +15,21 @@ class MongoDBClient:
         self.secrets = Secrets()
         self.client: Optional[AsyncIOMotorClient] = None
         self.connection_string = self.secrets.mongo_db_connection_string
+        self.database_name = self._set_database_target()
 
         if not self.connection_string:
             raise ValueError(
                 "MONGO_DB_CONNECTION_STRING not found in environment variables"
             )
+    
+    
+    def _set_database_target(self) -> str:
+        environment = AppSettings().environment
+        if environment == "production":
+            return self.secrets.mongo_db_prod_database_name
+        
+        return self.secrets.mongo_db_staging_database_name
+
 
     async def connect(self):
         """Initialize the MongoDB client connection"""
