@@ -3,4 +3,7 @@ import { Config } from "./types/secrets";
 export const config: Config = {
   SUPABASE_PROJECT_URL: process.env.NEXT_PUBLIC_SUPABASE_PROJECT_URL!,
   SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  ENVIRONMENT: process.env.NEXT_PUBLIC_ENVIRONMENT!,
+  STAGING_API_URL: process.env.NEXT_PUBLIC_API_STAGING_URL!,
+  PRODUCTION_API_URL: process.env.NEXT_PUBLIC_API_PRODUCTION_URL!
 };

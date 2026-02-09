@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase/client";
+import { config } from "./secrets";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL = config.ENVIRONMENT === "production" ? config.PRODUCTION_API_URL : config.ENVIRONMENT === "staging" ? config.STAGING_API_URL : "http://localhost:8000"
 
 export async function apiClient(
   endpoint: string,
