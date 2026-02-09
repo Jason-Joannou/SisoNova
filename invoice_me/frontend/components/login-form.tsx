@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { LoadingOverlay } from "./loading";
 import { supabase } from "@/lib/supabase/client";
+import { config } from "@/lib/secrets";
 
 export function LoginForm({
   className,
@@ -26,10 +27,11 @@ export function LoginForm({
   const { login } = useAuth();
 
   const handleGoogleLogin = async () => {
+    const redirect = config.ENVIRONMENT === "production" ? config.PRODUCTION_API_URL : config.ENVIRONMENT === "staging" ? config.STAGING_API_URL : "http://localhost:8000"
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "http://localhost:3000/auth/callback",
+        redirectTo: redirect,
       },
     });
   };

@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import { Shield } from "lucide-react";
 import { LoadingOverlay } from "./loading";
+import { config } from "@/lib/secrets";
 
 export function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -65,11 +66,12 @@ export function RegisterForm() {
   const handleGoogleSignup = async () => {
     setError("");
     setLoading(true);
+    const redirect = config.ENVIRONMENT === "production" ? config.PRODUCTION_API_URL : config.ENVIRONMENT === "staging" ? config.STAGING_API_URL : "http://localhost:8000"
 
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "http://localhost:3000/auth/callback",
+        redirectTo: redirect,
       },
     });
   };
