@@ -10,6 +10,7 @@ class Secrets(BaseSettings):
     supabase_jwks_url: str = Field(..., description="Supabase JWKS URL")
     supabase_issuer: str = Field(..., description="Supabase auth URL")
     supabase_audience: str = Field(..., description="Supabase auth audience")
+    environment: str = Field(..., description="The environment the application is running in")
 
 
 
@@ -18,7 +19,6 @@ class AppSettings(BaseSettings):
     app_name: str = Field(..., description="The name of the application")
     app_description: str = Field(..., description="A brief description of the application")
     app_version: str = Field(..., description="The version of the application")
-    environment: str = Field(..., description="The environment the application is running in")
     allowed_origins: list[str] = Field(default=["http://localhost:3000"], description="A list of allowed origins for CORS")
 
     # Needed to read from JSON file

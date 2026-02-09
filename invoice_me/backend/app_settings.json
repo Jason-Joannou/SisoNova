@@ -2,6 +2,5 @@
     "app_name": "InvoiceMe Backend",
     "app_description": "Backend settings for InvoiceMe application",
     "app_version": "1.0.0",
-    "environment": "staging",
-    "allowed_origings": ["https://sisonova-staging-frontend.onrender.com"]
+    "allowed_origins": ["https://sisonova-staging.onrender.com", "http://localhost:8000", "https://sisonova.onrender.com"]
 }

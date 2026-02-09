@@ -24,7 +24,7 @@ class MongoDBClient:
     
     
     def _set_database_target(self) -> str:
-        environment = AppSettings().environment
+        environment = self.secrets.environment
         if environment == "production":
             return self.secrets.mongo_db_prod_database_name
         

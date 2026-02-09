@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import os
 import uvicorn
-from config import AppSettings
+from config import AppSettings, Secrets
 import logging
 from fastapi.middleware.cors import CORSMiddleware
 from routes.user import router as user_router
@@ -23,6 +23,7 @@ async def lifespan(app: FastAPI):
 
 
 app_settings = AppSettings()
+app_secrets = Secrets()
 app = FastAPI(
     title=app_settings.app_name,
     description=app_settings.app_description,
@@ -42,7 +43,7 @@ app.add_middleware(
 logger.info(f"Application name: {app_settings.app_name}")
 logger.info(f"Application description: {app_settings.app_description}")
 logger.info(f"Application version: {app_settings.app_version}")
-logger.info(f"Environment: {app_settings.environment}")
+logger.info(f"Environment: {app_secrets.environment}")
 logger.info(f"Allowed origins: {app_settings.allowed_origins}")
 
 
@@ -56,5 +57,5 @@ if __name__ == "__main__":
         "app:app",
         host="0.0.0.0",
         port=int(os.getenv("PORT", 8000)),
-        reload=True if app_settings.environment != "production" else False
+        reload=True if app_secrets.environment != "production" else False
     )
