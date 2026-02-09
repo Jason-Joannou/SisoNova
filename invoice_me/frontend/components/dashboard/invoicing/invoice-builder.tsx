@@ -51,13 +51,13 @@ const defaultBusinessProfile: BusinessProfile = {
   address_line_2: "Suite 456",
   city: "Cape Town",
   province: "Western Cape",
+  country: "South Africa",
   postal_code: "8001",
   vat_number: "4123456789",
   company_registration: "2023/123456/07",
-  email: "billing@SisoNova.co.za",
-  phone: "+27 21 123 4567",
-  website: "www.SisoNova.co.za",
-  industry: "consulting",
+  contact_email: "billing@SisoNova.co.za",
+  contact_phone: "+27 21 123 4567",
+  industry_type: "consulting",
 };
 
 const defaultClientDetails: ClientDetails = {
@@ -465,7 +465,7 @@ export function InvoiceBuilder({
                       <div className="flex items-center gap-2">
                         <Mail className="h-3 w-3 text-slate-500" />
                         <EditableInputField
-                          value={config.business_profile.email}
+                          value={config.business_profile.contact_email}
                           type="email"
                           placeholder="your@email.com"
                           onEdit={(value) => {
@@ -480,7 +480,7 @@ export function InvoiceBuilder({
                       <div className="flex items-center gap-2">
                         <Phone className="h-3 w-3 text-slate-500" />
                         <EditableInputField
-                          value={config.business_profile.phone}
+                          value={config.business_profile.contact_phone}
                           placeholder="+27 11 123 4567"
                           onEdit={(value) => {
                             updateInvoiceConfig(
@@ -881,8 +881,8 @@ export function InvoiceBuilder({
               <div className="bg-slate-800 text-white p-4 rounded text-center">
                 <p className="text-sm">
                   <strong>{config.business_profile.company_name}</strong> |{" "}
-                  {config.business_profile.email} |{" "}
-                  {config.business_profile.phone}
+                  {config.business_profile.contact_email} |{" "}
+                  {config.business_profile.contact_phone}
                 </p>
                 <p className="text-xs mt-1">
                   This invoice was generated electronically and is valid without
