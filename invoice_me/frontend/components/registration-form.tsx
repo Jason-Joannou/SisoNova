@@ -66,7 +66,9 @@ export function RegisterForm() {
   const handleGoogleSignup = async () => {
     setError("");
     setLoading(true);
-    const redirect = config.ENVIRONMENT === "production" ? config.PRODUCTION_API_URL : config.ENVIRONMENT === "staging" ? config.STAGING_API_URL : "http://localhost:8000"
+    const baseUrl = config.ENVIRONMENT === "production" ? config.PRODUCTION_API_URL : config.ENVIRONMENT === "staging" ? config.STAGING_API_URL : "http://localhost:3000"
+    const redirect = `${baseUrl}/auth/callback`;
+    
 
     await supabase.auth.signInWithOAuth({
       provider: "google",

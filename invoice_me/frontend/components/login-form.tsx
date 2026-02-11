@@ -27,7 +27,9 @@ export function LoginForm({
   const { login } = useAuth();
 
   const handleGoogleLogin = async () => {
-    const redirect = config.ENVIRONMENT === "production" ? config.PRODUCTION_API_URL : config.ENVIRONMENT === "staging" ? config.STAGING_API_URL : "http://localhost:8000"
+    const baseUrl = config.ENVIRONMENT === "production" ? config.PRODUCTION_API_URL : config.ENVIRONMENT === "staging" ? config.STAGING_API_URL : "http://localhost:3000"
+    const redirect = `${baseUrl}/auth/callback`;
+    
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
