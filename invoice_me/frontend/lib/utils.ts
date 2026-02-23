@@ -18,3 +18,9 @@ export function setCookie(name: string, value: string) {
 export function deleteCookie(name: string) {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 }
+
+export function getInitials(name?: string, email?: string){
+  if (name) return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  if (email) return email[0].toUpperCase();
+  return "??";
+};
