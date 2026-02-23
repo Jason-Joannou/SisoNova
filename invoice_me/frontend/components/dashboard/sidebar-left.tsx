@@ -34,6 +34,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { NavigationItem, UserData } from "@/lib/types/user-interface"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
+import { useAuth } from "@/lib/auth-context"
 
 const navigationItems: NavigationItem[] = [
   {
@@ -104,14 +105,16 @@ const userData: UserData = {
 }
 
 export function SidebarLeft() {
+  const { user, session, logout } = useAuth();
   const pathname = usePathname()
   const [isInvoicingOpen, setIsInvoicingOpen] = useState(
     pathname?.startsWith("/dashboard/invoicing") || false
   )
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // Add your logout logic here
     console.log("Logging out...")
+    await logout()
     // window.location.href = "/login"
   }
 
