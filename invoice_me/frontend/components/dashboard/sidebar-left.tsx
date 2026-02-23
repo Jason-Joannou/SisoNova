@@ -31,10 +31,12 @@ import {
 } from "@/components/ui/collapsible"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { NavigationItem, UserData } from "@/lib/types/user-interface"
+import { NavigationItem } from "@/lib/types/user-interface"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
+import { useAppUser } from "@/lib/use-app-user"
 import { useAuth } from "@/lib/auth-context"
+import { getInitials } from "@/lib/utils"
 
 const navigationItems: NavigationItem[] = [
   {
@@ -96,16 +98,10 @@ const settingsItems: NavigationItem[] = [
   },
 ]
 
-// Mock user data - replace with actual user data from your auth system
-const userData: UserData = {
-  name: "Jason Joannou",
-  email: "jjoannou@bscglobal.com",
-  avatar: "", // Add avatar URL if available
-  initials: "JJ"
-}
 
 export function SidebarLeft() {
-  const { user, session, logout } = useAuth();
+  const { user, logout } = useAuth(); // 'user' is the Supabase Auth user
+  const { appUser, loading } = useAppUser(); // 'appUser' is your MongoDB user
   const pathname = usePathname()
   const [isInvoicingOpen, setIsInvoicingOpen] = useState(
     pathname?.startsWith("/dashboard/invoicing") || false
@@ -117,6 +113,10 @@ export function SidebarLeft() {
     await logout()
     // window.location.href = "/login"
   }
+
+  const displayName = user?.user_metadata?.full_name || appUser?.preferred_business_profile
+  const userEmail = user?.email || "";
+  const initials = getInitials(displayName, userEmail);
 
   const isActive = (url: string) => {
     if (url === "/dashboard/invoicing") {
@@ -237,22 +237,27 @@ export function SidebarLeft() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2 h-auto hover:bg-slate-50">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={userData.avatar} alt={userData.name} />
+                {/* Supabase user metadata often stores avatar_url from Google/OAuth */}
+                <AvatarImage src={user?.user_metadata?.avatar_url} alt={displayName} />
                 <AvatarFallback className="bg-emerald-100 text-emerald-700 text-sm font-medium">
-                  {userData.initials}
+                  {loading ? "..." : initials}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex flex-col items-start text-left">
-                <span className="text-sm font-medium text-slate-900">{userData.name}</span>
-                <span className="text-xs text-slate-500">{userData.email}</span>
+              <div className="flex flex-col items-start text-left overflow-hidden">
+                <span className="text-sm font-medium text-slate-900 truncate w-full">
+                  {loading ? "Loading..." : displayName}
+                </span>
+                <span className="text-xs text-slate-500 truncate w-full">
+                  {userEmail}
+                </span>
               </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{userData.name}</p>
-                <p className="text-xs leading-none text-slate-500">{userData.email}</p>
+                <p className="text-sm font-medium leading-none">{displayName}</p>
+                <p className="text-xs leading-none text-slate-500">{userEmail}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

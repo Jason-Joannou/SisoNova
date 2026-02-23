@@ -18,13 +18,6 @@ export interface NavigationItem {
   color: string;
 }
 
-export interface UserData {
-  name: string;
-  email: string;
-  avatar: string;
-  initials: string;
-}
-
 export interface StatsCardData {
   title: string;
   value: string | number;
