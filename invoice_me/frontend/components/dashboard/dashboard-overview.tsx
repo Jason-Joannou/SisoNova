@@ -12,17 +12,10 @@ import { Button } from "../ui/button";
 import { ComingSoon } from "../ui/coming-soon";
 import { useRouter } from "next/navigation";
 import {
-  AlertCircle,
   TrendingUp,
-  DollarSign,
-  ArrowUpRight,
-  Wallet,
   Zap,
   CreditCard,
   Smartphone,
-  Clock,
-  Activity,
-  MessageSquare,
   Brain,
   ChevronRight,
 } from "lucide-react";
@@ -33,33 +26,7 @@ import { BusinessProfile } from "@/lib/types/invoicing";
 import { API_ROUTES } from "@/lib/utility/api/routes";
 import { apiClient } from "@/lib/api-client";
 import { useAppUser } from "@/lib/use-app-user";
-
-interface AvailableService {
-  id: string;
-  name: string;
-  description: string;
-  icon: any;
-  color: string;
-  bgColor: string;
-  borderColor: string;
-  isActive: boolean;
-  comingSoon?: boolean;
-  summary: {
-    label: string;
-    value: string | number;
-    trend?: "up" | "down" | "neutral";
-  }[];
-  route: string;
-}
-
-interface BusinessHealth {
-  score: number;
-  factors: {
-    label: string;
-    status: "good" | "fair" | "poor";
-    value: string;
-  }[];
-}
+import { AvailableService } from "@/lib/types/dashboard";
 
 export function DashboardOverview() {
   const router = useRouter();

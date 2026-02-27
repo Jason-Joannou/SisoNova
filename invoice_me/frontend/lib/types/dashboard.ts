@@ -36,5 +36,23 @@ export interface ServiceQuickStats {
   serviceTilte: string;
   serviceValue: number;
   serviceValueAffix?: string;
-  affixPosition?: string; 
+  affixPosition?: string;
+}
+
+export interface AvailableService {
+  id: string;
+  name: string;
+  description: string;
+  icon: any;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+  isActive: boolean;
+  comingSoon?: boolean;
+  summary: {
+    label: string;
+    value: string | number;
+    trend?: "up" | "down" | "neutral";
+  }[];
+  route: string;
 }
