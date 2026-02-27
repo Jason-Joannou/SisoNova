@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/collapsible"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { NavigationItem } from "@/lib/types/user-interface"
+import { NavigationItem, NavigationSubItem } from "@/lib/types/user-interface"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { useAppUser } from "@/lib/use-app-user"
@@ -66,7 +66,7 @@ const navigationItems: NavigationItem[] = [
 ]
 
 // Invoicing submenu items
-const invoicingSubItems = [
+const invoicingSubItems: NavigationSubItem[] = [
   {
     title: "Overview",
     url: "/dashboard/invoicing",
@@ -117,6 +117,8 @@ export function SidebarLeft() {
   const displayName = user?.user_metadata?.full_name || appUser?.preferred_business_profile
   const userEmail = user?.email || "";
   const initials = getInitials(displayName, userEmail);
+  const userImage = user?.user_metadata?.avatar_url
+  const isValidImage = userImage && userImage.startsWith("http");
 
   const isActive = (url: string) => {
     if (url === "/dashboard/invoicing") {
@@ -149,8 +151,8 @@ export function SidebarLeft() {
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
+                  <SidebarMenuButton
+                    asChild
                     className="hover:bg-slate-50 data-[active=true]:bg-emerald-50 data-[active=true]:text-emerald-700"
                     isActive={isActive(item.url)}
                   >
@@ -170,22 +172,21 @@ export function SidebarLeft() {
               >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton 
+                    <SidebarMenuButton
                       className="hover:bg-slate-50 data-[active=true]:bg-purple-50 data-[active=true]:text-purple-700"
                       isActive={pathname?.startsWith("/dashboard/invoicing")}
                     >
                       <Smartphone className="h-4 w-4 text-purple-600" />
                       <span className="text-slate-700 font-medium">Invoicing</span>
-                      <ChevronDown className={`ml-auto h-4 w-4 text-slate-500 transition-transform duration-200 ${
-                        isInvoicingOpen ? "rotate-180" : ""
-                      }`} />
+                      <ChevronDown className={`ml-auto h-4 w-4 text-slate-500 transition-transform duration-200 ${isInvoicingOpen ? "rotate-180" : ""
+                        }`} />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {invoicingSubItems.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton 
+                          <SidebarMenuSubButton
                             asChild
                             isActive={isActive(subItem.url)}
                             className="hover:bg-slate-50 data-[active=true]:bg-purple-50 data-[active=true]:text-purple-700"
@@ -214,8 +215,8 @@ export function SidebarLeft() {
             <SidebarMenu>
               {settingsItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
+                  <SidebarMenuButton
+                    asChild
                     className="hover:bg-slate-50"
                     isActive={isActive(item.url)}
                   >
@@ -238,7 +239,7 @@ export function SidebarLeft() {
             <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2 h-auto hover:bg-slate-50">
               <Avatar className="h-8 w-8">
                 {/* Supabase user metadata often stores avatar_url from Google/OAuth */}
-                <AvatarImage src={user?.user_metadata?.avatar_url} alt={displayName} />
+                <AvatarImage src={userImage} alt={displayName} referrerPolicy="no-referrer" />
                 <AvatarFallback className="bg-emerald-100 text-emerald-700 text-sm font-medium">
                   {loading ? "..." : initials}
                 </AvatarFallback>
@@ -274,7 +275,7 @@ export function SidebarLeft() {
               </a>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={handleLogout}
               className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
             >

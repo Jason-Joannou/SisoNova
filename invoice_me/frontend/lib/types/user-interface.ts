@@ -18,6 +18,13 @@ export interface NavigationItem {
   color: string;
 }
 
+export interface NavigationSubItem {
+  title: string;
+  url: string;
+  icon: any;
+  color?: string;
+}
+
 export interface StatsCardData {
   title: string;
   value: string | number;
