@@ -145,7 +145,7 @@ export function DashboardOverview() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="w-full">
       <BusinessProfileModal
         open={showProfileModal}
         onOpenChange={setShowProfileModal}
@@ -159,20 +159,17 @@ export function DashboardOverview() {
         {/* Welcome Header */}
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Welcome back, {appUser?.preferred_business_profile || "there"}
+            Welcome back {appUser?.preferred_business_profile || ""}!
           </h1>
-          <p className="text-slate-600 text-sm">Your available services</p>
         </div>
 
         {/* Financial Services */}
         <div>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-slate-900">
-              Financial Services
+              Your Available Services
             </h2>
-            <p className="text-sm text-slate-600">
-              Digital services that help you grow your business
-            </p>
+            
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {financialServices.map((service) => (
