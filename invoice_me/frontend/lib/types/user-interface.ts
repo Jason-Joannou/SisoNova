@@ -16,6 +16,8 @@ export interface NavigationItem {
   url: string;
   icon: any;
   color: string;
+  hasSubItems?: boolean;
+  subItems?: NavigationSubItem[];
 }
 
 export interface NavigationSubItem {

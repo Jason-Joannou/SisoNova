@@ -1,6 +1,6 @@
 "use client"
 
-import { BarChart3, Home, Settings, TrendingUp, Smartphone, LogOut, User, Zap, ChevronDown, LayoutDashboard, Plus, CalendarDays } from "lucide-react"
+import { Settings, Smartphone, LogOut, User, ChevronDown } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -31,72 +31,12 @@ import {
 } from "@/components/ui/collapsible"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { NavigationItem, NavigationSubItem } from "@/lib/types/user-interface"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { useAppUser } from "@/lib/use-app-user"
 import { useAuth } from "@/lib/auth-context"
 import { getInitials } from "@/lib/utils"
-
-const navigationItems: NavigationItem[] = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: Home,
-    color: "text-slate-600"
-  },
-  {
-    title: "Financing",
-    url: "/dashboard/financing",
-    icon: Zap,
-    color: "text-emerald-600"
-  },
-  {
-    title: "Collections",
-    url: "/dashboard/collections",
-    icon: TrendingUp,
-    color: "text-blue-600"
-  },
-  {
-    title: "Grow Your Business",
-    url: "/dashboard/grow",
-    icon: TrendingUp,
-    color: "text-emerald-600"
-  },
-]
-
-// Invoicing submenu items
-const invoicingSubItems: NavigationSubItem[] = [
-  {
-    title: "Overview",
-    url: "/dashboard/invoicing",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Analytics",
-    url: "/dashboard/invoicing/analytics",
-    icon: BarChart3,
-  },
-  {
-    title: "Create Invoice",
-    url: "/dashboard/invoicing/create",
-    icon: Plus,
-  },
-  {
-    title: "Calendar",
-    url: "/dashboard/invoicing/calendar",
-    icon: CalendarDays,
-  },
-]
-
-const settingsItems: NavigationItem[] = [
-  {
-    title: "Settings",
-    url: "/dashboard/settings",
-    icon: Settings,
-    color: "text-slate-600"
-  },
-]
+import { navigationItems, settingsItems } from "@/lib/config/sidebar/config"
 
 
 export function SidebarLeft() {
@@ -121,11 +61,14 @@ export function SidebarLeft() {
   const isValidImage = userImage && userImage.startsWith("http");
 
   const isActive = (url: string) => {
-    if (url === "/dashboard/invoicing") {
-      return pathname === url
-    }
-    return pathname === url || pathname?.startsWith(url + "/")
-  }
+  if (!pathname) return false;
+
+  if (pathname === url) return true;
+
+  if (url === "/dashboard") return false;
+
+  return pathname.startsWith(url + "/");
+};
 
   return (
     <Sidebar className="border-r border-slate-200">
@@ -149,59 +92,73 @@ export function SidebarLeft() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigationItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className="hover:bg-slate-50 data-[active=true]:bg-emerald-50 data-[active=true]:text-emerald-700"
-                    isActive={isActive(item.url)}
-                  >
-                    <a href={item.url} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors">
-                      <item.icon className={`h-4 w-4 ${item.color}`} />
-                      <span className="text-slate-700 font-medium">{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {navigationItems.map((item) => {
+                const isSubActive = item.subItems?.some(sub => isActive(sub.url));
+                const isItemActive = isActive(item.url);
+                const activeAny = isSubActive || isItemActive;
 
-              {/* Invoicing with Collapsible Submenu */}
-              <Collapsible
-                open={isInvoicingOpen}
-                onOpenChange={setIsInvoicingOpen}
-                className="group/collapsible"
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton
-                      className="hover:bg-slate-50 data-[active=true]:bg-purple-50 data-[active=true]:text-purple-700"
-                      isActive={pathname?.startsWith("/dashboard/invoicing")}
+                // Define active colors based on the item title or config
+                // This ensures Invoicing stays purple and others stay emerald/blue
+                const activeClass = item.title === "Invoicing"
+                  ? "data-[active=true]:bg-purple-50 data-[active=true]:text-purple-700"
+                  : "data-[active=true]:bg-emerald-50 data-[active=true]:text-emerald-700";
+
+                if (item.hasSubItems && item.subItems) {
+                  return (
+                    <Collapsible
+                      key={item.title}
+                      defaultOpen={activeAny}
+                      className="group/collapsible"
                     >
-                      <Smartphone className="h-4 w-4 text-purple-600" />
-                      <span className="text-slate-700 font-medium">Invoicing</span>
-                      <ChevronDown className={`ml-auto h-4 w-4 text-slate-500 transition-transform duration-200 ${isInvoicingOpen ? "rotate-180" : ""
-                        }`} />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {invoicingSubItems.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={isActive(subItem.url)}
-                            className="hover:bg-slate-50 data-[active=true]:bg-purple-50 data-[active=true]:text-purple-700"
+                      <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton
+                            isActive={activeAny}
+                            className={`hover:bg-slate-50 transition-colors ${activeClass}`}
                           >
-                            <a href={subItem.url} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors">
-                              <subItem.icon className="h-4 w-4 text-purple-500" />
-                              <span className="text-slate-700">{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+                            <item.icon className={`h-4 w-4 ${activeAny ? 'text-current' : item.color}`} />
+                            <span className="font-medium">{item.title}</span>
+                            <ChevronDown className="ml-auto h-4 w-4 text-slate-500 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {item.subItems.map((subItem) => (
+                              <SidebarMenuSubItem key={subItem.title}>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  isActive={isActive(subItem.url)}
+                                  className="hover:bg-slate-50 data-[active=true]:bg-slate-100 data-[active=true]:text-slate-900"
+                                >
+                                  <a href={subItem.url} className="flex items-center gap-3">
+                                    <subItem.icon className={`h-4 w-4 ${isActive(subItem.url) ? 'text-purple-600' : 'text-slate-500'}`} />
+                                    <span>{subItem.title}</span>
+                                  </a>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </SidebarMenuItem>
+                    </Collapsible>
+                  );
+                }
+
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      className={`hover:bg-slate-50 ${activeClass}`}
+                      isActive={isItemActive}
+                    >
+                      <a href={item.url} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors">
+                        <item.icon className={`h-4 w-4 ${isItemActive ? 'text-current' : item.color}`} />
+                        <span className="font-medium">{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
