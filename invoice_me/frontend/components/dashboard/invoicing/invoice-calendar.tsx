@@ -139,7 +139,7 @@ export function InvoiceCalendar() {
     <div className="min-h-screen bg-[#F8FAFC] p-4 lg:p-10 font-sans">
       <div className="max-w-[1400px] mx-auto space-y-12">
         
-        {/* 1. NARRATIVE HEADER */}
+        {/* 1. NARRATIVE HEADER (Condensed/Polished) */}
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-100 pb-10">
           <div className="space-y-1">
             <h1 className="text-4xl font-black text-slate-900 tracking-tighter italic">
@@ -147,11 +147,9 @@ export function InvoiceCalendar() {
             </h1>
             <p className="text-slate-500 text-sm leading-relaxed max-w-lg">
               Manage upcoming deadlines and visualize your cash flow rhythm. 
-              <span className="text-slate-900 font-bold ml-1">Track what's due to ensure steady liquidity.</span>
             </p>
           </div>
           
-          {/* Navigation Controls */}
           <div className="flex items-center gap-3 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
              <Button variant="ghost" size="sm" onClick={() => navigateMonth('prev')} className="h-9 w-9 rounded-xl hover:bg-slate-50"><ChevronLeft className="h-4 w-4" /></Button>
              <span className="text-[10px] font-black uppercase tracking-widest min-w-[120px] text-center">{monthYear}</span>
@@ -177,18 +175,46 @@ export function InvoiceCalendar() {
                 {Array.from({ length: daysInMonth }, (_, i) => {
                   const day = i + 1;
                   const invoicesForDay = getInvoicesForDate(day);
+                  const isCurrentDay = isToday(day);
+                  
+                  // HIGHLIGHT LOGIC: Is the currently selected invoice on THIS day?
+                  const isDaySelected = selectedInvoice && 
+                    new Date(selectedInvoice.dueDate).getDate() === day &&
+                    new Date(selectedInvoice.dueDate).getMonth() === currentDate.getMonth();
+
                   return (
-                    <div key={day} className={`min-h-[100px] p-3 rounded-[1.5rem] border transition-all ${isToday(day) ? 'bg-purple-50 border-purple-200' : 'bg-slate-50/50 border-slate-100 hover:border-slate-200'}`}>
-                      <div className={`text-xs font-black mb-2 ${isToday(day) ? 'text-purple-600' : 'text-slate-400'}`}>{day}</div>
+                    <div 
+                      key={day} 
+                      className={`min-h-[110px] p-3 rounded-[1.5rem] border transition-all duration-300 relative group
+                        ${isDaySelected 
+                          ? 'border-purple-600 bg-white shadow-xl shadow-purple-100 z-10 scale-[1.02]' 
+                          : isCurrentDay 
+                            ? 'bg-purple-600 border-purple-600 shadow-lg shadow-purple-200' 
+                            : 'bg-slate-50/50 border-slate-100 hover:border-slate-300 hover:bg-white'
+                        }`}
+                    >
+                      <div className={`text-xs font-black mb-2 flex justify-between items-center
+                        ${isCurrentDay ? 'text-white' : isDaySelected ? 'text-purple-600' : 'text-slate-400'}`}>
+                        {day}
+                        {isCurrentDay && <div className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />}
+                      </div>
+
                       <div className="space-y-1.5">
                         {invoicesForDay.map(inv => (
                           <div 
                             key={inv.id} 
-                            onClick={() => setSelectedInvoice(inv)}
-                            className={`px-2 py-1 rounded-lg text-[9px] font-bold truncate cursor-pointer transition-transform hover:scale-105 border 
-                              ${inv.status === 'overdue' ? 'bg-rose-50 text-rose-600 border-rose-100' : 
-                                inv.status === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
-                                'bg-white border-slate-200 text-slate-600'}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedInvoice(inv);
+                            }}
+                            className={`px-2 py-1 rounded-lg text-[9px] font-bold truncate cursor-pointer transition-all border
+                              ${selectedInvoice?.id === inv.id 
+                                ? 'bg-purple-600 text-white border-purple-600 scale-105 shadow-md' 
+                                : isCurrentDay 
+                                  ? 'bg-white/20 text-white border-transparent'
+                                  : inv.status === 'overdue' 
+                                    ? 'bg-rose-50 text-rose-600 border-rose-100 hover:bg-rose-100' 
+                                    : 'bg-white border-slate-200 text-slate-600 hover:border-purple-300'}`}
                           >
                             {inv.buyerName}
                           </div>
@@ -203,15 +229,16 @@ export function InvoiceCalendar() {
 
           {/* 3. CONTEXTUAL DETAILS SIDEBAR */}
           <aside className="col-span-12 lg:col-span-4 space-y-8">
-             <Card className="rounded-[2.5rem] border-none shadow-2xl shadow-slate-200/50 bg-white p-8">
+             <Card className={`rounded-[2.5rem] border-none shadow-2xl transition-all duration-500 p-8
+                ${selectedInvoice ? 'bg-white shadow-purple-100' : 'bg-slate-50/50 shadow-slate-200'}`}>
                 <CardHeader className="p-0 mb-6">
-                  <CardTitle className="text-xl font-black text-slate-900 tracking-tight">Focus Date</CardTitle>
+                  <CardTitle className="text-xl font-black text-slate-900 tracking-tight">Invoice Detail</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                   {selectedInvoice ? (
-                    <div className="space-y-6">
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
                       <div className="flex justify-between items-start">
-                        <div>
+                        <div className="space-y-1">
                           <p className="text-sm font-black text-slate-900">{selectedInvoice.invoiceNumber}</p>
                           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{selectedInvoice.buyerName}</p>
                         </div>
@@ -223,40 +250,42 @@ export function InvoiceCalendar() {
                         </Badge>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="p-4 bg-slate-50 rounded-2xl">
+                      <div className="grid grid-cols-2 gap-4 text-center">
+                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Amount</p>
                           <p className="text-sm font-black text-slate-900 mt-1">R{selectedInvoice.amount.toLocaleString()}</p>
                         </div>
-                        <div className="p-4 bg-slate-50 rounded-2xl">
+                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Due Date</p>
-                          <p className="text-sm font-black text-slate-900 mt-1">{selectedInvoice.dueDate}</p>
+                          <p className="text-sm font-black text-slate-900 mt-1">{new Date(selectedInvoice.dueDate).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}</p>
                         </div>
                       </div>
 
-                      <Button className="w-full bg-slate-900 text-white rounded-2xl font-black text-xs py-6 hover:bg-slate-800 transition-all">
-                        <Eye className="h-4 w-4 mr-2" /> VIEW INVOICE
+                      <Button className="w-full bg-slate-900 text-white rounded-2xl font-black text-xs py-6 hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">
+                        <Eye className="h-4 w-4 mr-2" /> VIEW FULL INVOICE
                       </Button>
                     </div>
                   ) : (
-                    <div className="text-center py-10 space-y-4">
-                       <CalendarDays className="h-10 w-10 text-slate-200 mx-auto" />
-                       <p className="text-xs font-bold text-slate-400">SELECT AN INVOICE TO VIEW DETAILS</p>
+                    <div className="text-center py-12 space-y-4 opacity-40">
+                       <MousePointer2 className="h-10 w-10 text-slate-300 mx-auto animate-bounce" />
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Select a date <br/> to view activity</p>
                     </div>
                   )}
                 </CardContent>
              </Card>
 
-             {/* Upcoming */}
-             <div className="p-8 rounded-[2.5rem] bg-slate-900 text-white shadow-xl">
-                <h3 className="text-xs font-black uppercase tracking-widest text-purple-400 mb-6 flex items-center gap-2">
-                   <Zap className="h-3 w-3" /> Upcoming
-                </h3>
-                <div className="space-y-4">
-                   {upcomingInvoices.map(inv => (
-                     <div key={inv.id} className="flex items-center justify-between group">
-                        <span className="text-sm font-bold text-slate-300 group-hover:text-white transition-colors">{inv.buyerName}</span>
-                        <span className="text-sm font-black">{inv.dueDate}</span>
+             {/* Upcoming Quick View */}
+             <div className="p-8 rounded-[2.5rem] bg-slate-900 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden">
+                <Zap className="absolute -top-4 -right-4 h-24 w-24 text-white/5 rotate-12" />
+                <h3 className="text-xs font-black uppercase tracking-widest text-purple-400 mb-8 relative z-10">Next 7 Days</h3>
+                <div className="space-y-6 relative z-10">
+                   {upcomingInvoices.slice(0, 4).map(inv => (
+                     <div key={inv.id} className="flex items-center justify-between group cursor-pointer" onClick={() => setSelectedInvoice(inv)}>
+                        <div className="space-y-1">
+                          <p className="text-xs font-bold text-slate-300 group-hover:text-purple-400 transition-colors">{inv.buyerName}</p>
+                          <p className="text-[9px] text-slate-500 font-bold uppercase">{inv.invoiceNumber}</p>
+                        </div>
+                        <span className="text-xs font-black">R{(inv.amount/1000).toFixed(1)}k</span>
                      </div>
                    ))}
                 </div>
