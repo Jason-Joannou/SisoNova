@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Eye, CalendarDays, Clock, AlertTriangle, CheckCircle2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Eye, CalendarDays, Clock, AlertTriangle, CheckCircle2, MousePointer2, ArrowRight, Zap } from "lucide-react"
 import { Invoice } from "@/lib/types/invoicing"
 
 // More realistic calendar data with various dates
@@ -136,193 +136,132 @@ export function InvoiceCalendar() {
   const upcomingInvoices = getUpcomingInvoices()
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white p-6">
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-slate-900">Invoice Calendar</CardTitle>
-                  <CardDescription className="text-slate-600">Track due dates and payment schedules</CardDescription>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => navigateMonth('prev')} className="border-slate-200 hover:bg-slate-50">
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="font-medium min-w-[120px] text-center text-slate-900">{monthYear}</span>
-                  <Button variant="outline" size="sm" onClick={() => navigateMonth('next')} className="border-slate-200 hover:bg-slate-50">
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-7 gap-1 mb-4">
+    <div className="min-h-screen bg-[#F8FAFC] p-4 lg:p-10 font-sans">
+      <div className="max-w-[1400px] mx-auto space-y-12">
+        
+        {/* 1. NARRATIVE HEADER */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-100 pb-10">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-black text-slate-900 tracking-tighter italic">
+              Payment <span className="text-slate-400 font-light not-italic">Calendar</span>
+            </h1>
+            <p className="text-slate-500 text-sm leading-relaxed max-w-lg">
+              Manage upcoming deadlines and visualize your cash flow rhythm. 
+              <span className="text-slate-900 font-bold ml-1">Track what's due to ensure steady liquidity.</span>
+            </p>
+          </div>
+          
+          {/* Navigation Controls */}
+          <div className="flex items-center gap-3 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
+             <Button variant="ghost" size="sm" onClick={() => navigateMonth('prev')} className="h-9 w-9 rounded-xl hover:bg-slate-50"><ChevronLeft className="h-4 w-4" /></Button>
+             <span className="text-[10px] font-black uppercase tracking-widest min-w-[120px] text-center">{monthYear}</span>
+             <Button variant="ghost" size="sm" onClick={() => navigateMonth('next')} className="h-9 w-9 rounded-xl hover:bg-slate-50"><ChevronRight className="h-4 w-4" /></Button>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-12 gap-8">
+          
+          {/* 2. THE CALENDAR STAGE */}
+          <main className="col-span-12 lg:col-span-8">
+            <Card className="rounded-[3rem] border-none shadow-2xl shadow-slate-200/50 bg-white p-8">
+              <div className="grid grid-cols-7 gap-2 mb-6">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div key={day} className="p-2 text-center text-sm font-medium text-slate-600">
+                  <div key={day} className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
                     {day}
                   </div>
                 ))}
               </div>
-              <div className="grid grid-cols-7 gap-1">
-                {/* Empty cells for days before month starts */}
-                {Array.from({ length: firstDay }, (_, i) => (
-                  <div key={`empty-${i}`} className="p-2 h-24" />
-                ))}
+              <div className="grid grid-cols-7 gap-2">
+                {Array.from({ length: firstDay }, (_, i) => (<div key={`empty-${i}`} />))}
                 
-                {/* Days of the month */}
                 {Array.from({ length: daysInMonth }, (_, i) => {
-                  const day = i + 1
-                  const invoicesForDay = getInvoicesForDate(day)
-                  const todayClass = isToday(day) ? 'bg-emerald-50 border-emerald-200' : 'border-slate-200'
-                  
+                  const day = i + 1;
+                  const invoicesForDay = getInvoicesForDate(day);
                   return (
-                    <div key={day} className={`p-1 h-24 border rounded-lg hover:bg-slate-50 cursor-pointer transition-colors ${todayClass}`}>
-                      <div className={`text-sm font-medium mb-1 ${isToday(day) ? 'text-emerald-700' : 'text-slate-900'}`}>
-                        {day}
-                      </div>
-                      <div className="space-y-1">
-                        {invoicesForDay.slice(0, 2).map(invoice => (
-                          <div
-                            key={invoice.id}
-                            className={`text-xs p-1 rounded truncate cursor-pointer transition-colors ${getInvoiceColor(invoice)}`}
-                            onClick={() => setSelectedInvoice(invoice)}
-                            title={`${invoice.invoiceNumber} - ${invoice.buyerName} - R${invoice.amount.toLocaleString()}`}
+                    <div key={day} className={`min-h-[100px] p-3 rounded-[1.5rem] border transition-all ${isToday(day) ? 'bg-purple-50 border-purple-200' : 'bg-slate-50/50 border-slate-100 hover:border-slate-200'}`}>
+                      <div className={`text-xs font-black mb-2 ${isToday(day) ? 'text-purple-600' : 'text-slate-400'}`}>{day}</div>
+                      <div className="space-y-1.5">
+                        {invoicesForDay.map(inv => (
+                          <div 
+                            key={inv.id} 
+                            onClick={() => setSelectedInvoice(inv)}
+                            className={`px-2 py-1 rounded-lg text-[9px] font-bold truncate cursor-pointer transition-transform hover:scale-105 border 
+                              ${inv.status === 'overdue' ? 'bg-rose-50 text-rose-600 border-rose-100' : 
+                                inv.status === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+                                'bg-white border-slate-200 text-slate-600'}`}
                           >
-                            {invoice.invoiceNumber}
+                            {inv.buyerName}
                           </div>
                         ))}
-                        {invoicesForDay.length > 2 && (
-                          <div className="text-xs text-slate-500 font-medium">
-                            +{invoicesForDay.length - 2} more
-                          </div>
-                        )}
                       </div>
                     </div>
                   )
                 })}
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </Card>
+          </main>
 
-        {/* Invoice Details Sidebar */}
-        <div className="space-y-6">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-slate-900">Invoice Details</CardTitle>
-              <CardDescription className="text-slate-600">
-                {selectedInvoice ? 'Selected invoice information' : 'Click on an invoice to view details'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {selectedInvoice ? (
-                <div className="space-y-4">
-                  <div>
-                    <p className="font-medium text-slate-900">{selectedInvoice.invoiceNumber}</p>
-                    <p className="text-sm text-slate-600">{selectedInvoice.buyerName}</p>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Badge variant={
-                      selectedInvoice.status === 'paid' ? 'default' :
-                      selectedInvoice.status === 'overdue' ? 'destructive' :
-                      selectedInvoice.status === 'financed' ? 'secondary' : 'outline'
-                    } className={
-                      selectedInvoice.status === 'paid' ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100' :
-                      selectedInvoice.status === 'financed' ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100' : ''
-                    }>
-                      {selectedInvoice.status === 'paid' && <CheckCircle2 className="h-3 w-3 mr-1" />}
-                      {selectedInvoice.status === 'overdue' && <AlertTriangle className="h-3 w-3 mr-1" />}
-                      {selectedInvoice.status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
-                      {selectedInvoice.status}
-                    </Badge>
-                    <Badge variant="outline" className={
-                      selectedInvoice.service === 'financing' ? 'border-emerald-200 text-emerald-700' :
-                      selectedInvoice.service === 'collections' ? 'border-blue-200 text-blue-700' :
-                      'border-purple-200 text-purple-700'
-                    }>
-                      {selectedInvoice.service}
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-3 p-3 bg-slate-50 rounded-lg">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Amount:</span>
-                      <span className="font-medium text-slate-900">R{selectedInvoice.amount.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Due Date:</span>
-                      <span className="font-medium text-slate-900">{selectedInvoice.dueDate}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Created:</span>
-                      <span className="font-medium text-slate-900">{selectedInvoice.createdAt}</span>
-                    </div>
-                  </div>
-
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
-                    <Eye className="h-4 w-4 mr-2" />
-                    View Full Details
-                  </Button>
-                </div>
-              ) : (
-                <div className="text-center text-slate-500 py-8">
-                  <CalendarDays className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Select an invoice from the calendar to view details</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Upcoming Due Dates */}
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-slate-900 flex items-center gap-2">
-                <Clock className="h-5 w-5 text-slate-600" />
-                Upcoming Due Dates
-              </CardTitle>
-              <CardDescription className="text-slate-600">
-                Next 7 days
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {upcomingInvoices.length > 0 ? (
-                  upcomingInvoices.map(invoice => (
-                    <div 
-                      key={invoice.id} 
-                      className="flex items-center justify-between p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-                      onClick={() => setSelectedInvoice(invoice)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${
-                          invoice.status === 'overdue' ? 'bg-red-500' :
-                          invoice.status === 'paid' ? 'bg-emerald-500' :
-                          invoice.status === 'financed' ? 'bg-emerald-500' :
-                          'bg-slate-400'
-                        }`} />
+          {/* 3. CONTEXTUAL DETAILS SIDEBAR */}
+          <aside className="col-span-12 lg:col-span-4 space-y-8">
+             <Card className="rounded-[2.5rem] border-none shadow-2xl shadow-slate-200/50 bg-white p-8">
+                <CardHeader className="p-0 mb-6">
+                  <CardTitle className="text-xl font-black text-slate-900 tracking-tight">Focus Date</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {selectedInvoice ? (
+                    <div className="space-y-6">
+                      <div className="flex justify-between items-start">
                         <div>
-                          <p className="text-sm font-medium text-slate-900">{invoice.invoiceNumber}</p>
-                          <p className="text-xs text-slate-600">{invoice.buyerName}</p>
+                          <p className="text-sm font-black text-slate-900">{selectedInvoice.invoiceNumber}</p>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{selectedInvoice.buyerName}</p>
+                        </div>
+                        <Badge className={`rounded-xl px-3 py-1 font-black text-[10px] uppercase border-none ${
+                           selectedInvoice.status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 
+                           selectedInvoice.status === 'overdue' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'
+                        }`}>
+                          {selectedInvoice.status}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 bg-slate-50 rounded-2xl">
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Amount</p>
+                          <p className="text-sm font-black text-slate-900 mt-1">R{selectedInvoice.amount.toLocaleString()}</p>
+                        </div>
+                        <div className="p-4 bg-slate-50 rounded-2xl">
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Due Date</p>
+                          <p className="text-sm font-black text-slate-900 mt-1">{selectedInvoice.dueDate}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-slate-900">R{invoice.amount.toLocaleString()}</p>
-                        <p className="text-xs text-slate-500">{invoice.dueDate}</p>
-                      </div>
+
+                      <Button className="w-full bg-slate-900 text-white rounded-2xl font-black text-xs py-6 hover:bg-slate-800 transition-all">
+                        <Eye className="h-4 w-4 mr-2" /> VIEW INVOICE
+                      </Button>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-6 text-slate-500">
-                    <CheckCircle2 className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No invoices due in the next 7 days</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  ) : (
+                    <div className="text-center py-10 space-y-4">
+                       <CalendarDays className="h-10 w-10 text-slate-200 mx-auto" />
+                       <p className="text-xs font-bold text-slate-400">SELECT AN INVOICE TO VIEW DETAILS</p>
+                    </div>
+                  )}
+                </CardContent>
+             </Card>
+
+             {/* Upcoming */}
+             <div className="p-8 rounded-[2.5rem] bg-slate-900 text-white shadow-xl">
+                <h3 className="text-xs font-black uppercase tracking-widest text-purple-400 mb-6 flex items-center gap-2">
+                   <Zap className="h-3 w-3" /> Upcoming
+                </h3>
+                <div className="space-y-4">
+                   {upcomingInvoices.map(inv => (
+                     <div key={inv.id} className="flex items-center justify-between group">
+                        <span className="text-sm font-bold text-slate-300 group-hover:text-white transition-colors">{inv.buyerName}</span>
+                        <span className="text-sm font-black">{inv.dueDate}</span>
+                     </div>
+                   ))}
+                </div>
+             </div>
+          </aside>
         </div>
       </div>
     </div>
