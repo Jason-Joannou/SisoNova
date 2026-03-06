@@ -44,6 +44,12 @@ import {
   Download,
   Eye,
   Info,
+  Sparkles, 
+  ArrowRight, 
+  CheckCircle2, 
+  UserPlus2, 
+  FileStack, 
+  LayoutTemplate,
 } from "lucide-react";
 import { InvoiceBuilder } from "./invoice-builder";
 import {
@@ -252,16 +258,14 @@ export function InvoicingPage() {
 
   if (showInvoiceBuilder) {
     return (
-      <div>
-        <div className="mb-4">
-          <Button
-            variant="outline"
-            onClick={() => setShowInvoiceBuilder(false)}
-            className="mb-4"
-          >
-            ← Back to Setup
-          </Button>
-        </div>
+      <div className="space-y-6">
+        <Button
+          variant="ghost"
+          onClick={() => setShowInvoiceBuilder(false)}
+          className="text-slate-500 font-bold text-xs tracking-widest hover:text-purple-600 transition-colors"
+        >
+          ← BACK TO SETUP
+        </Button>
         <InvoiceBuilder
           initialBuyer={selectedBuyer}
           initialTemplate={selectedTemplate}
@@ -271,476 +275,148 @@ export function InvoicingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-              <Zap className="h-8 w-8 text-purple-600" />
-              Create New Invoice
+    <div className="min-h-screen bg-[#F8FAFC] p-4 lg:p-10 font-sans">
+      <div className="max-w-[1400px] mx-auto space-y-12">
+        
+        {/* 1. NARRATIVE HEADER */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-100 pb-10">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-black text-slate-900 tracking-tighter">
+              Create <span className="text-slate-300 font-light">Invoice</span>
             </h1>
-            <p className="text-slate-600">
-              Select a buyer and template to get started
+            <p className="text-slate-500 max-w-lg text-sm leading-relaxed">
+              Step-by-step guidance to generate professional invoices. 
+              Select a <span className="text-slate-900 font-bold underline decoration-purple-400">client</span> to begin.
             </p>
           </div>
-        </div>
 
-        {/* Progress Steps */}
-        <Card className="border-2 border-purple-200">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className={`flex items-center gap-2 ${selectedBuyer ? 'text-green-600' : 'text-slate-400'}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${selectedBuyer ? 'bg-green-100' : 'bg-slate-100'}`}>
-                    {selectedBuyer ? '✓' : '1'}
+          <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
+             <div className="flex -space-x-2">
+                {[1, 2, 3].map((step) => (
+                  <div key={step} className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-black
+                    ${step === 1 ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                    0{step}
                   </div>
-                  <span className="font-medium">Select Buyer</span>
-                </div>
-                <div className="w-12 h-0.5 bg-slate-200" />
-                <div className={`flex items-center gap-2 ${selectedTemplate ? 'text-green-600' : 'text-slate-400'}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${selectedTemplate ? 'bg-green-100' : 'bg-slate-100'}`}>
-                    {selectedTemplate ? '✓' : '2'}
-                  </div>
-                  <span className="font-medium">Choose Template (Optional)</span>
-                </div>
-                <div className="w-12 h-0.5 bg-slate-200" />
-                <div className="flex items-center gap-2 text-slate-400">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                    3
-                  </div>
-                  <span className="font-medium">Build Invoice</span>
-                </div>
-              </div>
-              <Button
+                ))}
+             </div>
+             <div className="w-px h-6 bg-slate-200" />
+             <Button 
                 onClick={handleStartInvoice}
                 disabled={!selectedBuyer}
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                Start Building →
+                className="bg-slate-900 text-white rounded-xl px-6 h-9 hover:bg-slate-800 transition-all font-bold text-xs"
+             >
+                START BUILDING <ArrowRight className="h-3 w-3 ml-2" />
+             </Button>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-12 gap-10">
+          
+          {/* 2. THE MAIN STAGE: Buyer Selection */}
+          <main className="col-span-12 lg:col-span-8 space-y-8">
+            <div className="space-y-4">
+               <div className="flex items-center justify-between px-2">
+                  <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Select Recipient</h2>
+                  <Button variant="ghost" onClick={() => setIsAddBuyerOpen(true)} className="text-[10px] font-black text-purple-600 hover:bg-purple-50 tracking-widest">
+                    <UserPlus2 className="h-3.5 w-3.5 mr-2" /> ADD NEW BUYER
+                  </Button>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredBuyers.map((buyer) => (
+                    <div 
+                      key={buyer.email}
+                      onClick={() => setSelectedBuyer(buyer)}
+                      className={`p-6 rounded-[2rem] transition-all cursor-pointer border relative group
+                        ${selectedBuyer?.email === buyer.email 
+                          ? 'bg-white border-purple-600 shadow-xl shadow-purple-100' 
+                          : 'bg-white border-slate-100 hover:border-purple-200'}`}
+                    >
+                      {selectedBuyer?.email === buyer.email && (
+                        <CheckCircle2 className="absolute top-6 right-6 h-5 w-5 text-purple-600" />
+                      )}
+                      <div className="flex items-center gap-4 mb-4">
+                         <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors
+                           ${selectedBuyer?.email === buyer.email ? 'bg-purple-600 text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-purple-50 group-hover:text-purple-600'}`}>
+                            <Building2 className="h-6 w-6" />
+                         </div>
+                         <div>
+                            <p className="text-sm font-black text-slate-900">{buyer.company_name}</p>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase">{buyer.contact_person}</p>
+                         </div>
+                      </div>
+                      <div className="space-y-2 border-t border-slate-50 pt-4">
+                         <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500">
+                            <Mail className="h-3 w-3" /> {buyer.email}
+                         </div>
+                         <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500">
+                            <MapPin className="h-3 w-3" /> {buyer.city}, {buyer.province}
+                         </div>
+                      </div>
+                    </div>
+                  ))}
+               </div>
+            </div>
+
+            {/* 3. TEMPLATE SELECTION (Horizontal Flow) */}
+            <div className="space-y-4">
+               <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-2">Blueprint (Optional)</h2>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div 
+                    onClick={() => setSelectedTemplate(null)}
+                    className={`p-6 rounded-[2rem] border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center text-center gap-3
+                      ${selectedTemplate === null ? 'bg-purple-50 border-purple-600' : 'bg-white border-slate-200 hover:border-slate-300'}`}
+                  >
+                    <Plus className={`h-8 w-8 ${selectedTemplate === null ? 'text-purple-600' : 'text-slate-300'}`} />
+                    <p className="text-xs font-black text-slate-900 uppercase tracking-widest">Blank Slate</p>
+                  </div>
+                  {mockTemplates.map((t) => (
+                    <div 
+                      key={t.id}
+                      onClick={() => setSelectedTemplate(t.id)}
+                      className={`p-6 rounded-[2rem] border transition-all cursor-pointer
+                        ${selectedTemplate === t.id ? 'bg-white border-purple-600 shadow-xl shadow-purple-100' : 'bg-white border-slate-100'}`}
+                    >
+                      <LayoutTemplate className={`h-5 w-5 mb-4 ${selectedTemplate === t.id ? 'text-purple-600' : 'text-slate-400'}`} />
+                      <p className="text-xs font-black text-slate-900 mb-1">{t.name}</p>
+                      <p className="text-[10px] text-slate-400 font-medium leading-tight">{t.description}</p>
+                    </div>
+                  ))}
+               </div>
+            </div>
+          </main>
+
+          {/* 4. THE ASIDE: Context & History */}
+          <aside className="col-span-12 lg:col-span-4 space-y-8">
+            <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden">
+              <Zap className="absolute -top-4 -right-4 h-24 w-24 text-white/5 rotate-12" />
+              <h3 className="text-xs font-black uppercase tracking-widest text-purple-400 mb-6">Recent History</h3>
+              <div className="space-y-6">
+                {mockRecentInvoices.map((inv) => (
+                  <div key={inv.id} className="flex items-center justify-between group cursor-pointer">
+                    <div className="space-y-1">
+                      <p className="text-sm font-bold group-hover:text-purple-400 transition-colors">{inv.invoice_number}</p>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase">{inv.client_name}</p>
+                    </div>
+                    <div className="text-right">
+                       <p className="text-sm font-black">R{(inv.amount/1000).toFixed(1)}k</p>
+                       <Badge className="bg-white/5 text-[8px] h-4 border-0">{inv.status}</Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Button variant="link" className="text-white/40 text-[10px] font-black p-0 mt-8 h-auto hover:text-white uppercase tracking-widest">
+                VIEW FULL AUDIT LOG <ArrowRight className="h-3 w-3 ml-2" />
               </Button>
             </div>
-          </CardContent>
-        </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Buyer Selection */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Buyer Selection */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-blue-600" />
-                      Select Buyer
-                    </CardTitle>
-                    <CardDescription>
-                      Choose from saved buyers or add a new one
-                    </CardDescription>
-                  </div>
-                  <Dialog open={isAddBuyerOpen} onOpenChange={setIsAddBuyerOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm">
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Add New Buyer
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Add New Buyer</DialogTitle>
-                        <DialogDescription>
-                          Enter the buyer's details to save them for future invoices
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid grid-cols-2 gap-4 py-4">
-                        <div className="col-span-2">
-                          <Label htmlFor="company_name">Company Name *</Label>
-                          <Input
-                            id="company_name"
-                            value={newBuyer.company_name || ""}
-                            onChange={(e) =>
-                              setNewBuyer({ ...newBuyer, company_name: e.target.value })
-                            }
-                            placeholder="Company Name"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="contact_person">Contact Person</Label>
-                          <Input
-                            id="contact_person"
-                            value={newBuyer.contact_person || ""}
-                            onChange={(e) =>
-                              setNewBuyer({ ...newBuyer, contact_person: e.target.value })
-                            }
-                            placeholder="John Doe"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="email">Email *</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            value={newBuyer.email || ""}
-                            onChange={(e) =>
-                              setNewBuyer({ ...newBuyer, email: e.target.value })
-                            }
-                            placeholder="email@company.com"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="phone">Phone</Label>
-                          <Input
-                            id="phone"
-                            value={newBuyer.phone || ""}
-                            onChange={(e) =>
-                              setNewBuyer({ ...newBuyer, phone: e.target.value })
-                            }
-                            placeholder="+27 11 123 4567"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="vat_number">VAT Number</Label>
-                          <Input
-                            id="vat_number"
-                            value={newBuyer.vat_number || ""}
-                            onChange={(e) =>
-                              setNewBuyer({ ...newBuyer, vat_number: e.target.value })
-                            }
-                            placeholder="4123456789"
-                          />
-                        </div>
-                        <div className="col-span-2">
-                          <Label htmlFor="address">Address</Label>
-                          <Input
-                            id="address"
-                            value={newBuyer.address_line_1 || ""}
-                            onChange={(e) =>
-                              setNewBuyer({ ...newBuyer, address_line_1: e.target.value })
-                            }
-                            placeholder="123 Main Street"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="city">City</Label>
-                          <Input
-                            id="city"
-                            value={newBuyer.city || ""}
-                            onChange={(e) =>
-                              setNewBuyer({ ...newBuyer, city: e.target.value })
-                            }
-                            placeholder="Johannesburg"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="province">Province</Label>
-                          <Input
-                            id="province"
-                            value={newBuyer.province || ""}
-                            onChange={(e) =>
-                              setNewBuyer({ ...newBuyer, province: e.target.value })
-                            }
-                            placeholder="Gauteng"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="postal_code">Postal Code</Label>
-                          <Input
-                            id="postal_code"
-                            value={newBuyer.postal_code || ""}
-                            onChange={(e) =>
-                              setNewBuyer({ ...newBuyer, postal_code: e.target.value })
-                            }
-                            placeholder="2000"
-                          />
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsAddBuyerOpen(false)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={handleAddBuyer} className="bg-purple-600">
-                          Add Buyer
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Search */}
-                <div className="mb-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <Input
-                      placeholder="Search buyers by name, email, or contact..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                {/* Buyers List */}
-                <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                  {filteredBuyers.map((buyer) => (
-                    <div
-                      key={buyer.email}
-                      onClick={() => handleSelectBuyer(buyer)}
-                      className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                        selectedBuyer?.email === buyer.email
-                          ? "border-purple-500 bg-purple-50"
-                          : "border-slate-200 hover:border-purple-300"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Building2 className="h-4 w-4 text-slate-500" />
-                            <h3 className="font-semibold text-slate-900">
-                              {buyer.company_name}
-                            </h3>
-                            {selectedBuyer?.email === buyer.email && (
-                              <Badge className="bg-purple-600">Selected</Badge>
-                            )}
-                          </div>
-                          <div className="space-y-1 text-sm text-slate-600">
-                            <div className="flex items-center gap-2">
-                              <Users className="h-3 w-3" />
-                              <span>{buyer.contact_person}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Mail className="h-3 w-3" />
-                              <span>{buyer.email}</span>
-                            </div>
-                            {buyer.phone && (
-                              <div className="flex items-center gap-2">
-                                <Phone className="h-3 w-3" />
-                                <span>{buyer.phone}</span>
-                              </div>
-                            )}
-                            {buyer.city && (
-                              <div className="flex items-center gap-2">
-                                <MapPin className="h-3 w-3" />
-                                <span>{buyer.city}, {buyer.province}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        {buyer.credit_limit_enabled && (
-                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                            Credit: R{buyer.credit_limit_amount?.toLocaleString()}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Template Selection */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-green-600" />
-                  Choose Template (Optional)
-                </CardTitle>
-                <CardDescription>
-                  Start with a pre-configured template or build from scratch
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Blank Template */}
-                  <div
-                    onClick={() => handleSelectTemplate(null)}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                      selectedTemplate === null
-                        ? "border-green-500 bg-green-50"
-                        : "border-slate-200 hover:border-green-300"
-                    }`}
-                  >
-                    <div className="flex flex-col items-center text-center gap-2">
-                      <Plus className="h-8 w-8 text-slate-400" />
-                      <h3 className="font-semibold">Blank Invoice</h3>
-                      <p className="text-xs text-slate-600">
-                        Start from scratch
-                      </p>
-                      {selectedTemplate === null && (
-                        <Badge className="bg-green-600">Selected</Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Saved Templates */}
-                  {mockTemplates.map((template) => (
-                    <div
-                      key={template.id}
-                      onClick={() => handleSelectTemplate(template.id)}
-                      className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                        selectedTemplate === template.id
-                          ? "border-green-500 bg-green-50"
-                          : "border-slate-200 hover:border-green-300"
-                      }`}
-                    >
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center justify-between">
-                          <FileText className="h-5 w-5 text-green-600" />
-                          {selectedTemplate === template.id && (
-                            <Badge className="bg-green-600">Selected</Badge>
-                          )}
-                        </div>
-                        <h3 className="font-semibold">{template.name}</h3>
-                        <p className="text-xs text-slate-600">
-                          {template.description}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {template.items.length} item(s)
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column - Recent Invoices & Quick Actions */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            <Card className="shadow-lg border-l-4 border-l-purple-500">
-              <CardHeader>
-                <CardTitle className="text-lg">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={handleStartInvoice}
-                  disabled={!selectedBuyer}
-                >
-                  <Zap className="h-4 w-4 mr-2" />
-                  Create Invoice
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => setIsAddBuyerOpen(true)}
-                >
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Add New Buyer
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  Save as Template
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Recent Invoices */}
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <History className="h-5 w-5 text-orange-600" />
-                  Recent Invoices
-                </CardTitle>
-                <CardDescription>
-                  Load or duplicate previous invoices
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {mockRecentInvoices.map((invoice) => (
-                    <div
-                      key={invoice.id}
-                      className="p-3 border rounded-lg hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <p className="font-mono text-sm font-semibold">
-                            {invoice.invoice_number}
-                          </p>
-                          <p className="text-sm text-slate-600">
-                            {invoice.client_name}
-                          </p>
-                        </div>
-                        <Badge
-                          variant="outline"
-                          className={`${
-                            invoice.status === "paid"
-                              ? "bg-green-100 text-green-700 border-green-200"
-                              : invoice.status === "pending"
-                              ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                              : "bg-red-100 text-red-700 border-red-200"
-                          }`}
-                        >
-                          {invoice.status}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm">
-                          <p className="font-semibold">
-                            R{invoice.amount.toLocaleString()}
-                          </p>
-                          <p className="text-xs text-slate-500">{invoice.date}</p>
-                        </div>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleLoadInvoice(invoice.id)}
-                          >
-                            <Eye className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDuplicateInvoice(invoice.id)}
-                          >
-                            <Copy className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Tips */}
-            <Card className="shadow-lg border-l-4 border-l-blue-500">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Info className="h-5 w-5 text-blue-600" />
-                  Tips
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-600">•</span>
-                    <span>Save buyers for quick invoice creation</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-600">•</span>
-                    <span>Use templates for recurring invoices</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-600">•</span>
-                    <span>Duplicate past invoices to save time</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-600">•</span>
-                    <span>Set credit limits for buyer management</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
+            <div className="p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm">
+               <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Pro Tip</h3>
+               <p className="text-xs text-slate-500 leading-relaxed">
+                  Invoices with <span className="text-slate-900 font-bold">Purchase Orders (PO)</span> are typically processed <span className="text-emerald-600 font-bold">15% faster</span> by large companies.
+               </p>
+            </div>
+          </aside>
         </div>
       </div>
     </div>
