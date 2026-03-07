@@ -62,7 +62,7 @@ export function DashboardOverview() {
 
   const handleBusinessProfileSubmit = async (data: BusinessProfile) => {
     try {
-      await apiClient(API_ROUTES.addBusinessProfile, {
+      await apiClient(API_ROUTES.addBusinessProfile(appUser.id), {
         method: "POST",
         body: JSON.stringify(data),
       });

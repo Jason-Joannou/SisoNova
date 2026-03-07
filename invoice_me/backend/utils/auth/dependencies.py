@@ -71,6 +71,7 @@ async def get_current_user(
         print(f"user: {user}")
 
         if not user:
+            # Ideally, we should be calling the supabase function to create the user outside of here
             print("user not found, creating new user")
             user = await create_user(
                 mongo_client=mongo_client,
