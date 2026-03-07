@@ -116,6 +116,7 @@ async def get_business_profile(
 )
 async def add_business_profile(
     business_profile: BusinessProfile,
+    supabase_id: str = Path(..., description="The user's Supabase ID"),
     user: User = Depends(get_current_user),
     mongo_client: MongoDBClient = Depends(get_mongo_client),
 ) -> BaseResponseModel:
@@ -123,7 +124,7 @@ async def add_business_profile(
     Add a business profile for the authenticated user
     """
 
-    if user.supabase_id != business_profile.supabase_id:
+    if user.supabase_id != supabase_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorized",
