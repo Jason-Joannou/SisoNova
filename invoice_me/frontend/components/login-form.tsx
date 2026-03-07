@@ -1,25 +1,17 @@
-import { cn } from "@/lib/utils";
+"use client";
+
+import { useState } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useState } from "react";
-import { useAuth } from "@/lib/auth-context";
+import { Chrome, KeyRound } from "lucide-react";
 import { LoadingOverlay } from "./loading";
-import { supabase } from "@/lib/supabase/client";
 import { config } from "@/lib/secrets";
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -28,13 +20,9 @@ export function LoginForm({
 
   const handleGoogleLogin = async () => {
     const baseUrl = config.ENVIRONMENT === "production" ? config.PRODUCTION_API_URL : config.ENVIRONMENT === "staging" ? config.STAGING_API_URL : "http://localhost:3000"
-    const redirect = `${baseUrl}/auth/callback`;
-    
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: redirect,
-      },
+      options: { redirectTo: `${baseUrl}/auth/callback` },
     });
   };
 
@@ -42,111 +30,87 @@ export function LoginForm({
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       await login(email, password);
-      return;
     } catch (err: any) {
-      setError(err.message || "Invalid email or password");
+      setError(err.message || "Invalid credentials");
       setLoading(false);
     }
   };
 
   return (
     <>
-      {loading && <LoadingOverlay message="Signing you in..." />}
-      <div className={cn("flex flex-col gap-6", className)} {...props}>
-        <Card className="shadow-lg border-0">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl text-slate-900">
-              Login to your account
-            </CardTitle>
-            <CardDescription className="text-slate-600">
-              Enter your email below to login to your account
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="email" className="text-slate-700 font-medium">
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={loading}
-                    className="border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <div className="flex items-center">
-                    <Label
-                      htmlFor="password"
-                      className="text-slate-700 font-medium"
-                    >
-                      Password
-                    </Label>
-                    <a
-                      href="#"
-                      className="ml-auto inline-block text-sm text-emerald-600 hover:text-emerald-700 underline-offset-4 hover:underline"
-                    >
-                      Forgot your password?
-                    </a>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="*******"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                    required
-                    className="border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                  />
-                </div>
-
-                {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-                    {error}
-                  </div>
-                )}
-
-                <div className="flex flex-col gap-3">
-                  <Button
-                    type="submit"
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 cursor-pointer"
-                    disabled={loading}
-                  >
-                    {loading ? "Signing in..." : "Sign in"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full border-slate-200 hover:bg-slate-50 cursor-pointer"
-                    onClick={handleGoogleLogin}
-                  >
-                    Login with Google
-                  </Button>
-
-                </div>
-              </div>
-              <div className="mt-6 text-center text-sm text-slate-600">
-                Don&apos;t have an account?{" "}
-                <Link
-                  href="/register"
-                  className="text-emerald-600 hover:text-emerald-700 underline underline-offset-4"
-                >
-                  Sign up
+      {loading && <LoadingOverlay message="Verifying Credentials..." />}
+      <div className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Identity</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="rounded-xl border-slate-100 bg-slate-50/50 h-11 focus:border-slate-900 focus:ring-0 transition-all"
+              />
+            </div>
+            
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between px-1">
+                <Label htmlFor="password" className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Secret</Label>
+                <Link href="#" className="text-[9px] font-black text-slate-300 uppercase tracking-widest hover:text-slate-900 transition-colors">
+                  Lost Password?
                 </Link>
               </div>
-            </form>
-          </CardContent>
-        </Card>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="rounded-xl border-slate-100 bg-slate-50/50 h-11 focus:border-slate-900 focus:ring-0 transition-all"
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-wide">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-3">
+            <Button
+              type="submit"
+              className="w-full bg-slate-900 hover:bg-black text-white rounded-xl h-12 text-xs font-black tracking-widest transition-all shadow-xl shadow-slate-200"
+              disabled={loading}
+            >
+              {loading ? "AUTHENTICATING..." : "SIGN IN"}
+            </Button>
+            
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full border-slate-200 rounded-xl h-11 text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
+              onClick={handleGoogleLogin}
+            >
+              <Chrome className="mr-2 h-4 w-4 text-slate-400" />
+              Continue with Google
+            </Button>
+          </div>
+        </form>
+
+        <div className="text-center pt-2">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+            New to the platform?{" "}
+            <Link href="/register" className="text-slate-900 underline underline-offset-4 decoration-slate-200 hover:decoration-slate-900 transition-all">
+              Create Account
+            </Link>
+          </p>
+        </div>
       </div>
     </>
   );

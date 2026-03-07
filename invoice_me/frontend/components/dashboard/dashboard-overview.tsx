@@ -16,8 +16,11 @@ import {
   Zap,
   CreditCard,
   Smartphone,
-  Brain,
-  ChevronRight,
+  ArrowRight,
+  Sparkles,
+  Lock,
+  Settings2,
+  type LucideIcon,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
@@ -26,12 +29,29 @@ import { BusinessProfile } from "@/lib/types/invoicing";
 import { API_ROUTES } from "@/lib/utility/api/routes";
 import { apiClient } from "@/lib/api-client";
 import { useAppUser } from "@/lib/use-app-user";
-import { AvailableService } from "@/lib/types/dashboard";
+
+type Trend = "up" | "down" | "neutral";
+
+type ServiceSummaryItem = {
+  label: string;
+  value: string | number;
+  trend?: Trend;
+};
+
+type FinancialService = {
+  id: string;
+  name: string;
+  description: string;
+  icon: LucideIcon;
+  isActive: boolean;
+  comingSoon: boolean;
+  summary: ServiceSummaryItem[];
+  route: string;
+};
 
 export function DashboardOverview() {
   const router = useRouter();
-  const { user, session } = useAuth();
-  const { appUser, loading, refreshAppUser } = useAppUser();
+  const { appUser, refreshAppUser } = useAppUser();
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
@@ -42,17 +62,10 @@ export function DashboardOverview() {
 
   const handleBusinessProfileSubmit = async (data: BusinessProfile) => {
     try {
-      const response = await apiClient(API_ROUTES.addBusinessProfile, {
+      await apiClient(API_ROUTES.addBusinessProfile, {
         method: "POST",
         body: JSON.stringify(data),
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API error response:", errorText);
-        throw new Error("Failed to save business profile");
-      }
-
       await refreshAppUser();
       setShowProfileModal(false);
     } catch (error) {
@@ -60,190 +73,189 @@ export function DashboardOverview() {
     }
   };
 
-  const financialServices: AvailableService[] = [
+  const getTrendIcon = (trend?: Trend) => {
+    if (!trend) return null;
+    if (trend === "up") return <TrendingUp className="h-3 w-3 text-emerald-500" />;
+    if (trend === "down") return <TrendingUp className="h-3 w-3 text-rose-500 rotate-180" />;
+    return null;
+  };
+
+  const financialServices: FinancialService[] = [
     {
       id: "invoicing",
       name: "Invoicing",
-      description: "Create and manage professional invoices",
+      description: "Professional billing workflow.",
       icon: Smartphone,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      borderColor: "border-purple-200",
       isActive: true,
       comingSoon: false,
       summary: [
-        { label: "Sent this month", value: 12, trend: "up" },
-        { label: "Total outstanding", value: "R45k" },
-        { label: "Paid on time", value: "85%", trend: "up" },
+        { label: "Drafts Sent", value: 12, trend: "up" },
+        { label: "Active Revenue", value: "R45k" },
       ],
       route: "/dashboard/invoicing",
     },
     {
       id: "financing",
-      name: "Invoice Financing",
-      description: "Get paid immediately for your invoices",
+      name: "Financing",
+      description: "Same-day invoice liquidity.",
       icon: Zap,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-      borderColor: "border-emerald-200",
       isActive: false,
       comingSoon: true,
-      summary: [
-        { label: "Available to finance", value: "R8.5k" },
-        { label: "Active advances", value: 2 },
-        { label: "Total financed", value: "R145k" },
-      ],
+      summary: [{ label: "Status", value: "Locked" }],
       route: "/dashboard/financing",
     },
     {
       id: "collections",
       name: "Collections",
-      description: "Track and collect overdue payments",
+      description: "Automated payment recovery.",
       icon: CreditCard,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200",
       isActive: false,
       comingSoon: true,
-      summary: [
-        { label: "Overdue invoices", value: 8 },
-        { label: "Total overdue", value: "R15k" },
-        { label: "Success rate", value: "92%", trend: "up" },
-      ],
+      summary: [{ label: "Status", value: "Locked" }],
       route: "/dashboard/collections",
     },
   ];
 
-  const aiAssistants: AvailableService[] = [
-    {
-      id: "ai-agents",
-      name: "AI Agents",
-      description: "Get personalized insights and recommendations",
-      icon: Brain,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
-      borderColor: "border-indigo-200",
-      isActive: true,
-      comingSoon: false,
-      summary: [
-        { label: "Active agents", value: 4 },
-        { label: "Insights today", value: 6 },
-        { label: "Actions suggested", value: 3 },
-      ],
-      route: "/dashboard/agents",
-    },
-  ];
-
-
-  const getTrendIcon = (trend?: "up" | "down" | "neutral") => {
-    if (!trend) return null;
-    if (trend === "up")
-      return <TrendingUp className="h-3 w-3 text-emerald-600" />;
-    if (trend === "down")
-      return <TrendingUp className="h-3 w-3 text-red-600 rotate-180" />;
-    return null;
-  };
-
   return (
-    <div className="w-full">
+    <div className="min-h-screen bg-[#F1F5F9] font-sans selection:bg-slate-200 text-slate-900 p-4 lg:p-10">
       <BusinessProfileModal
         open={showProfileModal}
         onOpenChange={setShowProfileModal}
         onSubmit={handleBusinessProfileSubmit}
-        title="Complete Your Business Profile"
-        description="Before you can access your dashboard, we need some information about your business."
-        submitButtonText="Complete Setup"
         allowClose={false}
       />
-      <div className="space-y-6 p-6 max-w-7xl mx-auto">
-        {/* Welcome Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            Welcome back {appUser?.preferred_business_profile || ""}!
-          </h1>
-        </div>
 
-        {/* Financial Services */}
-        <div>
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Your Available Services
-            </h2>
-            
+      <div className="max-w-[1400px] mx-auto space-y-16">
+        
+        {/* 1. REFINED INTEGRATED HEADER */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-slate-200 pb-10">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-black text-slate-900 tracking-tighter italic leading-none">
+              Control <span className="text-slate-400 not-italic font-light">Center.</span>
+            </h1>
+            <div className="flex items-center gap-2 mt-3">
+               <Badge className="bg-slate-900 text-white border-none font-black px-3 py-1 text-[8px] tracking-[0.2em] uppercase">
+                 <Sparkles className="h-2 w-2 mr-1.5 text-emerald-400" /> Standard
+               </Badge>
+               <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest px-2">Verified Merchant</span>
+            </div>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+
+          {/* NEW MERCHANT IDENTITY TRIGGER (TIGHT & ACCESSIBLE) */}
+          <div 
+            onClick={() => {/* Trigger Profile Settings */}}
+            className="group flex items-center bg-white border border-slate-200 p-1.5 pr-6 rounded-2xl shadow-sm hover:border-slate-400 transition-all cursor-pointer"
+          >
+            <div className="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-white text-xs font-black shadow-lg shadow-slate-200 group-hover:scale-95 transition-transform">
+               {appUser?.preferred_business_profile?.[0] || "U"}
+            </div>
+            <div className="ml-4 mr-8 space-y-0.5">
+               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Merchant Identity</p>
+               <p className="text-sm font-black text-slate-900 leading-none">
+                 {appUser?.preferred_business_profile || "Complete Setup"}
+               </p>
+            </div>
+            <Settings2 className="h-4 w-4 text-slate-300 group-hover:text-slate-900 transition-colors" />
+          </div>
+        </header>
+
+        {/* 2. OPERATIONAL MODULES (FULL WIDTH FOCUS) */}
+        <section className="space-y-8">
+          <div className="flex items-center justify-between px-2">
+            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">
+              Operational Modules
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {financialServices.map((service) => (
-              <div key={service.id} className="relative">
+              <div key={service.id} className="relative group">
                 <Card
-                  className={`border-2 ${service.borderColor} ${
-                    service.comingSoon
-                      ? "cursor-not-allowed"
-                      : "hover:shadow-lg cursor-pointer"
-                  } transition-all group`}
                   onClick={() => !service.comingSoon && router.push(service.route)}
+                  className={`rounded-[2.5rem] border-none shadow-xl transition-all duration-500 p-10 flex flex-col h-full
+                    ${
+                      service.comingSoon
+                        ? "bg-slate-50/50 opacity-60 grayscale cursor-not-allowed border-slate-100"
+                        : "bg-white hover:shadow-2xl hover:-translate-y-1 cursor-pointer"
+                    }`}
                 >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between mb-3">
-                      <div
-                        className={`p-3 rounded-lg ${service.bgColor} ${
-                          service.color
-                        } ${
-                          !service.comingSoon && "group-hover:scale-110"
-                        } transition-transform`}
-                      >
-                        <service.icon className="h-6 w-6" />
-                      </div>
-                      {service.isActive && (
-                        <Badge className="bg-emerald-100 text-emerald-800 text-xs">
-                          Active
-                        </Badge>
-                      )}
+                  <div className="flex justify-between items-start mb-12">
+                    <div
+                      className={`h-14 w-14 rounded-2xl flex items-center justify-center transition-all
+                      ${
+                        service.comingSoon
+                          ? "bg-slate-200 text-slate-400"
+                          : "bg-slate-900 text-white shadow-xl shadow-slate-200"
+                      }`}
+                    >
+                      <service.icon className="h-7 w-7" />
                     </div>
-                    <CardTitle className="text-base">{service.name}</CardTitle>
-                    <CardDescription className="text-xs">
+                    {!service.comingSoon ? (
+                      <Badge className="bg-emerald-50 text-emerald-700 border-none font-black px-3 py-1 text-[9px] tracking-widest uppercase">
+                        Live
+                      </Badge>
+                    ) : (
+                      <Lock className="h-4 w-4 text-slate-200" />
+                    )}
+                  </div>
+
+                  <div className="space-y-2 mb-10">
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tighter uppercase leading-none">
+                      {service.name}
+                    </h3>
+                    <p className="text-xs font-medium text-slate-400 leading-relaxed">
                       {service.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2.5">
-                      {service.summary.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between"
-                        >
-                          <span className="text-xs text-slate-600">
-                            {item.label}
+                    </p>
+                  </div>
+
+                  <div className="mt-auto pt-8 border-t border-slate-50 space-y-4">
+                    {service.summary.map((item, idx) => (
+                      <div key={idx} className="flex items-center justify-between">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                          {item.label}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-black text-slate-900 italic">
+                            {item.value}
                           </span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-sm font-semibold text-slate-900">
-                              {item.value}
-                            </span>
-                            {getTrendIcon(item.trend)}
-                          </div>
+                          {getTrendIcon(item.trend)}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {!service.comingSoon && (
                     <Button
                       variant="ghost"
-                      size="sm"
-                      className="w-full mt-3 group-hover:bg-slate-100 text-xs"
-                      disabled={service.comingSoon}
+                      className="w-full mt-10 text-[10px] font-black tracking-widest text-slate-900 hover:bg-slate-50 rounded-xl uppercase transition-colors group"
                     >
-                      View Details
-                      <ChevronRight className="h-4 w-4 ml-1" />
+                      Access Utility 
+                      <ArrowRight className="ml-2 h-3 w-3 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                  </CardContent>
+                  )}
                 </Card>
+
                 {service.comingSoon && (
-                  <ComingSoon
-                    featureName={service.name}
-                    message="This feature is currently in development and will be available soon"
-                  />
+                  <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+                    <span className="bg-white/80 backdrop-blur-sm px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border border-slate-200 shadow-sm text-slate-400">
+                      In Development
+                    </span>
+                  </div>
                 )}
               </div>
             ))}
           </div>
-        </div>
+        </section>
+
+        {/* 3. TIGHT SYSTEM STATUS FOOTER */}
+        <footer className="pt-20 text-center">
+           <div className="inline-flex items-center gap-4 text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">
+              <span>SisoNova Core v1.2</span>
+              <div className="h-1 w-1 rounded-full bg-slate-200" />
+              <span>All Systems Operational</span>
+           </div>
+        </footer>
+
       </div>
     </div>
   );

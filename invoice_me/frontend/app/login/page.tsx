@@ -1,90 +1,58 @@
 "use client"
 
 import Link from "next/link"
+import { Zap, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { LoginForm } from "@/components/login-form"
 
-export default function page() {
+export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Navigation - Same as landing page */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Link href="/">
-                <span className="text-2xl font-bold text-slate-900 cursor-pointer">SisoNova</span>
-              </Link>
+    <div className="min-h-screen bg-[#F1F5F9] font-sans selection:bg-slate-200 text-slate-900 flex flex-col">
+      {/* TIGHT NAV */}
+      <nav className="h-16 border-b border-slate-200 bg-white/70 backdrop-blur-xl sticky top-0 z-50 flex items-center">
+        <div className="container mx-auto px-6 flex justify-between items-center max-w-[1400px]">
+          <Link href="/" className="flex items-center gap-2 group cursor-pointer">
+            <div className="h-7 w-7 bg-slate-900 rounded flex items-center justify-center transition-all group-hover:bg-black">
+                <Zap className="h-4 w-4 text-white fill-white" />
             </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="cursor-pointer">How it works</Button>
-              <Button variant="ghost" className="cursor-pointer">Pricing</Button>
-              <Link href="/register">
-                <Button variant="outline" className="cursor-pointer">Register</Button>
-              </Link>
-            </div>
+            <span className="text-lg font-black text-slate-900 tracking-tighter uppercase">SisoNova</span>
+          </Link>
+          <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-slate-400">
+            <Link href="/register" className="hover:text-slate-900 transition-colors uppercase underline decoration-slate-200 underline-offset-4">Register</Link>
           </div>
         </div>
       </nav>
 
-      {/* Login Section */}
-      <section className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center p-6 md:p-10">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome back</h1>
-            <p className="text-slate-600">Sign in to your SisoNova account</p>
+      {/* LOGIN CONTENT */}
+      <main className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center space-y-2">
+            <h1 className="text-4xl font-black text-slate-900 tracking-tighter italic">
+              Welcome <span className="text-slate-400 not-italic font-light">back.</span>
+            </h1>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Secure Access Portal</p>
           </div>
           
-          {/* Using the LoginForm component */}
-          <LoginForm />
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100">
+            <LoginForm />
+          </div>
           
-          {/* Trust indicators */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-slate-500">
-              Trusted by SMEs across South Africa • Secure & encrypted
+          <div className="flex items-center justify-center gap-2 opacity-50">
+            <ShieldCheck className="h-3 w-3" />
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+              AES-256 Encrypted Session
             </p>
           </div>
         </div>
-      </section>
+      </main>
 
-      {/* Footer - Same as landing page */}
-      <footer className="bg-slate-900 text-slate-400 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-white font-bold text-lg mb-4">SisoNova</h3>
-              <p className="text-sm">The ooba of receivables. Get paid now, grow faster.</p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-3">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Financing</a></li>
-                <li><a href="#" className="hover:text-white">Collections</a></li>
-                <li><a href="#" className="hover:text-white">Invoicing</a></li>
-                <li><a href="#" className="hover:text-white">Trade Insurance</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-3">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">About</a></li>
-                <li><a href="#" className="hover:text-white">Pricing</a></li>
-                <li><a href="#" className="hover:text-white">Partners</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-3">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Privacy</a></li>
-                <li><a href="#" className="hover:text-white">Terms</a></li>
-                <li><a href="#" className="hover:text-white">POPIA</a></li>
-                <li><a href="#" className="hover:text-white">FIC Act</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm">
-            <p>&copy; 2024 SisoNova. All rights reserved. Licensed credit provider.</p>
+      {/* MINIMAL FOOTER */}
+      <footer className="py-8 px-6 border-t border-slate-200 bg-white">
+        <div className="container mx-auto max-w-6xl flex justify-between items-center text-[9px] font-black text-slate-300 uppercase tracking-[0.3em]">
+          <p>© 2026 SISONOVA PLATFORM</p>
+          <div className="flex gap-6">
+            <span className="hover:text-slate-900 cursor-pointer">Support</span>
+            <span className="hover:text-slate-900 cursor-pointer">Security</span>
           </div>
         </div>
       </footer>
