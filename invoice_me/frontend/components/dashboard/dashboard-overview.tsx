@@ -107,7 +107,7 @@ export function DashboardOverview() {
     {
       id: "collections",
       name: "Collections",
-      description: "Automated payment recovery.",
+      description: "Automated payment reminders.",
       icon: CreditCard,
       isActive: false,
       comingSoon: true,
@@ -131,7 +131,7 @@ export function DashboardOverview() {
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-slate-200 pb-10">
           <div className="space-y-1">
             <h1 className="text-4xl font-black text-slate-900 tracking-tighter italic leading-none">
-              Control <span className="text-slate-400 not-italic font-light">Center.</span>
+              Welcome <span className="text-slate-400 not-italic font-light">{appUser?.preferred_business_profile || "back"}.</span>
             </h1>
             <div className="flex items-center gap-2 mt-3">
                <Badge className="bg-slate-900 text-white border-none font-black px-3 py-1 text-[8px] tracking-[0.2em] uppercase">
@@ -150,7 +150,7 @@ export function DashboardOverview() {
                {appUser?.preferred_business_profile?.[0] || "U"}
             </div>
             <div className="ml-4 mr-8 space-y-0.5">
-               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Merchant Identity</p>
+               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Business Profile</p>
                <p className="text-sm font-black text-slate-900 leading-none">
                  {appUser?.preferred_business_profile || "Complete Setup"}
                </p>
@@ -246,16 +246,6 @@ export function DashboardOverview() {
             ))}
           </div>
         </section>
-
-        {/* 3. TIGHT SYSTEM STATUS FOOTER */}
-        <footer className="pt-20 text-center">
-           <div className="inline-flex items-center gap-4 text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">
-              <span>SisoNova Core v1.2</span>
-              <div className="h-1 w-1 rounded-full bg-slate-200" />
-              <span>All Systems Operational</span>
-           </div>
-        </footer>
-
       </div>
     </div>
   );
