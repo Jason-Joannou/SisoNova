@@ -2,7 +2,6 @@ from fastapi import APIRouter, status, Depends, Path
 from fastapi.exceptions import HTTPException
 from models.users import UserProfile, UserUpdate, User
 from models.base import BaseResponseModel
-from models.auth import TokenInfo
 from models.business import BusinessProfile, UpdateBusinessProfile
 from typing import List
 from database.mongo_operations import (
@@ -17,7 +16,6 @@ from database.mongo_operations import (
 )
 from database.mongo_client import MongoDBClient
 from database.mongo_dependencies import get_mongo_client
-from services.auth import AuthenticationService
 from utils.auth.dependencies import get_current_user
 
 
