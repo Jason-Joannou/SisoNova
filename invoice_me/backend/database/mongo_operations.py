@@ -130,16 +130,22 @@ async def get_user_profile(
 
 async def get_user_business_profile_company_names(
     mongo_client: MongoDBClient, supabase_id: str
-) -> List[str] | None:
+) -> List[str]:
     try:
         async with mongo_client.get_db(mongo_client.database_name) as db:
-            business_profiles = await db["business_profiles"].find(
-                {"supabase_id": supabase_id}, {"_id": 0}
-            )  # Exclude _id field, 1 would include it
-            return [bp["company_name"] for bp in business_profiles]
+            doc = await db["business_profiles"].find_one(
+                {"supabase_id": supabase_id}, 
+                {"business_profiles": 1, "_id": 0}
+            )
+            
+            if not doc or "business_profiles" not in doc:
+                return []
+
+            return [bp["company_name"] for bp in doc["business_profiles"]]
+
     except Exception as e:
-        print(f"Error retrieving user information: {e}")
-        raise HTTPException(status_code=500, detail="Error retrieving user information")
+        print(f"Error retrieving business profiles: {e}")
+        raise HTTPException(status_code=500, detail="Error retrieving business profiles")
 
 
 async def get_user_business_profiles(
