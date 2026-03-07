@@ -1,6 +1,6 @@
 "use client"
 
-import { Settings, Smartphone, LogOut, User, ChevronDown } from "lucide-react"
+import { Settings, Smartphone, LogOut, User, ChevronDown, Zap } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -38,70 +38,54 @@ import { useAuth } from "@/lib/auth-context"
 import { getInitials } from "@/lib/utils"
 import { navigationItems, settingsItems } from "@/lib/config/sidebar/config"
 
-
 export function SidebarLeft() {
-  const { user, logout } = useAuth(); // 'user' is the Supabase Auth user
-  const { appUser, loading } = useAppUser(); // 'appUser' is your MongoDB user
+  const { user, logout } = useAuth();
+  const { appUser, loading } = useAppUser();
   const pathname = usePathname()
-  const [isInvoicingOpen, setIsInvoicingOpen] = useState(
-    pathname?.startsWith("/dashboard/invoicing") || false
-  )
 
   const handleLogout = async () => {
-    // Add your logout logic here
     console.log("Logging out...")
     await logout()
-    // window.location.href = "/login"
   }
 
   const displayName = user?.user_metadata?.full_name || appUser?.preferred_business_profile
   const userEmail = user?.email || "";
   const initials = getInitials(displayName, userEmail);
   const userImage = user?.user_metadata?.avatar_url
-  const isValidImage = userImage && userImage.startsWith("http");
 
   const isActive = (url: string) => {
-  if (!pathname) return false;
-
-  if (pathname === url) return true;
-
-  if (url === "/dashboard") return false;
-
-  return pathname.startsWith(url + "/");
-};
+    if (!pathname) return false;
+    if (pathname === url) return true;
+    if (url === "/dashboard") return pathname === "/dashboard";
+    return pathname.startsWith(url + "/");
+  };
 
   return (
-    <Sidebar className="border-r border-slate-200">
-      <SidebarHeader className="border-b border-slate-200 p-4">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600">
-            <span className="text-sm font-bold text-white">S</span>
+    <Sidebar className="border-r border-slate-200 bg-white">
+      <SidebarHeader className="p-6">
+        <div className="flex items-center gap-3 group cursor-pointer">
+          <div className="flex h-8 w-8 items-center justify-center rounded bg-slate-900 transition-all group-hover:bg-black">
+            <Zap className="h-4 w-4 text-white fill-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">SisoNova</h2>
-            <p className="text-xs text-slate-500">Receivables Platform</p>
+            <h2 className="text-sm font-black text-slate-900 tracking-tighter uppercase leading-none">SisoNova</h2>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Platform v1.2</p>
           </div>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="bg-white">
+      <SidebarContent className="px-2">
         {/* Main Navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-slate-600 font-medium text-xs uppercase tracking-wider">
-            Main Menu
+          <SidebarGroupLabel className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-2 px-4">
+            Operations
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-1">
               {navigationItems.map((item) => {
                 const isSubActive = item.subItems?.some(sub => isActive(sub.url));
                 const isItemActive = isActive(item.url);
                 const activeAny = isSubActive || isItemActive;
-
-                // Define active colors based on the item title or config
-                // This ensures Invoicing stays purple and others stay emerald/blue
-                const activeClass = item.title === "Invoicing"
-                  ? "data-[active=true]:bg-purple-50 data-[active=true]:text-purple-700"
-                  : "data-[active=true]:bg-emerald-50 data-[active=true]:text-emerald-700";
 
                 if (item.hasSubItems && item.subItems) {
                   return (
@@ -114,25 +98,25 @@ export function SidebarLeft() {
                         <CollapsibleTrigger asChild>
                           <SidebarMenuButton
                             isActive={activeAny}
-                            className={`hover:bg-slate-50 transition-colors ${activeClass}`}
+                            className="h-10 px-4 rounded-xl hover:bg-slate-50 transition-all data-[active=true]:bg-slate-900 data-[active=true]:text-white"
                           >
-                            <item.icon className={`h-4 w-4 ${activeAny ? 'text-current' : item.color}`} />
-                            <span className="font-medium">{item.title}</span>
-                            <ChevronDown className="ml-auto h-4 w-4 text-slate-500 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                            <item.icon className={`h-4 w-4 ${activeAny ? 'text-white' : 'text-slate-400'}`} />
+                            <span className="text-[11px] font-black uppercase tracking-wider ml-1">{item.title}</span>
+                            <ChevronDown className="ml-auto h-3 w-3 opacity-50 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
                           </SidebarMenuButton>
                         </CollapsibleTrigger>
                         <CollapsibleContent>
-                          <SidebarMenuSub>
+                          <SidebarMenuSub className="ml-4 border-l border-slate-100 gap-1 mt-1">
                             {item.subItems.map((subItem) => (
                               <SidebarMenuSubItem key={subItem.title}>
                                 <SidebarMenuSubButton
                                   asChild
                                   isActive={isActive(subItem.url)}
-                                  className="hover:bg-slate-50 data-[active=true]:bg-slate-100 data-[active=true]:text-slate-900"
+                                  className="h-9 rounded-lg data-[active=true]:bg-slate-50 data-[active=true]:text-slate-900"
                                 >
                                   <a href={subItem.url} className="flex items-center gap-3">
-                                    <subItem.icon className={`h-4 w-4 ${isActive(subItem.url) ? 'text-purple-600' : 'text-slate-500'}`} />
-                                    <span>{subItem.title}</span>
+                                    <subItem.icon className={`h-3.5 w-3.5 ${isActive(subItem.url) ? 'text-slate-900' : 'text-slate-400'}`} />
+                                    <span className="text-[10px] font-bold uppercase tracking-tight">{subItem.title}</span>
                                   </a>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
@@ -148,12 +132,12 @@ export function SidebarLeft() {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
-                      className={`hover:bg-slate-50 ${activeClass}`}
                       isActive={isItemActive}
+                      className="h-10 px-4 rounded-xl hover:bg-slate-50 transition-all data-[active=true]:bg-slate-900 data-[active=true]:text-white shadow-none"
                     >
-                      <a href={item.url} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors">
-                        <item.icon className={`h-4 w-4 ${isItemActive ? 'text-current' : item.color}`} />
-                        <span className="font-medium">{item.title}</span>
+                      <a href={item.url}>
+                        <item.icon className={`h-4 w-4 ${isItemActive ? 'text-white' : 'text-slate-400'}`} />
+                        <span className="text-[11px] font-black uppercase tracking-wider ml-1">{item.title}</span>
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -163,23 +147,23 @@ export function SidebarLeft() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Settings Section */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-slate-600 font-medium text-xs uppercase tracking-wider">
-            Account
+        {/* Account Section */}
+        <SidebarGroup className="mt-4">
+          <SidebarGroupLabel className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-2 px-4">
+            System
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-1">
               {settingsItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
-                    className="hover:bg-slate-50"
                     isActive={isActive(item.url)}
+                    className="h-10 px-4 rounded-xl hover:bg-slate-50 data-[active=true]:bg-slate-900 data-[active=true]:text-white"
                   >
-                    <a href={item.url} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors">
-                      <item.icon className={`h-4 w-4 ${item.color}`} />
-                      <span className="text-slate-700 font-medium">{item.title}</span>
+                    <a href={item.url}>
+                      <item.icon className={`h-4 w-4 ${isActive(item.url) ? 'text-white' : 'text-slate-400'}`} />
+                      <span className="text-[11px] font-black uppercase tracking-wider ml-1">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -189,55 +173,46 @@ export function SidebarLeft() {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* User Profile & Logout */}
-      <SidebarFooter className="border-t border-slate-200 p-4">
+      {/* User Footer */}
+      <SidebarFooter className="p-4 border-t border-slate-50">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2 h-auto hover:bg-slate-50">
-              <Avatar className="h-8 w-8">
-                {/* Supabase user metadata often stores avatar_url from Google/OAuth */}
+            <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-6 h-auto hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
+              <Avatar className="h-9 w-9 rounded-xl border-2 border-white shadow-sm">
                 <AvatarImage src={userImage} alt={displayName} referrerPolicy="no-referrer" />
-                <AvatarFallback className="bg-emerald-100 text-emerald-700 text-sm font-medium">
+                <AvatarFallback className="bg-slate-900 text-white text-xs font-black rounded-xl">
                   {loading ? "..." : initials}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col items-start text-left overflow-hidden">
-                <span className="text-sm font-medium text-slate-900 truncate w-full">
-                  {loading ? "Loading..." : displayName}
+                <span className="text-xs font-black text-slate-900 uppercase tracking-tight truncate w-full">
+                  {loading ? "AUTHENTICATING..." : displayName}
                 </span>
-                <span className="text-xs text-slate-500 truncate w-full">
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest truncate w-full">
                   {userEmail}
                 </span>
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel className="font-normal">
+          <DropdownMenuContent align="end" className="w-64 p-2 rounded-[1.5rem] shadow-2xl border-slate-100">
+            <DropdownMenuLabel className="px-3 py-4">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{displayName}</p>
-                <p className="text-xs leading-none text-slate-500">{userEmail}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Account Identity</p>
+                <p className="text-sm font-black text-slate-900">{displayName}</p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <a href="/dashboard/profile" className="cursor-pointer">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+            <DropdownMenuSeparator className="bg-slate-50" />
+            <DropdownMenuItem asChild className="rounded-xl h-10 px-3 cursor-pointer">
+              <a href="/dashboard/profile" className="flex items-center text-[11px] font-black uppercase tracking-wider">
+                <User className="mr-3 h-4 w-4 text-slate-400" /> Profile Settings
               </a>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <a href="/dashboard/settings" className="cursor-pointer">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </a>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleLogout}
-              className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+              className="rounded-xl h-10 px-3 cursor-pointer text-rose-600 focus:text-rose-600 focus:bg-rose-50"
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
+              <LogOut className="mr-3 h-4 w-4" />
+              <span className="text-[11px] font-black uppercase tracking-wider">Terminate Session</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
