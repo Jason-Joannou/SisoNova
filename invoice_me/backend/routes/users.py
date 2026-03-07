@@ -109,7 +109,7 @@ async def get_business_profile(
 
 
 @router.post(
-    "{supabase_id}/business-profiles",
+    "/{supabase_id}/business-profiles",
     response_model=BaseResponseModel,
     description="Add business profile",
     status_code=status.HTTP_200_OK,
@@ -153,7 +153,7 @@ async def add_business_profile(
 
 
 @router.get(
-    "{supabase_id}/business-profiles/{company_name}",
+    "/{supabase_id}/business-profiles/{company_name}",
     response_model=BusinessProfile,
     description="Get business profile",
     status_code=status.HTTP_200_OK,
@@ -182,7 +182,7 @@ async def get_business_profile(
 
 
 @router.patch(
-    "{supabase_id}/business-profiles/{company_name}",
+    "/{supabase_id}/business-profiles/{company_name}",
     response_model=BaseResponseModel,
     description="Update business profile",
     status_code=status.HTTP_200_OK,
