@@ -35,6 +35,12 @@ class UpdateBusinessProfile(BaseModel):
     industry_type: Optional[str] = Field(None, description="The industry type of the company")
 
 
+class ClientDetails(BusinessProfile):
+    purchase_order_number: Optional[str] = None
+    credit_limit_enabled: bool
+    credit_limit_amount: Optional[float] = None
+
+
 class BusinessProfileCollection(BaseModel):
     email: EmailStr = Field(..., description="The user's email address")
     business_profiles: List[BusinessProfile] = Field([], description="The business profiles associated with the user")
