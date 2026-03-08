@@ -214,10 +214,7 @@ export function DashboardOverview() {
               Welcome <span className="text-slate-400 not-italic font-light">{appUser?.preferred_business_profile || "back"}.</span>
             </h1>
             <div className="flex items-center gap-2 mt-3">
-              <Badge className="bg-slate-900 text-white border-none font-black px-3 py-1 text-[8px] tracking-[0.2em] uppercase">
-                <Sparkles className="h-2 w-2 mr-1.5 text-emerald-400" /> Standard
-              </Badge>
-              <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest px-2">Identity Verified</span>
+              <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest px-2">Your Services Overview</span>
             </div>
           </div>
 
@@ -288,7 +285,7 @@ export function DashboardOverview() {
         <section className="space-y-8">
           <div className="flex items-center justify-between px-2">
             <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">
-              Operational Modules
+              Available Services
             </h2>
           </div>
 
