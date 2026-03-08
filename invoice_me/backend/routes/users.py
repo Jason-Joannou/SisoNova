@@ -72,7 +72,7 @@ async def update_user_profile(
         )
 
     updated = await update_user_information(
-        email=user.email, user_update=update, mongo_client=mongo_client
+        supabase_id=supabase_id, user_update=update, mongo_client=mongo_client
     )
 
     user_profile = await get_user_by_supabase_id(supabase_id=user.supabase_id, mongo_client=mongo_client)
