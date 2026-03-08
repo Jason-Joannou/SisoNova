@@ -1,64 +1,46 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
-  Plus,
-  Users,
-  FileText,
-  Clock,
-  Search,
-  Save,
-  Copy,
-  Trash2,
-  Edit,
   Building2,
   Mail,
-  Phone,
   MapPin,
   Zap,
-  History,
-  UserPlus,
-  Download,
-  Eye,
-  Info,
-  Sparkles, 
+  UserPlus2,
   ArrowRight, 
   CheckCircle2, 
-  UserPlus2, 
-  FileStack, 
   LayoutTemplate,
+  Plus,
 } from "lucide-react";
 import { InvoiceBuilder } from "./invoice-builder";
+import { InvoiceVerification } from "./invoice-verification"; // The new Verification Stage
 import {
-  BusinessProfile,
   ClientDetails,
   InvoiceConfiguration,
+  BusinessProfile,
 } from "@/lib/types/invoicing";
+import { generateInvoiceNumber } from "@/lib/utility/invoicing/utils";
 
-// Mock data for saved buyers
+// --- MOCK DATA PRESERVED ---
+const defaultBusinessProfile: BusinessProfile = {
+  company_name: "SisoNova Solutions (Pty) Ltd",
+  trading_name: "SisoNova",
+  address_line_1: "123 Business Park Drive",
+  address_line_2: "Suite 456",
+  city: "Cape Town",
+  province: "Western Cape",
+  country: "South Africa",
+  postal_code: "8001",
+  vat_number: "4123456789",
+  company_registration: "2023/123456/07",
+  contact_email: "billing@SisoNova.co.za",
+  contact_phone: "+27 21 123 4567",
+  industry_type: "consulting",
+};
+
 const mockSavedBuyers: ClientDetails[] = [
   {
     company_name: "Ridgeway Butchery",
@@ -99,98 +81,30 @@ const mockSavedBuyers: ClientDetails[] = [
   },
 ];
 
-// Mock data for recent invoices
 const mockRecentInvoices = [
-  {
-    id: "1",
-    invoice_number: "INV-2024-001",
-    client_name: "Ridgeway Butchery",
-    amount: 15750.00,
-    date: "2024-10-15",
-    status: "paid",
-  },
-  {
-    id: "2",
-    invoice_number: "INV-2024-002",
-    client_name: "Tech Solutions Ltd",
-    amount: 28500.00,
-    date: "2024-10-18",
-    status: "pending",
-  },
-  {
-    id: "3",
-    invoice_number: "INV-2024-003",
-    client_name: "Green Energy Co",
-    amount: 12300.00,
-    date: "2024-10-20",
-    status: "overdue",
-  },
+  { id: "1", invoice_number: "INV-2024-001", client_name: "Ridgeway Butchery", amount: 15750.00, date: "2024-10-15", status: "paid" },
+  { id: "2", invoice_number: "INV-2024-002", client_name: "Tech Solutions Ltd", amount: 28500.00, date: "2024-10-18", status: "pending" },
+  { id: "3", invoice_number: "INV-2024-003", client_name: "Green Energy Co", amount: 12300.00, date: "2024-10-20", status: "overdue" },
 ];
 
-// Mock invoice templates
 const mockTemplates = [
-  {
-    id: "1",
-    name: "Consulting Services",
-    description: "Standard consulting invoice template",
-    items: [
-      {
-        id: "1",
-        title: "Consulting Services",
-        description: "Professional consulting and advisory",
-        quantity: 1,
-        unit: "hours",
-        unit_price: 1500,
-        discount_percentage: 0,
-      },
-    ],
-  },
-  {
-    id: "2",
-    name: "Monthly Retainer",
-    description: "Monthly retainer agreement",
-    items: [
-      {
-        id: "1",
-        title: "Monthly Retainer Fee",
-        description: "Ongoing support and services",
-        quantity: 1,
-        unit: "months",
-        unit_price: 25000,
-        discount_percentage: 0,
-      },
-    ],
-  },
-  {
-    id: "3",
-    name: "Product Sale",
-    description: "Standard product invoice",
-    items: [
-      {
-        id: "1",
-        title: "Product Item",
-        description: "Product description",
-        quantity: 1,
-        unit: "each",
-        unit_price: 0,
-        discount_percentage: 0,
-      },
-    ],
-  },
+  { id: "1", name: "Consulting Services", description: "Standard consulting invoice template" },
+  { id: "2", name: "Monthly Retainer", description: "Monthly retainer agreement" },
+  { id: "3", name: "Product Sale", description: "Standard product invoice" },
 ];
 
 export function InvoicingPage() {
-  const [showInvoiceBuilder, setShowInvoiceBuilder] = useState(false);
+  // --- STATE MANAGEMENT ---
+  const [currentStep, setCurrentStep] = useState(1); // 1: Setup, 2: Builder, 3: Verification
   const [selectedBuyer, setSelectedBuyer] = useState<ClientDetails | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [savedBuyers, setSavedBuyers] = useState(mockSavedBuyers);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddBuyerOpen, setIsAddBuyerOpen] = useState(false);
-  const [newBuyer, setNewBuyer] = useState<Partial<ClientDetails>>({
-    credit_limit_enabled: false,
-  });
+  
+  // ADDED: Lifting state here to prevent data loss on navigation
+  const [activeConfig, setActiveConfig] = useState<InvoiceConfiguration | null>(null);
 
-  // Filter buyers based on search
   const filteredBuyers = savedBuyers.filter(
     (buyer) =>
       buyer.company_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -198,226 +112,221 @@ export function InvoicingPage() {
       buyer.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Handle buyer selection
-  const handleSelectBuyer = (buyer: ClientDetails) => {
-    setSelectedBuyer(buyer);
-  };
-
-  // Handle template selection
-  const handleSelectTemplate = (templateId: string | null) => {
-    setSelectedTemplate(templateId);
-  };
-
-  // Start creating invoice
   const handleStartInvoice = () => {
-    if (!selectedBuyer) {
-      alert("Please select a buyer first");
-      return;
+    if (!selectedBuyer) return;
+
+    // ADDED: Initialize activeConfig if it doesn't exist OR if the buyer changed
+    if (!activeConfig || activeConfig.client_details.email !== selectedBuyer.email) {
+      setActiveConfig({
+        invoice_number: generateInvoiceNumber(defaultBusinessProfile.company_name),
+        invoice_date: new Date().toISOString().split("T")[0],
+        due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        business_profile: defaultBusinessProfile,
+        client_details: selectedBuyer,
+        items: [
+          {
+            id: "1",
+            title: "Professional Services",
+            description: "Consulting and advisory services",
+            category: "Consulting",
+            sku: "CONS-001",
+            quantity: 1,
+            unit: "each",
+            unit_price: 0,
+            discount_percentage: 0,
+          },
+        ],
+        include_vat: true,
+        vat_rate: 0.15,
+        currency: "ZAR",
+      });
     }
-    setShowInvoiceBuilder(true);
+
+    setCurrentStep(2);
   };
 
-  // Add new buyer
-  const handleAddBuyer = () => {
-    if (!newBuyer.company_name || !newBuyer.email) {
-      alert("Please fill in required fields");
-      return;
-    }
-    
-    const buyer: ClientDetails = {
-      company_name: newBuyer.company_name,
-      contact_person: newBuyer.contact_person || "",
-      email: newBuyer.email,
-      phone: newBuyer.phone,
-      address_line_1: newBuyer.address_line_1,
-      city: newBuyer.city,
-      province: newBuyer.province,
-      postal_code: newBuyer.postal_code,
-      vat_number: newBuyer.vat_number,
-      credit_limit_enabled: newBuyer.credit_limit_enabled || false,
-      credit_limit_amount: newBuyer.credit_limit_amount,
-    };
-
-    setSavedBuyers([...savedBuyers, buyer]);
-    setNewBuyer({ credit_limit_enabled: false });
-    setIsAddBuyerOpen(false);
-    setSelectedBuyer(buyer);
+  const handleProceedToVerify = (config: InvoiceConfiguration) => {
+    setActiveConfig(config);
+    setCurrentStep(3);
   };
 
-  // Load invoice from history
-  const handleLoadInvoice = (invoiceId: string) => {
-    console.log("Loading invoice:", invoiceId);
-    // Implement load invoice logic
-  };
+  // --- REIMAGINED HEADER LOGIC (Consistent for all steps) ---
+  const WorkflowHeader = ({ step, title, subtitle, onBack }: { step: number, title: string, subtitle: string, onBack?: () => void }) => (
+    <div className="space-y-8 mb-10">
+      {/* 1. TOP UTILITY LINE */}
+      <div className="flex items-center justify-between border-b border-slate-100 pb-6">
+        <div className="flex items-center gap-3">
+          {onBack ? (
+             <Button variant="ghost" onClick={onBack} className="h-8 w-8 rounded-full border border-slate-200 p-0 hover:bg-slate-900 hover:text-white transition-all">
+                <ArrowRight className="h-3 w-3 rotate-180" />
+             </Button>
+          ) : (
+             <div className="h-8 w-8 rounded-xl bg-slate-900 flex items-center justify-center">
+                <Zap className="h-4 w-4 text-white fill-white" />
+             </div>
+          )}
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900">
+            SisoNova <span className="text-slate-300 font-light">Billing</span>
+          </span>
+        </div>
 
-  // Duplicate invoice
-  const handleDuplicateInvoice = (invoiceId: string) => {
-    console.log("Duplicating invoice:", invoiceId);
-    // Implement duplicate logic
-  };
-
-  if (showInvoiceBuilder) {
-    return (
-      <div className="space-y-6">
-        <Button
-          variant="ghost"
-          onClick={() => setShowInvoiceBuilder(false)}
-          className="text-slate-500 font-bold text-xs tracking-widest hover:text-purple-600 transition-colors"
-        >
-          ← BACK TO SETUP
-        </Button>
-        <InvoiceBuilder
-          initialBuyer={selectedBuyer}
-          initialTemplate={selectedTemplate}
-        />
+        {/* COMPACT PROGRESS STRIP (Right-aligned) */}
+        <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-2xl border border-slate-200/60 shadow-sm">
+           <div className="flex items-center gap-1.5">
+              {[1, 2, 3].map((s) => (
+                <div key={s} className={`h-1 transition-all duration-500 rounded-full ${step === s ? 'w-8 bg-slate-900' : 'w-2 bg-slate-200'}`} />
+              ))}
+           </div>
+           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phase 0{step}</span>
+        </div>
       </div>
-    );
-  }
+
+      {/* 2. NARRATIVE HEADER (Always Left-Aligned) */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase italic">
+            {title} <span className="text-slate-300 font-light not-italic">{subtitle}</span>
+          </h1>
+          <p className="text-slate-500 max-w-lg text-sm leading-relaxed">
+            {step === 1 && "Select a Verified Client from your ledger to initiate the billing sequence."}
+            {step === 2 && "Refine your line items and configure arrears protocols for this draft."}
+            {step === 3 && "Final verification before document authentication and dispatch."}
+          </p>
+        </div>
+
+        {step === 1 && (
+           <Button 
+              onClick={handleStartInvoice}
+              disabled={!selectedBuyer}
+              className="bg-slate-900 text-white rounded-xl px-8 h-12 hover:bg-black transition-all font-black text-[10px] tracking-[0.2em] uppercase shadow-xl shadow-slate-200 disabled:opacity-30"
+           >
+              Initialize Builder <ArrowRight className="h-3.5 w-3.5 ml-2" />
+           </Button>
+        )}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] p-4 lg:p-10 font-sans">
-      <div className="max-w-[1400px] mx-auto space-y-12">
+    <div className="min-h-screen bg-[#F8FAFC] p-4 lg:p-10 font-sans selection:bg-slate-200">
+      <div className="max-w-[1400px] mx-auto">
         
-        {/* 1. NARRATIVE HEADER */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-100 pb-10">
-          <div className="space-y-1">
-            <h1 className="text-4xl font-black text-slate-900 tracking-tighter">
-              Create <span className="text-slate-300 font-light">Invoice</span>
-            </h1>
-            <p className="text-slate-500 max-w-lg text-sm leading-relaxed">
-              Step-by-step guidance to generate professional invoices. 
-              Select a <span className="text-slate-900 font-bold underline decoration-purple-400">client</span> to begin.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
-             <div className="flex -space-x-2">
-                {[1, 2, 3].map((step) => (
-                  <div key={step} className={`w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-black
-                    ${step === 1 ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                    0{step}
+        {/* STEP 01: SELECTION */}
+        {currentStep === 1 && (
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <WorkflowHeader step={1} title="Identity" subtitle="& Intent." />
+            <div className="grid grid-cols-12 gap-10">
+              <main className="col-span-12 lg:col-span-8 space-y-8">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between px-2">
+                    <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Select Recipient</h2>
+                    <Button variant="ghost" className="text-[10px] font-black text-slate-900 hover:bg-slate-50 tracking-widest border border-slate-100 rounded-xl px-4 h-8">
+                      <UserPlus2 className="h-3.5 w-3.5 mr-2" /> ADD NEW BUYER
+                    </Button>
                   </div>
-                ))}
-             </div>
-             <div className="w-px h-6 bg-slate-200" />
-             <Button 
-                onClick={handleStartInvoice}
-                disabled={!selectedBuyer}
-                className="bg-slate-900 text-white rounded-xl px-6 h-9 hover:bg-slate-800 transition-all font-bold text-xs"
-             >
-                START BUILDING <ArrowRight className="h-3 w-3 ml-2" />
-             </Button>
-          </div>
-        </header>
-
-        <div className="grid grid-cols-12 gap-10">
-          
-          {/* 2. THE MAIN STAGE: Buyer Selection */}
-          <main className="col-span-12 lg:col-span-8 space-y-8">
-            <div className="space-y-4">
-               <div className="flex items-center justify-between px-2">
-                  <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Select Recipient</h2>
-                  <Button variant="ghost" onClick={() => setIsAddBuyerOpen(true)} className="text-[10px] font-black text-purple-600 hover:bg-purple-50 tracking-widest">
-                    <UserPlus2 className="h-3.5 w-3.5 mr-2" /> ADD NEW BUYER
-                  </Button>
-               </div>
-
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredBuyers.map((buyer) => (
-                    <div 
-                      key={buyer.email}
-                      onClick={() => setSelectedBuyer(buyer)}
-                      className={`p-6 rounded-[2rem] transition-all cursor-pointer border relative group
-                        ${selectedBuyer?.email === buyer.email 
-                          ? 'bg-white border-purple-600 shadow-xl shadow-purple-100' 
-                          : 'bg-white border-slate-100 hover:border-purple-200'}`}
-                    >
-                      {selectedBuyer?.email === buyer.email && (
-                        <CheckCircle2 className="absolute top-6 right-6 h-5 w-5 text-purple-600" />
-                      )}
-                      <div className="flex items-center gap-4 mb-4">
-                         <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors
-                           ${selectedBuyer?.email === buyer.email ? 'bg-purple-600 text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-purple-50 group-hover:text-purple-600'}`}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filteredBuyers.map((buyer) => (
+                      <div key={buyer.email} onClick={() => setSelectedBuyer(buyer)}
+                        className={`p-6 rounded-[2rem] transition-all cursor-pointer border relative group
+                          ${selectedBuyer?.email === buyer.email ? 'bg-white border-slate-900 shadow-xl shadow-slate-200' : 'bg-white border-slate-100 hover:border-slate-300'}`}>
+                        {selectedBuyer?.email === buyer.email && <CheckCircle2 className="absolute top-6 right-6 h-5 w-5 text-slate-900" />}
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${selectedBuyer?.email === buyer.email ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400'}`}>
                             <Building2 className="h-6 w-6" />
-                         </div>
-                         <div>
+                          </div>
+                          <div>
                             <p className="text-sm font-black text-slate-900">{buyer.company_name}</p>
                             <p className="text-[10px] text-slate-400 font-bold uppercase">{buyer.contact_person}</p>
-                         </div>
+                          </div>
+                        </div>
+                        <div className="space-y-2 border-t border-slate-50 pt-4 text-[10px] font-bold text-slate-500">
+                          <div className="flex items-center gap-2"><Mail className="h-3 w-3" /> {buyer.email}</div>
+                          <div className="flex items-center gap-2"><MapPin className="h-3 w-3" /> {buyer.city}, {buyer.province}</div>
+                        </div>
                       </div>
-                      <div className="space-y-2 border-t border-slate-50 pt-4">
-                         <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500">
-                            <Mail className="h-3 w-3" /> {buyer.email}
-                         </div>
-                         <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500">
-                            <MapPin className="h-3 w-3" /> {buyer.city}, {buyer.province}
-                         </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-2">Blueprint (Optional)</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div onClick={() => setSelectedTemplate(null)}
+                      className={`p-6 rounded-[2rem] border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center text-center gap-3
+                        ${selectedTemplate === null ? 'bg-white border-slate-900' : 'bg-white border-slate-100 hover:border-slate-200'}`}>
+                      <Plus className={`h-8 w-8 ${selectedTemplate === null ? 'text-slate-900' : 'text-slate-300'}`} />
+                      <p className="text-xs font-black text-slate-900 uppercase tracking-widest">Blank Slate</p>
+                    </div>
+                    {mockTemplates.map((t) => (
+                      <div key={t.id} onClick={() => setSelectedTemplate(t.id)}
+                        className={`p-6 rounded-[2rem] border transition-all cursor-pointer
+                          ${selectedTemplate === t.id ? 'bg-white border-slate-900 shadow-xl shadow-slate-200' : 'bg-white border-slate-100'}`}>
+                        <LayoutTemplate className={`h-5 w-5 mb-4 ${selectedTemplate === t.id ? 'text-slate-900' : 'text-slate-400'}`} />
+                        <p className="text-xs font-black text-slate-900 mb-1">{t.name}</p>
+                        <p className="text-[10px] text-slate-400 font-medium leading-tight">{t.description}</p>
                       </div>
-                    </div>
-                  ))}
-               </div>
-            </div>
-
-            {/* 3. TEMPLATE SELECTION (Horizontal Flow) */}
-            <div className="space-y-4">
-               <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] px-2">Blueprint (Optional)</h2>
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div 
-                    onClick={() => setSelectedTemplate(null)}
-                    className={`p-6 rounded-[2rem] border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center text-center gap-3
-                      ${selectedTemplate === null ? 'bg-purple-50 border-purple-600' : 'bg-white border-slate-200 hover:border-slate-300'}`}
-                  >
-                    <Plus className={`h-8 w-8 ${selectedTemplate === null ? 'text-purple-600' : 'text-slate-300'}`} />
-                    <p className="text-xs font-black text-slate-900 uppercase tracking-widest">Blank Slate</p>
+                    ))}
                   </div>
-                  {mockTemplates.map((t) => (
-                    <div 
-                      key={t.id}
-                      onClick={() => setSelectedTemplate(t.id)}
-                      className={`p-6 rounded-[2rem] border transition-all cursor-pointer
-                        ${selectedTemplate === t.id ? 'bg-white border-purple-600 shadow-xl shadow-purple-100' : 'bg-white border-slate-100'}`}
-                    >
-                      <LayoutTemplate className={`h-5 w-5 mb-4 ${selectedTemplate === t.id ? 'text-purple-600' : 'text-slate-400'}`} />
-                      <p className="text-xs font-black text-slate-900 mb-1">{t.name}</p>
-                      <p className="text-[10px] text-slate-400 font-medium leading-tight">{t.description}</p>
-                    </div>
-                  ))}
-               </div>
-            </div>
-          </main>
-
-          {/* 4. THE ASIDE: Context & History */}
-          <aside className="col-span-12 lg:col-span-4 space-y-8">
-            <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden">
-              <Zap className="absolute -top-4 -right-4 h-24 w-24 text-white/5 rotate-12" />
-              <h3 className="text-xs font-black uppercase tracking-widest text-purple-400 mb-6">Recent History</h3>
-              <div className="space-y-6">
-                {mockRecentInvoices.map((inv) => (
-                  <div key={inv.id} className="flex items-center justify-between group cursor-pointer">
-                    <div className="space-y-1">
-                      <p className="text-sm font-bold group-hover:text-purple-400 transition-colors">{inv.invoice_number}</p>
-                      <p className="text-[10px] text-slate-500 font-bold uppercase">{inv.client_name}</p>
-                    </div>
-                    <div className="text-right">
-                       <p className="text-sm font-black">R{(inv.amount/1000).toFixed(1)}k</p>
-                       <Badge className="bg-white/5 text-[8px] h-4 border-0">{inv.status}</Badge>
-                    </div>
+                </div>
+              </main>
+              <aside className="col-span-12 lg:col-span-4 space-y-8">
+                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden">
+                  <Zap className="absolute -top-4 -right-4 h-24 w-24 text-white/5 rotate-12" />
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-6 px-1">Recent History</h3>
+                  <div className="space-y-6">
+                    {mockRecentInvoices.map((inv) => (
+                      <div key={inv.id} className="flex items-center justify-between group cursor-pointer">
+                        <div className="space-y-1">
+                          <p className="text-sm font-bold group-hover:text-slate-400 transition-colors">{inv.invoice_number}</p>
+                          <p className="text-[10px] text-slate-500 font-bold uppercase">{inv.client_name}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-black italic">R{(inv.amount/1000).toFixed(1)}k</p>
+                          <Badge className="bg-white/5 text-[8px] h-4 border-0 font-black uppercase tracking-widest">{inv.status}</Badge>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <Button variant="link" className="text-white/40 text-[10px] font-black p-0 mt-8 h-auto hover:text-white uppercase tracking-widest">
-                VIEW FULL AUDIT LOG <ArrowRight className="h-3 w-3 ml-2" />
-              </Button>
+                </div>
+              </aside>
             </div>
+          </div>
+        )}
 
-            <div className="p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm">
-               <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Pro Tip</h3>
-               <p className="text-xs text-slate-500 leading-relaxed">
-                  Invoices with <span className="text-slate-900 font-bold">Purchase Orders (PO)</span> are typically processed <span className="text-emerald-600 font-bold">15% faster</span> by large companies.
-               </p>
-            </div>
-          </aside>
-        </div>
+        {/* STEP 02: BUILDER */}
+        {currentStep === 2 && activeConfig && (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+            <WorkflowHeader 
+              step={2} 
+              title="Construction" 
+              subtitle="& Logic." 
+              onBack={() => setCurrentStep(1)} 
+            />
+            <InvoiceBuilder
+              // ADDED: Passing the lifted state and the setter
+              config={activeConfig}
+              setConfig={setActiveConfig}
+              onProceedToReview={handleProceedToVerify} 
+            />
+          </div>
+        )}
+
+        {/* STEP 03: VERIFICATION */}
+        {currentStep === 3 && activeConfig && (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+            <WorkflowHeader 
+              step={3} 
+              title="Verification" 
+              subtitle="& Dispatch." 
+              onBack={() => setCurrentStep(2)} 
+            />
+            <InvoiceVerification
+              config={activeConfig} 
+              onBackToBuild={() => setCurrentStep(2)}
+              onFinalize={(method) => console.log(`Dispatching via ${method}...`)}
+           />
+          </div>
+        )}
+
       </div>
     </div>
   );
