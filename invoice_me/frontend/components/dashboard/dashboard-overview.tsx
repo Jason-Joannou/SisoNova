@@ -358,7 +358,7 @@ export function DashboardOverview() {
                 {service.comingSoon && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
                     <span className="bg-white/80 backdrop-blur-sm px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border border-slate-200 shadow-sm text-slate-400">
-                      In Development
+                      Coming Soon
                     </span>
                   </div>
                 )}
