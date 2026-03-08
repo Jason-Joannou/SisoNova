@@ -22,7 +22,7 @@ from utils.auth.dependencies import get_current_user
 router = APIRouter(prefix="/invoices", tags=["invoices"])
 
 
-router.get("/{supabase_id}", response_model=UserProfile, description="Get user profile", status_code=status.HTTP_200_OK)
+@router.get("/{supabase_id}", response_model=UserProfile, description="Get user profile", status_code=status.HTTP_200_OK)
 async def get_all_invoices(
     supabase_id: str = Path(..., description="The user's Supabase ID"),
     user: User = Depends(get_current_user),
@@ -40,13 +40,13 @@ async def get_all_invoices(
 
     return UserProfile
 
-router.get("/{supabase_id}/{company_name}/invoice-overview", response_model=List[InvoiceOverviewSummary], description="Summary KPIs of invoicing for a company", status_code=status.HTTP_200_OK)
-async def get_all_invoices(
+@router.get("/{supabase_id}/{company_name}/overview", response_model=List[InvoiceOverviewSummary], description="Summary KPIs of invoicing for a company", status_code=status.HTTP_200_OK)
+async def get_invoice_overview(
     supabase_id: str = Path(..., description="The user's Supabase ID"),
     company_name: str = Path(..., description="The name of the company"),
     user: User = Depends(get_current_user),
     mongo_client: MongoDBClient = Depends(get_mongo_client),
-) -> UserProfile:
+) -> List[InvoiceOverviewSummary]:
     """
     Docstring
     """

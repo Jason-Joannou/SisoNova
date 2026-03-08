@@ -5,6 +5,7 @@ from config import AppSettings, Secrets
 import logging
 from fastapi.middleware.cors import CORSMiddleware
 from routes.users import router as users_router
+from routes.invoices import router as invoices_router
 from contextlib import asynccontextmanager
 from database.mongo_client import MongoDBClient
 
@@ -47,6 +48,7 @@ logger.info(f"Environment: {app_secrets.environment}")
 logger.info(f"Allowed origins: {app_settings.allowed_origins}")
 
 app.include_router(users_router)
+app.include_router(invoices_router)
 @app.get("/")
 async def root():
     return {"message": "Hello World"}

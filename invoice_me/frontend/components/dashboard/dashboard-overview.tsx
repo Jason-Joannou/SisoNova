@@ -87,7 +87,7 @@ export function DashboardOverview() {
         const profilePromise = apiClient(API_ROUTES.businessProfiles(supabaseId));
         
         const summaryPromise = companyName 
-          ? apiClient(API_ROUTES.serviceOverviewSummary(supabaseId, companyName, "invoice"))
+          ? apiClient(API_ROUTES.serviceOverviewSummary(supabaseId, companyName, "invoices"))
           : Promise.resolve(null);
 
         const [profileRes, summaryRes] = await Promise.all([profilePromise, summaryPromise]);
