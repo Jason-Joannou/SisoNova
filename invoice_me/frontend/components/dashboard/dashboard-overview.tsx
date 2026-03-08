@@ -267,7 +267,7 @@ export function DashboardOverview() {
 
               <DropdownMenuItem
                 onClick={() => setShowProfileModal(true)}
-                className="rounded-xl h-10 px-3 cursor-pointer text-purple-600 focus:text-purple-600 focus:bg-purple-50"
+                className="rounded-xl h-10 px-3 cursor-pointer"
               >
                 <Plus className="mr-3 h-4 w-4" />
                 <span className="text-[11px] font-black uppercase tracking-wider">Add New Profile</span>
