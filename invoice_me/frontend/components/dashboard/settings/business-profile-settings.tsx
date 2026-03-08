@@ -16,8 +16,9 @@ import { CountryDropdown, RegionDropdown } from 'react-country-region-selector'
 import { 
   ShieldCheck, 
   Save, 
-  Sparkles,
-  Zap
+  Building2,
+  Globe,
+  Fingerprint
 } from "lucide-react"
 import { useAppUser } from "@/lib/use-app-user"
 import { BusinessProfile } from "@/lib/types/invoicing"
@@ -67,8 +68,9 @@ export default function BusinessProfileSettings() {
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-12 animate-in fade-in duration-700">
+    <div className="max-w-5xl mx-auto space-y-12 animate-in fade-in duration-700">
       
+      {/* 1. EDITORIAL HEADER */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-10">
         <div className="space-y-1">
           <h1 className="text-4xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">
@@ -81,136 +83,160 @@ export default function BusinessProfileSettings() {
         <Button 
           onClick={handleSave}
           disabled={loading}
-          className="bg-slate-900 text-white rounded-xl px-8 h-11 text-[10px] font-black tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-200 uppercase"
+          className="bg-slate-900 text-white rounded-xl px-10 h-12 text-[10px] font-black tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-200 uppercase"
         >
-          <Save className="h-3.5 w-3.5 mr-2" /> {loading ? "Syncing..." : "Commit Profile Changes"}
+          <Save className="h-4 w-4 mr-2" /> {loading ? "Syncing..." : "Save All Changes"}
         </Button>
       </header>
 
-      <div className="grid md:grid-cols-12 gap-10">
-        
-        <div className="md:col-span-8">
-          <Card className="rounded-[2.5rem] border-none shadow-xl p-10 bg-white space-y-10">
-            
-            {/* BRANDING GROUP */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Registered Entity Name</Label>
-                <Input value={formData.company_name} onChange={(e) => handleInputChange("company_name", e.target.value)} className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold focus:border-slate-900" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Trading Name (DBA)</Label>
-                <Input value={formData.trading_name} onChange={(e) => handleInputChange("trading_name", e.target.value)} className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold focus:border-slate-900" />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Industry Classification</Label>
-                <Select value={formData.industry_type} onValueChange={(v) => handleInputChange("industry_type", v)}>
-                  <SelectTrigger className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold text-[10px] uppercase">
-                    <SelectValue placeholder="Categorize Merchant" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    {INDUSTRY_TYPES.map((i) => (
-                      <SelectItem key={i.value} value={i.value} className="text-[10px] font-bold uppercase">{i.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+      {/* 2. CONSOLIDATED SETTINGS CONTAINER */}
+      <div className="w-full">
+        <Card className="rounded-[3rem] border-none shadow-2xl p-12 lg:p-16 bg-white space-y-12">
+          
+          {/* BRANDING GROUP */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Registered Entity Name</Label>
+              <Input 
+                value={formData.company_name} 
+                onChange={(e) => handleInputChange("company_name", e.target.value)} 
+                className="rounded-2xl border-slate-100 bg-slate-50/50 h-14 px-6 text-base font-bold focus:border-slate-900 focus:bg-white transition-all" 
+              />
             </div>
-
-            <Separator className="bg-slate-50" />
-
-            {/* CONTACT & NEXUS GROUP */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Billing Email</Label>
-                <Input type="email" value={formData.contact_email} onChange={(e) => handleInputChange("contact_email", e.target.value)} className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Contact Phone</Label>
-                <Input type="tel" value={formData.contact_phone} onChange={(e) => handleInputChange("contact_phone", e.target.value)} className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Address Line 1</Label>
-                <Input value={formData.address_line_1} onChange={(e) => handleInputChange("address_line_1", e.target.value)} className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Suite / Unit (Line 2)</Label>
-                <Input value={formData.address_line_2} onChange={(e) => handleInputChange("address_line_2", e.target.value)} className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold" />
-              </div>
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Trading Name (DBA)</Label>
+              <Input 
+                value={formData.trading_name} 
+                onChange={(e) => handleInputChange("trading_name", e.target.value)} 
+                className="rounded-2xl border-slate-100 bg-slate-50/50 h-14 px-6 text-base font-bold focus:border-slate-900 focus:bg-white transition-all" 
+              />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">City</Label>
-                <Input value={formData.city} onChange={(e) => handleInputChange("city", e.target.value)} className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Province</Label>
-                <RegionDropdown country={formData.country || "South Africa"} value={formData.province || ""} onChange={(v) => handleInputChange("province", v)} className="flex h-11 w-full rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2 text-[10px] font-black uppercase tracking-tight focus:outline-none focus:border-slate-900" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Postal Code</Label>
-                <Input value={formData.postal_code} onChange={(e) => handleInputChange("postal_code", e.target.value)} className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold" />
-              </div>
+            <div className="space-y-3 md:col-span-2">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Industry Classification</Label>
+              <Select value={formData.industry_type} onValueChange={(v) => handleInputChange("industry_type", v)}>
+                <SelectTrigger className="rounded-2xl border-slate-100 bg-slate-50/50 h-14 px-6 text-base font-bold focus:border-slate-900 focus:bg-white transition-all uppercase tracking-wider">
+                  <SelectValue placeholder="Categorize Merchant" />
+                </SelectTrigger>
+                <SelectContent className="rounded-2xl border-slate-100 shadow-2xl">
+                  {INDUSTRY_TYPES.map((i) => (
+                    <SelectItem key={i.value} value={i.value} className="text-sm font-bold uppercase py-3">{i.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-
-            <Separator className="bg-slate-50" />
-
-            {/* COMPLIANCE GROUP */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Company Reg (CIPC)</Label>
-                <Input value={formData.company_registration} onChange={(e) => handleInputChange("company_registration", e.target.value)} className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold focus:border-slate-900" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Tax Reference (SARS)</Label>
-                <Input value={formData.tax_registration} onChange={(e) => handleInputChange("tax_registration", e.target.value)} className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold focus:border-slate-900" />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">VAT Identification Number</Label>
-                <Input value={formData.vat_number} onChange={(e) => handleInputChange("vat_number", e.target.value)} className="rounded-xl border-slate-100 bg-slate-50/50 h-11 font-bold focus:border-slate-900" />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 pt-4 border-t border-slate-50">
-               <ShieldCheck className="h-4 w-4 text-slate-900" />
-               <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Verified Merchant Identity Vault</p>
-            </div>
-          </Card>
-        </div>
-
-        {/* 3. PERSISTENT STATUS (RIGHT) */}
-        <aside className="md:col-span-4 space-y-8 h-fit sticky top-20">
-          <Card className="rounded-[2.5rem] border-none shadow-2xl bg-slate-900 p-10 text-white relative overflow-hidden">
-            <Sparkles className="absolute -right-6 -top-6 h-32 w-32 text-white/5 rotate-12" />
-            <div className="relative z-10 space-y-6">
-              <div>
-                <p className="text-[9px] font-black text-emerald-400 uppercase tracking-[0.3em] mb-2">Account Tier</p>
-                <h3 className="text-3xl font-black tracking-tighter italic">Standard <span className="not-italic text-slate-500 font-light text-2xl">Merchant.</span></h3>
-              </div>
-              <div className="space-y-4 pt-4 border-t border-white/10">
-                <div className="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase">
-                  <span>Next Billing</span><span className="text-white">01 APR 2026</span>
-                </div>
-                <div className="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase">
-                  <span>Limit Usage</span><span className="text-white italic">85% Capacity</span>
-                </div>
-              </div>
-              <Button className="w-full bg-white text-slate-900 rounded-xl h-11 text-[10px] font-black tracking-widest hover:bg-slate-100 uppercase mt-4">Upgrade Plan</Button>
-            </div>
-          </Card>
-
-          <div className="p-8 bg-white border border-slate-200 rounded-[2.5rem] shadow-sm space-y-6">
-             <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-                   <ShieldCheck className="h-4 w-4" />
-                </div>
-                <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Security Protocol</p>
-             </div>
-             <p className="text-[10px] text-slate-500 leading-relaxed font-medium uppercase">Two-factor identity is <span className="text-emerald-600 font-black">Active</span>. Verified via Supabase Auth Protocol.</p>
           </div>
-        </aside>
 
+          <Separator className="bg-slate-100" />
+
+          {/* CONTACT & NEXUS GROUP */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Official Billing Email</Label>
+              <Input 
+                type="email" 
+                value={formData.contact_email} 
+                onChange={(e) => handleInputChange("contact_email", e.target.value)} 
+                className="rounded-2xl border-slate-100 bg-slate-50/50 h-14 px-6 text-base font-bold focus:border-slate-900 focus:bg-white transition-all" 
+              />
+            </div>
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Contact Phone</Label>
+              <Input 
+                type="tel" 
+                value={formData.contact_phone} 
+                onChange={(e) => handleInputChange("contact_phone", e.target.value)} 
+                className="rounded-2xl border-slate-100 bg-slate-50/50 h-14 px-6 text-base font-bold focus:border-slate-900 focus:bg-white transition-all" 
+              />
+            </div>
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Street Address Line 1</Label>
+              <Input 
+                value={formData.address_line_1} 
+                onChange={(e) => handleInputChange("address_line_1", e.target.value)} 
+                className="rounded-2xl border-slate-100 bg-slate-50/50 h-14 px-6 text-base font-bold focus:border-slate-900 focus:bg-white transition-all" 
+              />
+            </div>
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Suite / Unit (Line 2)</Label>
+              <Input 
+                value={formData.address_line_2} 
+                onChange={(e) => handleInputChange("address_line_2", e.target.value)} 
+                className="rounded-2xl border-slate-100 bg-slate-50/50 h-14 px-6 text-base font-bold focus:border-slate-900 focus:bg-white transition-all" 
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">City</Label>
+              <Input 
+                value={formData.city} 
+                onChange={(e) => handleInputChange("city", e.target.value)} 
+                className="rounded-2xl border-slate-100 bg-slate-50/50 h-14 px-6 text-base font-bold focus:border-slate-900 focus:bg-white transition-all" 
+              />
+            </div>
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Province / State</Label>
+              <RegionDropdown 
+                country={formData.country || "South Africa"} 
+                value={formData.province || ""} 
+                onChange={(v) => handleInputChange("province", v)} 
+                className="flex h-14 w-full rounded-2xl border border-slate-100 bg-slate-50/50 px-6 py-2 text-sm font-bold uppercase tracking-tight focus:outline-none focus:border-slate-900 focus:bg-white transition-all" 
+              />
+            </div>
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Postal Code</Label>
+              <Input 
+                value={formData.postal_code} 
+                onChange={(e) => handleInputChange("postal_code", e.target.value)} 
+                className="rounded-2xl border-slate-100 bg-slate-50/50 h-14 px-6 text-base font-bold focus:border-slate-900 focus:bg-white transition-all" 
+              />
+            </div>
+          </div>
+
+          <Separator className="bg-slate-100" />
+
+          {/* COMPLIANCE GROUP */}
+          <div className="bg-slate-50/50 p-10 lg:p-12 rounded-[2.5rem] border border-slate-100 space-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="space-y-3">
+                <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Company Reg (CIPC)</Label>
+                <Input 
+                  value={formData.company_registration} 
+                  onChange={(e) => handleInputChange("company_registration", e.target.value)} 
+                  className="rounded-2xl border-slate-200 bg-white h-14 px-6 text-base font-bold focus:border-slate-900 transition-all" 
+                />
+              </div>
+              <div className="space-y-3">
+                <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">Tax Reference (SARS)</Label>
+                <Input 
+                  value={formData.tax_registration} 
+                  onChange={(e) => handleInputChange("tax_registration", e.target.value)} 
+                  className="rounded-2xl border-slate-200 bg-white h-14 px-6 text-base font-bold focus:border-slate-900 transition-all" 
+                />
+              </div>
+              <div className="space-y-3 md:col-span-2">
+                <Label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1">VAT Identification Number</Label>
+                <Input 
+                  value={formData.vat_number} 
+                  onChange={(e) => handleInputChange("vat_number", e.target.value)} 
+                  className="rounded-2xl border-slate-200 bg-white h-14 px-6 text-base font-bold focus:border-slate-900 transition-all" 
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 pt-8 border-t border-slate-200/60">
+               <div className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center shrink-0">
+                 <ShieldCheck className="h-5 w-5 text-white" />
+               </div>
+               <div className="space-y-0.5">
+                 <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Verified Identity Vault</p>
+                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Merchant legal credentials secured for automated compliance</p>
+               </div>
+            </div>
+          </div>
+
+        </Card>
       </div>
     </div>
   )

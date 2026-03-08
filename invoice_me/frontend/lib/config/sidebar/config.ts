@@ -88,7 +88,6 @@ export const settingsItems = [
     subItems: [
       { title: "User Settings", url: "/dashboard/settings", icon: User },
       { title: "Business Profile", url: "/dashboard/settings/business-profile", icon: Building2 },
-      { title: "Plan & Billing", url: "/dashboard/settings/subscription", icon: CreditCard },
     ],
   },
 ];
