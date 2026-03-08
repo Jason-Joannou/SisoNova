@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Union, Literal
-from models.invoices import AcceptedPaymentMethods
+from enums.payments import AcceptedPaymentMethods
 from enum import Enum
 
 class BasePaymentMethodInfo(BaseModel):

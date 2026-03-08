@@ -67,38 +67,53 @@ export function DashboardOverview() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [businessProfiles, setBusinessProfiles] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  // State for dynamic summaries
+  const [invoiceSummary, setInvoiceSummary] = useState<ServiceSummaryItem[]>([
+    { label: "Total Invoices", value: 0 },
+    { label: "Total Value", value: 0 },
+  ]);
 
-
+  // CONSOLIDATED DATA ORCHESTRATOR
   useEffect(() => {
-    const fetchProfiles = async () => {
-      // 1. Get the ID directly from the Supabase session
+    const syncDashboardData = async () => {
       const supabaseId = session?.user?.id;
+      const companyName = appUser?.preferred_business_profile;
 
-      if (!supabaseId) {
-        console.log("No active session found yet...");
-        return;
-      }
+      if (!supabaseId) return;
 
       try {
-        console.log("Fetching profiles via session ID:", supabaseId);
+        // Parallel fetching of profiles and service summary
+        const profilePromise = apiClient(API_ROUTES.businessProfiles(supabaseId));
+        
+        const summaryPromise = companyName 
+          ? apiClient(API_ROUTES.serviceOverviewSummary(supabaseId, companyName, "invoice"))
+          : Promise.resolve(null);
 
-        const res = await apiClient(API_ROUTES.businessProfiles(supabaseId), {
-          method: "GET"
-        });
+        const [profileRes, summaryRes] = await Promise.all([profilePromise, summaryPromise]);
 
-        if (res.ok) {
-          const names = await res.json();
+        if (profileRes.ok) {
+          const names = await profileRes.json();
           setBusinessProfiles(names);
         }
+
+        if (summaryRes && summaryRes.ok) {
+          const summaryData = await summaryRes.json();
+          const formatted = summaryData.map((item: any) => ({
+            label: item.label,
+            value: typeof item.value === 'number' && item.label.toLowerCase().includes('value')
+              ? `R${(item.value / 1000).toFixed(1)}k`
+              : item.value
+          }));
+          setInvoiceSummary(formatted);
+        }
       } catch (err) {
-        console.error("Failed to load business profiles:", err);
+        console.error("Dashboard Sync Error:", err);
       }
     };
 
-    fetchProfiles();
-
-    // 2. We now depend on the session, which is the most stable trigger
-  }, [session?.user?.id]);
+    syncDashboardData();
+  }, [session?.user?.id, appUser?.preferred_business_profile]);
 
   useEffect(() => {
     if (appUser?.preferred_business_profile === null) {
@@ -108,17 +123,14 @@ export function DashboardOverview() {
 
   const handleSwitchProfile = async (companyName: string) => {
     const supabaseId = session?.user?.id;
-
     if (companyName === appUser?.preferred_business_profile || isUpdating || !supabaseId) return;
 
     setIsUpdating(true);
     try {
-      // RESTful PATCH: /users/{supabase_id}
       await apiClient(API_ROUTES.user(supabaseId), {
         method: "PATCH",
         body: JSON.stringify({ preferred_business_profile: companyName }),
       });
-
       await refreshAppUser();
     } catch (error) {
       console.error("Profile switch failed", error);
@@ -129,19 +141,14 @@ export function DashboardOverview() {
 
   const handleBusinessProfileSubmit = async (data: BusinessProfile) => {
     const supabaseId = session?.user?.id;
-
     if (!supabaseId) return;
 
     try {
-      // Ensure the data object sent to the server also has the correct ID
       const profileWithId = { ...data, supabase_id: supabaseId };
-
-      // RESTful POST: /users/{supabase_id}/business-profiles
       await apiClient(API_ROUTES.addBusinessProfile(supabaseId), {
         method: "POST",
         body: JSON.stringify(profileWithId),
       });
-
       await refreshAppUser();
       setShowProfileModal(false);
     } catch (error) {
@@ -164,10 +171,7 @@ export function DashboardOverview() {
       icon: Smartphone,
       isActive: true,
       comingSoon: false,
-      summary: [
-        { label: "Drafts Sent", value: 12, trend: "up" },
-        { label: "Active Revenue", value: "R45k" },
-      ],
+      summary: invoiceSummary,
       route: "/dashboard/invoicing",
     },
     {
@@ -200,14 +204,12 @@ export function DashboardOverview() {
         open={showProfileModal}
         onOpenChange={setShowProfileModal}
         onSubmit={handleBusinessProfileSubmit}
-        allowClose={!isInitialSetup} // <--- THIS FIXES THE "STUCK" MODAL
+        allowClose={!isInitialSetup}
         title={isInitialSetup ? "Initialize Merchant" : "Register New Entity"}
         submitButtonText={isInitialSetup ? "Finish Setup" : "Register Profile"}
       />
 
       <div className="max-w-[1400px] mx-auto space-y-16">
-
-        {/* 1. REFINED INTEGRATED HEADER */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-slate-200 pb-10">
           <div className="space-y-1">
             <h1 className="text-4xl font-black text-slate-900 tracking-tighter italic leading-none">
@@ -218,7 +220,6 @@ export function DashboardOverview() {
             </div>
           </div>
 
-          {/* NEW MERCHANT IDENTITY TRIGGER (TIGHT & ACCESSIBLE) */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="group flex items-center bg-white border border-slate-200 p-1.5 pr-6 rounded-2xl shadow-sm hover:border-slate-400 transition-all cursor-pointer">
@@ -281,7 +282,6 @@ export function DashboardOverview() {
           </DropdownMenu>
         </header>
 
-        {/* 2. OPERATIONAL MODULES (FULL WIDTH FOCUS) */}
         <section className="space-y-8">
           <div className="flex items-center justify-between px-2">
             <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">

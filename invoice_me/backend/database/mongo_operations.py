@@ -6,6 +6,7 @@ from models.business import (
     UpdateBusinessProfile,
     BusinessProfileCollection,
 )
+from models.invoices import InvoiceConfiguration, InvoiceOverviewSummary
 from config import Secrets
 from datetime import datetime
 from typing import List
@@ -208,6 +209,24 @@ async def add_business_profile_operation(
     except Exception as e:
         print(f"Error updating business profile: {e}")
         raise HTTPException(status_code=500, detail="Error updating business profile")
+    
+async def add_invoice_operation(
+    mongo_client: MongoDBClient, supabase_id: str, company_name: str, invoice: InvoiceConfiguration
+):
+    try:
+        async with mongo_client.get_db(mongo_client.database_name) as db:
+            result = await db["invoices"].update_one(
+                {"supabase_id": supabase_id, "company_name": company_name},
+                {
+                    "$push": {"invoices": invoice.model_dump()},
+                },
+                upsert=True,  # True if you want to create the entry if it doesn't exist
+            )
+            return result.modified_count > 0 or result.upserted_id is not None
+    except Exception as e:
+        print(f"Error updating business profile: {e}")
+        raise HTTPException(status_code=500, detail="Error updating business profile")
+    
 
 
 async def update_business_profile_operation(
@@ -233,3 +252,47 @@ async def update_business_profile_operation(
     except Exception as e:
         print(f"Error updating business profile: {e}")
         return False
+    
+
+async def get_service_overview_summary(
+        mongo_client: MongoDBClient,
+        supabase_id: str,
+        company_name: str,
+        service: str
+):
+    
+    try:
+        if service == "invoice":
+            async with mongo_client.get_db(mongo_client.database_name) as db:
+                invoices = await db["invoices"].find_one(
+                    {"supabase_id": supabase_id, "company_name": company_name}, {"_id": 0}
+                )
+
+                if not invoices or "invoices" not in invoices:
+                    return [
+                        InvoiceOverviewSummary(
+                            label="Total Invoices",
+                            value=0
+                        ),
+                        InvoiceOverviewSummary(
+                            label="Total Invoice Value",
+                            value=0
+                        )
+                    ]
+                
+                return [
+                    InvoiceOverviewSummary(
+                        label="Total Invoices",
+                        value=len(invoices["invoices"])
+                    ),
+                    InvoiceOverviewSummary(
+                        label="Total Invoice Value",
+                        value=sum(invoice["invoice_value"] for invoice in invoices["invoices"])
+                    )
+                ]
+                
+
+    except Exception as e:
+        print(f"Error retrieving user information: {e}")
+        return None
+    
