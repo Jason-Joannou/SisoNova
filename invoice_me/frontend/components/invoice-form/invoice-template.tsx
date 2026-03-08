@@ -108,7 +108,6 @@ export const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({
             <p className="font-black text-slate-900 uppercase text-sm mb-1">
               {config.client_details.company_name}
             </p>
-            <p className="text-slate-900 font-bold">{config.client_details.contact_person}</p>
             {config.client_details.address_line_1 && (
               <>
                 <p>{config.client_details.address_line_1}</p>
@@ -122,9 +121,9 @@ export const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({
               </>
             )}
             <div className="pt-3 space-y-0.5">
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-tight">Email: <span className="text-slate-900">{config.client_details.email}</span></p>
-                {config.client_details.phone && (
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-tight">Phone: <span className="text-slate-900">{config.client_details.phone}</span></p>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-tight">Email: <span className="text-slate-900">{config.client_details.contact_email}</span></p>
+                {config.client_details.contact_phone && (
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-tight">Phone: <span className="text-slate-900">{config.client_details.contact_phone}</span></p>
                 )}
                 {config.client_details.vat_number && (
                 <p className="text-[9px] font-black text-slate-900 uppercase tracking-tight mt-1">VAT #: {config.client_details.vat_number}</p>

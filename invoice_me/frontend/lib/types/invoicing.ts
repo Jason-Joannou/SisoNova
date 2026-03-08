@@ -45,17 +45,7 @@ export interface BusinessProfile {
   industry_type: string
 }
 
-export interface ClientDetails {
-  company_name: string
-  contact_person: string
-  email: string
-  phone?: string
-  address_line_1?: string
-  address_line_2?: string
-  city?: string
-  province?: string
-  postal_code?: string
-  vat_number?: string
+export interface ClientDetails extends BusinessProfile {
   purchase_order_number?: string
   credit_limit_enabled: boolean
   credit_limit_amount?: number

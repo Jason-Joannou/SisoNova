@@ -277,10 +277,10 @@ export function InvoiceBuilder({
                 <EditableInputField value={config.client_details.company_name} className="font-bold text-slate-900 text-sm" onEdit={(v) => updateInvoiceConfig("client_details", "company_name", v)} />
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <Mail className="h-3 w-3" /> <EditableInputField value={config.client_details.email} onEdit={(v) => updateInvoiceConfig("client_details", "email", v)} />
+                    <Mail className="h-3 w-3" /> <EditableInputField value={config.client_details.contact_email} onEdit={(v) => updateInvoiceConfig("client_details", "email", v)} />
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <Phone className="h-3 w-3" /> <EditableInputField value={config.client_details.phone} onEdit={(v) => updateInvoiceConfig("client_details", "phone", v)} />
+                    <Phone className="h-3 w-3" /> <EditableInputField value={config.client_details.contact_phone} onEdit={(v) => updateInvoiceConfig("client_details", "phone", v)} />
                   </div>
                 </div>
               </div>

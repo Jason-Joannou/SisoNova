@@ -79,7 +79,7 @@ export function InvoiceVerification({ config, onBackToBuild, onFinalize }: Invoi
                <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
                   <p className="text-[10px] font-black text-slate-500 uppercase mb-1">Primary Recipient</p>
                   <p className="text-sm font-bold truncate">{config.client_details.company_name}</p>
-                  <p className="text-[10px] text-slate-400">{config.client_details.email}</p>
+                  <p className="text-[10px] text-slate-400">{config.client_details.contact_email}</p>
                </div>
 
                <div className="p-4 bg-white/5 rounded-2xl border border-white/10">

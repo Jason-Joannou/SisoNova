@@ -47,10 +47,15 @@ export function ViewInvoiceModal(props: InvoicePreviewModalProps) {
     },
     client_details: {
       company_name: "Client Company",
-      contact_person: "John Doe",
-      email: "billing@SisoNova.co.za",
-      phone: "+27 21 123 4567",
+      contact_email: "billing@SisoNova.co.za",
+      contact_phone: "+27 21 123 4567",
       credit_limit_enabled: false,
+      address_line_1: "123 Client St, City, Country",
+      city: "Johannesburg",
+      province: "Gauteng",
+      country: "South Africa",
+      postal_code: "2000",
+      industry_type: "Technology",
     },
     items: [
       {

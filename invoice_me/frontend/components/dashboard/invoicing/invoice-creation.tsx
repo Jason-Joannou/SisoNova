@@ -23,6 +23,11 @@ import {
   BusinessProfile,
 } from "@/lib/types/invoicing";
 import { generateInvoiceNumber } from "@/lib/utility/invoicing/utils";
+import { BusinessProfileModal } from "@/components/modals/ui/business-profile";
+import { useAuth } from "@/lib/auth-context";
+import { API_ROUTES } from "@/lib/utility/api/routes";
+import { apiClient } from "@/lib/api-client";
+import { useAppUser } from "@/lib/use-app-user";
 
 // --- MOCK DATA PRESERVED ---
 const defaultBusinessProfile: BusinessProfile = {
@@ -44,21 +49,21 @@ const defaultBusinessProfile: BusinessProfile = {
 const mockSavedBuyers: ClientDetails[] = [
   {
     company_name: "Ridgeway Butchery",
-    contact_person: "John Smith",
-    email: "accounts@ridgewaybutchery.co.za",
-    phone: "+27 11 987 6543",
+    contact_email: "accounts@ridgewaybutchery.co.za",
+    contact_phone: "+27 11 987 6543",
     address_line_1: "789 Main Street",
     city: "Johannesburg",
     province: "Gauteng",
     postal_code: "2000",
     vat_number: "4987654321",
     credit_limit_enabled: false,
+    country: "South Africa",
+    industry_type: "Butchery",
   },
   {
     company_name: "Tech Solutions Ltd",
-    contact_person: "Sarah Johnson",
-    email: "billing@techsolutions.co.za",
-    phone: "+27 21 555 1234",
+    contact_email: "billing@techsolutions.co.za",
+    contact_phone: "+27 21 555 1234",
     address_line_1: "45 Innovation Drive",
     city: "Cape Town",
     province: "Western Cape",
@@ -66,18 +71,21 @@ const mockSavedBuyers: ClientDetails[] = [
     vat_number: "4123456789",
     credit_limit_enabled: true,
     credit_limit_amount: 50000,
+    country: "South Africa",
+    industry_type: "Technology",
   },
   {
     company_name: "Green Energy Co",
-    contact_person: "Michael Brown",
-    email: "finance@greenenergy.co.za",
-    phone: "+27 31 444 5678",
+    contact_email: "finance@greenenergy.co.za",
+    contact_phone: "+27 31 444 5678",
     address_line_1: "12 Solar Street",
     city: "Durban",
     province: "KwaZulu-Natal",
     postal_code: "4001",
     vat_number: "4567891234",
     credit_limit_enabled: false,
+    country: "South Africa",
+    industry_type: "Energy",
   },
 ];
 
@@ -95,9 +103,12 @@ const mockTemplates = [
 
 export function InvoicingPage() {
   // --- STATE MANAGEMENT ---
+  const { session } = useAuth();
+  const { appUser, refreshAppUser } = useAppUser();
   const [currentStep, setCurrentStep] = useState(1); // 1: Setup, 2: Builder, 3: Verification
   const [selectedBuyer, setSelectedBuyer] = useState<ClientDetails | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [openModal, setOpenModal] = useState(false);
   const [savedBuyers, setSavedBuyers] = useState(mockSavedBuyers);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddBuyerOpen, setIsAddBuyerOpen] = useState(false);
@@ -108,15 +119,14 @@ export function InvoicingPage() {
   const filteredBuyers = savedBuyers.filter(
     (buyer) =>
       buyer.company_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      buyer.contact_person.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      buyer.email.toLowerCase().includes(searchQuery.toLowerCase())
+      buyer.contact_email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleStartInvoice = () => {
     if (!selectedBuyer) return;
 
     // ADDED: Initialize activeConfig if it doesn't exist OR if the buyer changed
-    if (!activeConfig || activeConfig.client_details.email !== selectedBuyer.email) {
+    if (!activeConfig || activeConfig.client_details.contact_email !== selectedBuyer.contact_email) {
       setActiveConfig({
         invoice_number: generateInvoiceNumber(defaultBusinessProfile.company_name),
         invoice_date: new Date().toISOString().split("T")[0],
@@ -149,6 +159,30 @@ export function InvoicingPage() {
     setActiveConfig(config);
     setCurrentStep(3);
   };
+
+  const handleSubmitBuyerProfile = async (buyer: ClientDetails) => {
+  setSavedBuyers([...savedBuyers, buyer]);
+  setSelectedBuyer(buyer);
+  setIsAddBuyerOpen(false);
+
+  const supabaseId = session?.user?.id;
+
+  if (!supabaseId) return;
+
+  try {
+    const profileWithId = { ...buyer, supabase_id: supabaseId };
+
+    await apiClient(API_ROUTES.addBusinessProfile(supabaseId), {
+      method: "POST",
+      body: JSON.stringify(profileWithId),
+    });
+
+    await refreshAppUser();
+    setOpenModal(false);
+  } catch (error) {
+    console.error("Error saving business profile:", error);
+  }
+};
 
   // --- REIMAGINED HEADER LOGIC (Consistent for all steps) ---
   const WorkflowHeader = ({ step, title, subtitle, onBack }: { step: number, title: string, subtitle: string, onBack?: () => void }) => (
@@ -209,6 +243,15 @@ export function InvoicingPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-4 lg:p-10 font-sans selection:bg-slate-200">
+      <BusinessProfileModal
+              open={openModal}
+              onOpenChange={setOpenModal}
+              onSubmit={handleSubmitBuyerProfile}
+              allowClose={true} // <--- THIS FIXES THE "STUCK" MODAL
+              title={"Register A New Buyer Profile"}
+              submitButtonText={"Register Buyer Profile"}
+              mode="buyer"
+            />
       <div className="max-w-[1400px] mx-auto">
         
         {/* STEP 01: SELECTION */}
@@ -220,27 +263,29 @@ export function InvoicingPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between px-2">
                     <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Select Recipient</h2>
-                    <Button variant="ghost" className="text-[10px] font-black text-slate-900 hover:bg-slate-50 tracking-widest border border-slate-100 rounded-xl px-4 h-8">
+                    <Button 
+                    onClick={() => setOpenModal(true)} // Open modal
+                    variant="ghost" 
+                    className="text-[10px] font-black text-slate-900 hover:bg-slate-50 tracking-widest border border-slate-100 rounded-xl px-4 h-8">
                       <UserPlus2 className="h-3.5 w-3.5 mr-2" /> ADD NEW BUYER
                     </Button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {filteredBuyers.map((buyer) => (
-                      <div key={buyer.email} onClick={() => setSelectedBuyer(buyer)}
+                      <div key={buyer.contact_email} onClick={() => setSelectedBuyer(buyer)}
                         className={`p-6 rounded-[2rem] transition-all cursor-pointer border relative group
-                          ${selectedBuyer?.email === buyer.email ? 'bg-white border-slate-900 shadow-xl shadow-slate-200' : 'bg-white border-slate-100 hover:border-slate-300'}`}>
-                        {selectedBuyer?.email === buyer.email && <CheckCircle2 className="absolute top-6 right-6 h-5 w-5 text-slate-900" />}
+                          ${selectedBuyer?.contact_email === buyer.contact_email ? 'bg-white border-slate-900 shadow-xl shadow-slate-200' : 'bg-white border-slate-100 hover:border-slate-300'}`}>
+                        {selectedBuyer?.contact_email === buyer.contact_email && <CheckCircle2 className="absolute top-6 right-6 h-5 w-5 text-slate-900" />}
                         <div className="flex items-center gap-4 mb-4">
-                          <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${selectedBuyer?.email === buyer.email ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400'}`}>
+                          <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${selectedBuyer?.contact_email === buyer.contact_email ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400'}`}>
                             <Building2 className="h-6 w-6" />
                           </div>
                           <div>
                             <p className="text-sm font-black text-slate-900">{buyer.company_name}</p>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase">{buyer.contact_person}</p>
                           </div>
                         </div>
                         <div className="space-y-2 border-t border-slate-50 pt-4 text-[10px] font-bold text-slate-500">
-                          <div className="flex items-center gap-2"><Mail className="h-3 w-3" /> {buyer.email}</div>
+                          <div className="flex items-center gap-2"><Mail className="h-3 w-3" /> {buyer.contact_email}</div>
                           <div className="flex items-center gap-2"><MapPin className="h-3 w-3" /> {buyer.city}, {buyer.province}</div>
                         </div>
                       </div>
