@@ -148,26 +148,62 @@ export function SidebarLeft() {
         </SidebarGroup>
 
         {/* Account Section */}
+        {/* Account Section - Now with Dropdown Support */}
         <SidebarGroup className="mt-4">
           <SidebarGroupLabel className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-2 px-4">
             System
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
-              {settingsItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    className="h-10 px-4 rounded-xl hover:bg-slate-50 data-[active=true]:bg-slate-900 data-[active=true]:text-white"
-                  >
-                    <a href={item.url}>
-                      <item.icon className={`h-4 w-4 ${isActive(item.url) ? 'text-white' : 'text-slate-400'}`} />
-                      <span className="text-[11px] font-black uppercase tracking-wider ml-1">{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {settingsItems.map((item) => {
+                const isSubActive = item.subItems?.some(sub => isActive(sub.url));
+                const isItemActive = isActive(item.url);
+                const activeAny = isSubActive || isItemActive;
+
+                if (item.hasSubItems && item.subItems) {
+                  return (
+                    <Collapsible key={item.title} defaultOpen={activeAny} className="group/collapsible">
+                      <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton
+                            isActive={activeAny}
+                            className="h-10 px-4 rounded-xl hover:bg-slate-50 transition-all data-[active=true]:bg-slate-900 data-[active=true]:text-white"
+                          >
+                            <item.icon className={`h-4 w-4 ${activeAny ? 'text-white' : 'text-slate-400'}`} />
+                            <span className="text-[11px] font-black uppercase tracking-wider ml-1">{item.title}</span>
+                            <ChevronDown className="ml-auto h-3 w-3 opacity-50 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub className="ml-4 border-l border-slate-100 gap-1 mt-1">
+                            {item.subItems.map((subItem) => (
+                              <SidebarMenuSubItem key={subItem.title}>
+                                <SidebarMenuSubButton asChild isActive={isActive(subItem.url)} className="h-9 rounded-lg">
+                                  <a href={subItem.url} className="flex items-center gap-3">
+                                    <subItem.icon className={`h-3.5 w-3.5 ${isActive(subItem.url) ? 'text-slate-900' : 'text-slate-400'}`} />
+                                    <span className="text-[10px] font-bold uppercase tracking-tight">{subItem.title}</span>
+                                  </a>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </SidebarMenuItem>
+                    </Collapsible>
+                  );
+                }
+
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={isItemActive} className="h-10 px-4 rounded-xl hover:bg-slate-50 data-[active=true]:bg-slate-900 data-[active=true]:text-white">
+                      <a href={item.url}>
+                        <item.icon className={`h-4 w-4 ${isItemActive ? 'text-white' : 'text-slate-400'}`} />
+                        <span className="text-[11px] font-black uppercase tracking-wider ml-1">{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

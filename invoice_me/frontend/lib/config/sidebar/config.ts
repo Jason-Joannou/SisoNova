@@ -1,5 +1,23 @@
 import { NavigationItem, NavigationSubItem } from "@/lib/types/user-interface"
-import { BarChart3, Home, Settings, TrendingUp, Smartphone, LogOut, User, Zap, ChevronDown, LayoutDashboard, Plus, CalendarDays } from "lucide-react"
+import {
+    BarChart3, 
+    Home, 
+    Settings, 
+    TrendingUp, 
+    Smartphone, 
+    LogOut, 
+    User, 
+    Zap, 
+    ChevronDown, 
+    LayoutDashboard, 
+    Plus, 
+    CalendarDays,
+    Building2,
+    Bell,
+    CreditCard,
+    ShieldCheck,
+    History
+} from "lucide-react"
 
 export const invoicingSubItems: NavigationSubItem[] = [
     {
@@ -61,12 +79,17 @@ export const navigationItems: NavigationItem[] = [
 ]
 
 // Seperated
-export const settingsItems: NavigationItem[] = [
-    {
-        title: "Settings",
-        url: "/dashboard/settings",
-        icon: Settings,
-        color: "text-slate-600"
-    },
-]
+export const settingsItems = [
+  {
+    title: "Settings",
+    url: "/dashboard/settings",
+    icon: Settings,
+    hasSubItems: true,
+    subItems: [
+      { title: "User Settings", url: "/dashboard/settings", icon: User },
+      { title: "Business Profile", url: "/dashboard/settings/business-profile", icon: Building2 },
+      { title: "Plan & Billing", url: "/dashboard/settings/subscription", icon: CreditCard },
+    ],
+  },
+];
 

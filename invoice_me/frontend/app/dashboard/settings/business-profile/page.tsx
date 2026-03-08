@@ -1,7 +1,7 @@
 "use client"
 
 import { SidebarLeft } from "@/components/dashboard/sidebar-left"
-import UserProfilePage from "@/components/dashboard/settings/user-settings"
+import BusinessProfileSettings from "@/components/dashboard/settings/business-profile-settings"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-export default function SettingsPage() {
+export default function MerchantSettingsPage() {
   return (
     <SidebarProvider>
       <SidebarLeft />
@@ -28,7 +28,7 @@ export default function SettingsPage() {
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                    System Settings
+                    Settings / Merchant Profile
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
@@ -37,7 +37,7 @@ export default function SettingsPage() {
         </header>
         
         <main className="p-4 lg:p-10">
-          <UserProfilePage />
+          <BusinessProfileSettings />
         </main>
       </SidebarInset>
     </SidebarProvider>
