@@ -1,6 +1,7 @@
 "use client"
 
 import { Settings, Smartphone, LogOut, User, ChevronDown, Zap } from "lucide-react"
+import Link from "next/link"
 import {
   Sidebar,
   SidebarContent,
@@ -114,10 +115,10 @@ export function SidebarLeft() {
                                   isActive={isActive(subItem.url)}
                                   className="h-9 rounded-lg data-[active=true]:bg-slate-50 data-[active=true]:text-slate-900"
                                 >
-                                  <a href={subItem.url} className="flex items-center gap-3">
+                                  <Link href={subItem.url} className="flex items-center gap-3">
                                     <subItem.icon className={`h-3.5 w-3.5 ${isActive(subItem.url) ? 'text-slate-900' : 'text-slate-400'}`} />
                                     <span className="text-[10px] font-bold uppercase tracking-tight">{subItem.title}</span>
-                                  </a>
+                                  </Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
                             ))}
@@ -135,10 +136,10 @@ export function SidebarLeft() {
                       isActive={isItemActive}
                       className="h-10 px-4 rounded-xl hover:bg-slate-50 transition-all data-[active=true]:bg-slate-900 data-[active=true]:text-white shadow-none"
                     >
-                      <a href={item.url}>
+                      <Link href={item.url}>
                         <item.icon className={`h-4 w-4 ${isItemActive ? 'text-white' : 'text-slate-400'}`} />
                         <span className="text-[11px] font-black uppercase tracking-wider ml-1">{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -179,10 +180,10 @@ export function SidebarLeft() {
                             {item.subItems.map((subItem) => (
                               <SidebarMenuSubItem key={subItem.title}>
                                 <SidebarMenuSubButton asChild isActive={isActive(subItem.url)} className="h-9 rounded-lg">
-                                  <a href={subItem.url} className="flex items-center gap-3">
+                                  <Link href={subItem.url} className="flex items-center gap-3">
                                     <subItem.icon className={`h-3.5 w-3.5 ${isActive(subItem.url) ? 'text-slate-900' : 'text-slate-400'}`} />
                                     <span className="text-[10px] font-bold uppercase tracking-tight">{subItem.title}</span>
-                                  </a>
+                                  </Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
                             ))}
@@ -196,10 +197,10 @@ export function SidebarLeft() {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isItemActive} className="h-10 px-4 rounded-xl hover:bg-slate-50 data-[active=true]:bg-slate-900 data-[active=true]:text-white">
-                      <a href={item.url}>
+                      <Link href={item.url}>
                         <item.icon className={`h-4 w-4 ${isItemActive ? 'text-white' : 'text-slate-400'}`} />
                         <span className="text-[11px] font-black uppercase tracking-wider ml-1">{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -239,9 +240,9 @@ export function SidebarLeft() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-slate-50" />
             <DropdownMenuItem asChild className="rounded-xl h-10 px-3 cursor-pointer">
-              <a href="/dashboard/profile" className="flex items-center text-[11px] font-black uppercase tracking-wider">
+              <Link href="/dashboard/profile" className="flex items-center text-[11px] font-black uppercase tracking-wider">
                 <User className="mr-3 h-4 w-4 text-slate-400" /> Profile Settings
-              </a>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleLogout}
