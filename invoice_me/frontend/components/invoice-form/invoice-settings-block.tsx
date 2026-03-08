@@ -1,3 +1,5 @@
+"use client";
+
 import {
   InvoiceConfiguration,
   InvoiceConfigurationSettings,
@@ -10,6 +12,7 @@ import {
   Phone,
   Plus,
   Trash2,
+  Zap,
 } from "lucide-react";
 import { ConfirmationModalWithButton } from "../modals/invoice-form/confirmation-modal-button";
 import { EditableInputField } from "../ui/editable-field";
@@ -114,23 +117,26 @@ export function InvoiceSettingsBlock({
   };
 
   return (
-    <div className="bg-slate-50 border border-slate-300 rounded-lg p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-slate-700 flex items-center gap-2">
-          <Settings className="h-4 w-4" />
-          Invoice Settings
-        </h3>
+    <div className="bg-white border border-slate-200 rounded-[1.5rem] p-5 shadow-sm">
+      {/* HEADER SECTION */}
+      <div className="flex items-center justify-between mb-4 px-1">
+        <div className="flex items-center gap-2">
+          <Settings className="h-3.5 w-3.5 text-slate-900" />
+          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            System Settings
+          </h3>
+        </div>
         <ConfirmationModalWithButton
           modalInformation={{
             modalTitle: "Close Invoice Settings",
-            modalDescription:
-              "Are you sure you want to close the invoice settings? Your changes will be saved.",
+            modalDescription: "Are you sure you want to close the invoice settings? Your changes will be saved.",
           }}
           buttonInformation={{
-            buttonText: "Close",
-            buttonIcon: <X className="h-4 w-4" />,
+            buttonText: "",
+            buttonIcon: <X className="h-3.5 w-3.5" />,
             buttonVariant: "ghost",
             buttonSize: "sm",
+            buttonClass: "h-6 w-6 p-0 text-slate-300 hover:text-rose-500 transition-colors",
           }}
           updateInvoiceConfig={updateInvoiceConfig}
           toggleComponent={toggleComponent}
@@ -143,216 +149,116 @@ export function InvoiceSettingsBlock({
         />
       </div>
 
-      <div className="space-y-6">
-        {/* Collection Service Configuration */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <label className="text-sm font-medium text-slate-700">
-                Enable Collection Service
-              </label>
-              <p className="text-xs text-slate-600">
-                Let SisoNova handle payment reminders and collections for you
-              </p>
-            </div>
-            <Switch
-              checked={componentConfig.enable_collections_service}
-              onCheckedChange={(val) =>
-                updateComponentConfig("", "enable_collections_service", val)
-              }
-            />
+      <div className="space-y-4">
+        {/* PRIMARY TOGGLE BLOCK */}
+        <div className="flex items-center justify-between bg-slate-900 p-4 rounded-xl shadow-lg">
+          <div className="space-y-0.5">
+            <label className="text-[10px] font-black text-white uppercase tracking-tight">
+              Collection Service
+            </label>
+            <p className="text-[8px] font-bold text-slate-400 uppercase leading-none">
+              Automated Payment Recovery Protocol
+            </p>
           </div>
+          <Switch
+            checked={componentConfig.enable_collections_service}
+            onCheckedChange={(val) => updateComponentConfig("", "enable_collections_service", val)}
+            className="scale-75 data-[state=checked]:bg-emerald-500"
+          />
+        </div>
 
-          {componentConfig.enable_collections_service && (
-            <div className="space-y-6 ml-4">
-              {/* Communication Channels */}
-              <div>
-                <label className="text-sm font-medium text-slate-700 block mb-3">
-                  Communication Channels:
-                </label>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <MessageCircle className="h-4 w-4 text-slate-600" />
-                      <span className="text-sm font-medium text-slate-700">
-                        WhatsApp
-                      </span>
-                    </div>
-                    <Switch
-                      checked={
-                        componentConfig.collection_service_settings
-                          .whatsapp_enabled
-                      }
-                      onCheckedChange={(val) =>
-                        updateComponentConfig(
-                          "collection_service_settings",
-                          "whatsapp_enabled",
-                          val
-                        )
-                      }
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-slate-600" />
-                      <span className="text-sm font-medium text-slate-700">
-                        Email
-                      </span>
-                    </div>
-                    <Switch
-                      checked={
-                        componentConfig.collection_service_settings
-                          .email_enabled
-                      }
-                      onCheckedChange={(val) =>
-                        updateComponentConfig(
-                          "collection_service_settings",
-                          "email_enabled",
-                          val
-                        )
-                      }
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-slate-600" />
-                      <span className="text-sm font-medium text-slate-700">
-                        SMS
-                      </span>
-                    </div>
-                    <Switch
-                      checked={
-                        componentConfig.collection_service_settings.sms_enabled
-                      }
-                      onCheckedChange={(val) =>
-                        updateComponentConfig(
-                          "collection_service_settings",
-                          "sms_enabled",
-                          val
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Reminder Schedule - Improved UI */}
-              <div className="border-t border-slate-200 pt-4">
-                <label className="text-sm font-medium text-slate-700 block mb-2">
-                  Reminder Schedule:
-                </label>
-                <p className="text-xs text-slate-600 mb-4">
-                  Set reminder days relative to due date (negative = before due,
-                  positive = after due)
-                </p>
-
-                <div className="bg-white border border-slate-200 rounded-lg p-4">
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {(
-                      componentConfig?.collection_service_settings
-                        ?.reminder_schedule || []
-                    ).map((day, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-1 bg-slate-100 rounded-md px-2 py-1 text-sm"
-                      >
-                        <EditableInputField
-                          value={day}
-                          type="number"
-                          onEdit={(value) =>
-                            updateReminderSchedule(index, Number(value) || 0)
-                          }
-                          placeholder="0"
-                          className="w-12 text-center text-xs bg-transparent border-none p-0"
-                        />
-                        <span className="text-xs text-slate-600">days</span>
-                        {(componentConfig?.collection_service_settings
-                          ?.reminder_schedule?.length || 0) > 1 && (
-                          <button
-                            onClick={() => removeReminderDay(index)}
-                            className="ml-1 text-red-500 hover:text-red-700 p-0.5"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  <Button
-                    onClick={addReminderDay}
-                    variant="outline"
-                    size="sm"
-                    className="text-slate-600 border-slate-300 hover:bg-slate-50"
-                  >
-                    <Plus className="h-3 w-3 mr-1" />
-                    Add Day
-                  </Button>
-                </div>
-              </div>
-
-              {/* Escalation Settings */}
-              <div className="border-t border-slate-200 pt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-slate-700">
-                    Enable Escalation:
-                  </label>
+        {componentConfig.enable_collections_service && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+            {/* CHANNELS GRID */}
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: "WhatsApp", icon: MessageCircle, field: "whatsapp_enabled" },
+                { label: "Email", icon: Mail, field: "email_enabled" },
+                { label: "SMS", icon: Phone, field: "sms_enabled" },
+              ].map((channel) => (
+                <div key={channel.field} className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl flex flex-col items-center gap-2">
+                  <channel.icon className="h-3 w-3 text-slate-400" />
+                  <span className="text-[8px] font-black text-slate-500 uppercase">{channel.label}</span>
                   <Switch
-                    checked={
-                      componentConfig.collection_service_settings
-                        .escalation_enabled
-                    }
-                    onCheckedChange={(val) =>
-                      updateComponentConfig(
-                        "collection_service_settings",
-                        "escalation_enabled",
-                        val
-                      )
-                    }
+                    checked={(componentConfig.collection_service_settings as any)[channel.field]}
+                    onCheckedChange={(val) => updateComponentConfig("collection_service_settings", channel.field, val)}
+                    className="scale-50 data-[state=checked]:bg-slate-900"
                   />
                 </div>
-                <p className="text-xs text-slate-600 mb-3">
-                  Escalate to more intensive collection methods
-                </p>
+              ))}
+            </div>
 
-                {componentConfig.collection_service_settings
-                  .escalation_enabled && (
-                  <div className="bg-white p-3 rounded border border-slate-200 ml-4">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-xs text-slate-600 block mb-1">
-                          Escalation After:
-                        </label>
-                        <EditableInputField
-                          value={
-                            componentConfig.collection_service_settings
-                              .escalation_days
-                          }
-                          type="number"
-                          onEdit={(value) =>
-                            updateComponentConfig(
-                              "collection_service_settings",
-                              "escalation_days",
-                              Number(value) || 30
-                            )
-                          }
-                          placeholder="30"
-                        />
-                      </div>
-                      <div className="flex items-end">
-                        <span className="text-xs text-slate-600 pb-2">
-                          days after due date
-                        </span>
-                      </div>
-                    </div>
+            {/* REMINDER SCHEDULE - HIGH DENSITY */}
+            <div className="p-4 bg-white border border-slate-100 rounded-xl space-y-3">
+              <div className="flex justify-between items-center">
+                <label className="text-[9px] font-black text-slate-900 uppercase tracking-widest">
+                  Reminder Cadence
+                </label>
+                <Button
+                  onClick={addReminderDay}
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 text-[8px] font-black text-slate-900 uppercase hover:bg-slate-50 px-2"
+                >
+                  <Plus className="h-2.5 w-2.5 mr-1" /> Add Phase
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap gap-1.5">
+                {(componentConfig?.collection_service_settings?.reminder_schedule || []).map((day, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-1.5 bg-slate-900 text-white rounded-lg px-2 py-1 transition-all"
+                  >
+                    <EditableInputField
+                      value={day}
+                      type="number"
+                      onEdit={(v) => updateReminderSchedule(index, Number(v) || 0)}
+                      className="w-6 text-center text-[10px] font-bold bg-transparent p-0 border-none text-white focus:ring-0"
+                    />
+                    <span className="text-[8px] font-black uppercase opacity-50">D</span>
+                    <button
+                      onClick={() => removeReminderDay(index)}
+                      className="ml-1 text-slate-500 hover:text-rose-400 transition-colors"
+                    >
+                      <X className="h-2.5 w-2.5" />
+                    </button>
                   </div>
-                )}
+                ))}
               </div>
             </div>
-          )}
-        </div>
+
+            {/* ESCALATION BLOCK - COMPACT */}
+            <div className="p-4 bg-rose-50/30 border border-rose-100 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <label className="text-[9px] font-black text-rose-900 uppercase tracking-tight">
+                    Critical Escalation
+                  </label>
+                  <p className="text-[8px] font-bold text-rose-400 uppercase">Intensive Recovery Mode</p>
+                </div>
+                <Switch
+                  checked={componentConfig.collection_service_settings.escalation_enabled}
+                  onCheckedChange={(val) => updateComponentConfig("collection_service_settings", "escalation_enabled", val)}
+                  className="scale-75 data-[state=checked]:bg-rose-500"
+                />
+              </div>
+
+              {componentConfig.collection_service_settings.escalation_enabled && (
+                <div className="flex items-center gap-3 bg-white/50 p-2.5 rounded-lg border border-rose-100/50">
+                  <span className="text-[8px] font-black text-rose-400 uppercase tracking-widest">Trigger After:</span>
+                  <EditableInputField
+                    value={componentConfig.collection_service_settings.escalation_days}
+                    type="number"
+                    onEdit={(v) => updateComponentConfig("collection_service_settings", "escalation_days", Number(v) || 30)}
+                    className="text-[10px] font-bold text-rose-700 w-10 text-center"
+                  />
+                  <span className="text-[8px] font-black text-rose-400 uppercase tracking-widest">Days Post-Due</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,12 +1,12 @@
-import { Clock, X, Save, Edit } from "lucide-react";
-import { useEffect } from "react";
+"use client";
+
+import { Clock, X, Check } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { EditableInputField } from "../ui/editable-field";
-import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import {
   PaymentTermsType,
-  AcceptedPaymentMethods,
 } from "@/lib/enums/invoicing";
 
 import {
@@ -91,12 +91,15 @@ export function PaymentTermsBlock({
   };
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-blue-800 flex items-center gap-2">
-          <Clock className="h-4 w-4" />
-          Payment Terms
-        </h3>
+    <div className="bg-white border border-slate-200 rounded-[1.5rem] p-5 shadow-sm">
+      {/* HEADER SECTION - TIGHTER */}
+      <div className="flex items-center justify-between mb-4 px-1">
+        <div className="flex items-center gap-2">
+          <Clock className="h-3.5 w-3.5 text-slate-900" />
+          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            Maturity Schedule
+          </h3>
+        </div>
         <ConfirmationModalWithButton
           modalInformation={{
             modalTitle: "Remove Payment Terms?",
@@ -105,9 +108,9 @@ export function PaymentTermsBlock({
           buttonInformation={{
             buttonVariant: "ghost",
             buttonSize: "sm",
-            buttonClass: "text-blue-600 hover:text-blue-800",
-            buttonIcon: <X className="h-4 w-4" />,
-            buttonText: "X",
+            buttonClass: "h-6 w-6 p-0 text-slate-300 hover:text-rose-500 transition-colors",
+            buttonIcon: <X className="h-3.5 w-3.5" />,
+            buttonText: "",
           }}
           updateInvoiceConfig={updateInvoiceConfig}
           toggleComponent={toggleComponent}
@@ -120,121 +123,69 @@ export function PaymentTermsBlock({
         />
       </div>
 
-      <div className="space-y-6">
-        {/* Payment Terms Type */}
+      <div className="space-y-4">
+        {/* PROTOCOL SELECTION - TIGHT GRID */}
         <div>
-          <label className="text-sm font-medium text-blue-800 block mb-3">
-            Choose your payment terms:
-          </label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             {Object.values(PaymentTermsType).map((term) => {
-              const isSelected =
-                componentConfig.payment_terms_type.includes(term);
+              const isSelected = componentConfig.payment_terms_type.includes(term);
               return (
                 <div
                   key={term}
-                  className={`relative p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    isSelected
-                      ? "border-blue-500 bg-blue-50 ring-2 ring-blue-200"
-                      : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm"
-                  }`}
                   onClick={() => handlePaymentTermToggle(term, !isSelected)}
+                  className={`p-2.5 rounded-xl border transition-all duration-200 cursor-pointer flex items-center justify-between ${
+                    isSelected
+                      ? "border-slate-900 bg-slate-900 text-white shadow-md shadow-slate-100"
+                      : "border-slate-100 bg-slate-50/50 hover:border-slate-300"
+                  }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sm text-gray-900">
-                        {formatPaymentMethod(term)}
-                      </h4>
-                    </div>
-                    <div className="ml-3">
-                      {isSelected ? (
-                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                          <svg
-                            className="w-3 h-3 text-white"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                      ) : (
-                        <div className="w-5 h-5 border-2 border-gray-300 rounded-full"></div>
-                      )}
-                    </div>
-                  </div>
+                  <span className="text-[9px] font-black uppercase tracking-tight truncate">
+                    {formatPaymentMethod(term)}
+                  </span>
+                  {isSelected && <Check className="w-3 h-3 text-white stroke-[4]" />}
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* Payment Description */}
-        <div>
-          <label className="text-sm font-medium text-blue-800 block mb-3">
-            Customize your payment term descriptions:
-          </label>
-          {componentConfig.payment_description &&
-          componentConfig.payment_description.length > 0 ? (
-            <div className="space-y-3">
-              {componentConfig.payment_description.map((desc, index) => (
-                <div
-                  key={desc.payment_terms_type}
-                  className="bg-white border border-gray-200 rounded-lg p-4"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <h5 className="font-medium text-sm text-gray-900">
-                      {formatPaymentMethod(desc.payment_terms_type)}
-                    </h5>
-                  </div>
-                  <EditableInputField
-                    value={desc.description}
-                    onEdit={(value) => {
-                      const currentDescriptions =
-                        componentConfig.payment_description || [];
-                      const updatedDescriptions = currentDescriptions.map(
-                        (d, i) =>
-                          i === index ? { ...d, description: value } : d
-                      );
-                      updateComponentConfig(
-                        "payment_description",
-                        updatedDescriptions
-                      );
-                    }}
-                    placeholder={getDefaultDescription(desc.payment_terms_type)}
-                    multiline
-                    className="w-full"
-                  />
+        {/* DESCRIPTION CUSTOMIZATION - HIGH DENSITY CARDS */}
+        {componentConfig.payment_description && componentConfig.payment_description.length > 0 ? (
+          <div className="space-y-2 pt-2 border-t border-slate-50">
+            {componentConfig.payment_description.map((desc, index) => (
+              <div
+                key={desc.payment_terms_type}
+                className="bg-slate-50/50 border border-slate-100 rounded-xl p-3"
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="h-1 w-1 bg-slate-900 rounded-full"></div>
+                  <h5 className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                    {formatPaymentMethod(desc.payment_terms_type)}
+                  </h5>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
-              <div className="text-gray-400 mb-2">
-                <svg
-                  className="w-8 h-8 mx-auto"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
+                <EditableInputField
+                  value={desc.description}
+                  onEdit={(value) => {
+                    const currentDescriptions = componentConfig.payment_description || [];
+                    const updatedDescriptions = currentDescriptions.map((d, i) =>
+                      i === index ? { ...d, description: value } : d
+                    );
+                    updateComponentConfig("payment_description", updatedDescriptions);
+                  }}
+                  placeholder={getDefaultDescription(desc.payment_terms_type)}
+                  multiline
+                  className="w-full text-[10px] font-medium leading-tight text-slate-600 p-0 bg-transparent border-none focus:ring-0"
+                />
               </div>
-              <p className="text-sm text-gray-500 italic">
-                Select payment terms above to customize their descriptions
-              </p>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-center">
+            <p className="text-[9px] font-bold text-slate-400 uppercase italic">
+              Select protocols to configure language
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
