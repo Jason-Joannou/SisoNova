@@ -89,6 +89,16 @@ class InvoiceConfiguration(BaseModel):
     currency: str
     notes: Optional[str] = None
 
+class Invoice(BaseModel):
+    invoice_number: str
+    invoice_date: str
+    due_date: str
+    buyer_name: str
+    amount: float
+    status: str
+    created_at: str
+
+
 
 class InvoiceOverviewSummary(BaseModel):
     label: str
