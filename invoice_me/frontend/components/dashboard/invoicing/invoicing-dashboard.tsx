@@ -51,25 +51,19 @@ import { API_ROUTES } from "@/lib/utility/api/routes";
 import { apiClient } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
 import { useAppUser } from "@/lib/contexts/app-user-context";
+import { LoadingState } from "@/components/loading";
 
-// Mock data remains the same...
-const mockInvoices: Invoice[] = [
-  { id: "1", invoiceNumber: "INV-2024-001", buyerName: "Ridgeway Butchery", amount: 15750.0, dueDate: "2024-11-15", status: "pending", service: "invoicing", createdAt: "2024-10-15" },
-  { id: "2", invoiceNumber: "INV-2024-002", buyerName: "Tech Solutions Ltd", amount: 28500.0, dueDate: "2024-11-20", status: "paid", service: "invoicing", createdAt: "2024-10-18" },
-  { id: "3", invoiceNumber: "INV-2024-003", buyerName: "Green Energy Co", amount: 12300.0, dueDate: "2024-10-25", status: "overdue", service: "invoicing", createdAt: "2024-09-25" },
-  { id: "4", invoiceNumber: "INV-2024-004", buyerName: "Urban Developers", amount: 45000.0, dueDate: "2024-11-30", status: "pending", service: "financing", createdAt: "2024-10-20" },
-  { id: "5", invoiceNumber: "INV-2024-005", buyerName: "Retail Mart", amount: 8900.0, dueDate: "2024-11-10", status: "paid", service: "invoicing", createdAt: "2024-10-12" },
-];
 
 export function InvoiceDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const { appUser, refreshAppUser } = useAppUser();
+  const { appUser, refreshAppUser, loading: appUserLoading } = useAppUser();
   const { session } = useAuth();
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [invoiceOverview, setInvoiceOverview] = useState<InvoiceServiceOverview | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
   useEffect(() => {
     async function fetchInvoiceOverview() {
@@ -78,23 +72,26 @@ export function InvoiceDashboard() {
 
       if (!supabaseId) return;
 
+      setIsDataLoading(true);
       try {
-        const data = await apiClient(API_ROUTES.serviceOverviewSummary(supabaseId, companyName, "invoices"));
-        const response: InvoiceResponse = await data.json();
-        if (response.success) {
-          setInvoiceOverview(response.data as InvoiceServiceOverview);
-        } else {
-          console.error("Error fetching invoice overview:", response.message);
-        }
-        const invoicesData = await apiClient(API_ROUTES.listServiceItems(supabaseId, companyName, "invoices"));
-        const invoicesResponse: InvoiceResponse = await invoicesData.json();
-        if (invoicesResponse.success) {
-          setInvoices(invoicesResponse.data as Invoice[]);
-        } else {
-          console.error("Error fetching invoices:", invoicesResponse.message);
-        }
+        const [overviewRes, invoicesRes] = await Promise.all([
+          apiClient(API_ROUTES.serviceOverviewSummary(supabaseId, companyName, "invoices")),
+          apiClient(API_ROUTES.listServiceItems(supabaseId, companyName, "invoices"))
+        ]);
+
+        const overviewData = await overviewRes.json();
+        const invoicesData = await invoicesRes.json();
+
+        console.log("Invoice Overview Data:", overviewData);
+        console.log("Invoices Data:", invoicesData);
+
+        if (overviewData.success) setInvoiceOverview(overviewData.data);
+        if (invoicesData.success) setInvoices(invoicesData.data);
       } catch (error) {
         console.error("Error fetching invoice overview:", error);
+      }
+      finally {
+        setIsDataLoading(false);
       }
     }
 
@@ -235,7 +232,7 @@ export function InvoiceDashboard() {
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-20">
                           <FileText className="h-10 w-10 text-slate-200 mx-auto mb-3" />
-                          <p className="text-slate-500">No invoice history for {appUser?.business_profile?.company_name}.</p>
+                          <p className="text-slate-500">No invoice history for {appUser?.preferred_business_profile}.</p>
                         </TableCell>
                       </TableRow>
                     ) : (
