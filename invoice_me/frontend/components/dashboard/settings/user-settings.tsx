@@ -12,7 +12,7 @@ import {
   Mail,
   Smartphone
 } from "lucide-react"
-import { useAppUser } from "@/lib/use-app-user"
+import { useAppUser } from "@/lib/contexts/app-user-context"
 import { useAuth } from "@/lib/auth-context"
 
 export default function UserProfileSettings() {
