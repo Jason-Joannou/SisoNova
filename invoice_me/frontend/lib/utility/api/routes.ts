@@ -7,5 +7,6 @@ export const API_ROUTES = {
     specificBusinessProfile: (userId: string, companyName: string) => `/users/${userId}/business-profiles/${companyName}`,
     serviceOverview: (userId: string, companyName: string, service: string) => `/${service}/${userId}/${companyName}/overview`,
     serviceOverviewSummary: (userId: string, companyName: string, service: string) => `/${service}/${userId}/${companyName}/service-overview`,
+    listServiceItems: (userId: string, companyName: string, service: string) => `/${service}/${userId}/${companyName}`,
 
 };

@@ -50,7 +50,7 @@ import { ViewInvoiceModal } from "./modals/view-invoice-modal";
 import { API_ROUTES } from "@/lib/utility/api/routes";
 import { apiClient } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
-import { useAppUser } from "@/lib/use-app-user";
+import { useAppUser } from "@/lib/contexts/app-user-context";
 
 // Mock data remains the same...
 const mockInvoices: Invoice[] = [
@@ -69,6 +69,7 @@ export function InvoiceDashboard() {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [invoiceOverview, setInvoiceOverview] = useState<InvoiceServiceOverview | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
 
   useEffect(() => {
     async function fetchInvoiceOverview() {
@@ -85,6 +86,13 @@ export function InvoiceDashboard() {
         } else {
           console.error("Error fetching invoice overview:", response.message);
         }
+        const invoicesData = await apiClient(API_ROUTES.listServiceItems(supabaseId, companyName, "invoices"));
+        const invoicesResponse: InvoiceResponse = await invoicesData.json();
+        if (invoicesResponse.success) {
+          setInvoices(invoicesResponse.data as Invoice[]);
+        } else {
+          console.error("Error fetching invoices:", invoicesResponse.message);
+        }
       } catch (error) {
         console.error("Error fetching invoice overview:", error);
       }
@@ -94,7 +102,7 @@ export function InvoiceDashboard() {
   }, [session, appUser]);
 
   // LOGIC: Functional Filtering restored
-  const filteredInvoices = mockInvoices.filter((invoice) => {
+  const filteredInvoices = invoices.filter((invoice) => {
     const matchesSearch =
       invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       invoice.buyerName.toLowerCase().includes(searchQuery.toLowerCase());

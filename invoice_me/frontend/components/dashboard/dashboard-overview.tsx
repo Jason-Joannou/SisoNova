@@ -31,7 +31,6 @@ import { BusinessProfileModal } from "../modals/ui/business-profile";
 import { BusinessProfile } from "@/lib/types/invoicing";
 import { API_ROUTES } from "@/lib/utility/api/routes";
 import { apiClient } from "@/lib/api-client";
-import { useAppUser } from "@/lib/use-app-user";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +39,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useAppUser } from "@/lib/contexts/app-user-context";
 
 type Trend = "up" | "down" | "neutral";
 
