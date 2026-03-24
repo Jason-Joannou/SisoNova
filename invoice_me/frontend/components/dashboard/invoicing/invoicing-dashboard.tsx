@@ -235,7 +235,7 @@ export function InvoiceDashboard() {
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-20">
                           <FileText className="h-10 w-10 text-slate-200 mx-auto mb-3" />
-                          <p className="text-slate-500">No transactions match your search.</p>
+                          <p className="text-slate-500">No invoice history for {appUser?.business_profile?.company_name}.</p>
                         </TableCell>
                       </TableRow>
                     ) : (

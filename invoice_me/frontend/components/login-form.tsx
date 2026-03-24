@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Chrome, KeyRound } from "lucide-react";
-import { LoadingOverlay } from "./loading";
+import { LoadingState } from "./loading";
 import { config } from "@/lib/secrets";
 
 export function LoginForm() {
@@ -26,6 +26,8 @@ export function LoginForm() {
     });
   };
 
+  // This is linked to old email/password flow
+  // Can be removed in favour for supabase email/password flow
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -40,7 +42,7 @@ export function LoginForm() {
 
   return (
     <>
-      {loading && <LoadingOverlay message="Verifying Credentials..." />}
+      {loading && <LoadingState variant="full-page" label="Verifying Credentials..." />}
       <div className="space-y-6">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-4">

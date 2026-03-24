@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
+import { LoadingState } from '@/components/loading'
 
 export default function AuthCallbackPage() {
   const router = useRouter()
@@ -35,11 +36,6 @@ export default function AuthCallbackPage() {
   }, [router])
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center space-y-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
-        <p className="text-lg">Completing sign in...</p>
-      </div>
-    </div>
+    <LoadingState variant="full-page" label="Authenticating..." />
   )
 }

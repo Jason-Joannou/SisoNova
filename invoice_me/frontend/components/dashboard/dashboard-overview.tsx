@@ -40,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useAppUser } from "@/lib/contexts/app-user-context";
+import { LoadingState } from "../loading";
 
 type Trend = "up" | "down" | "neutral";
 
@@ -62,17 +63,20 @@ type FinancialService = {
 
 export function DashboardOverview() {
   const router = useRouter();
-  const { appUser, refreshAppUser } = useAppUser();
+  const { appUser, refreshAppUser, loading: appUserLoading } = useAppUser();
   const { session } = useAuth();
+  const [isDataLoading, setIsDataLoading] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [businessProfiles, setBusinessProfiles] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
-  
-  // State for dynamic summaries
   const [invoiceSummary, setInvoiceSummary] = useState<ServiceSummaryItem[]>([
     { label: "Total Invoices", value: 0 },
     { label: "Total Value", value: 0 },
   ]);
+
+  if (appUserLoading) {
+    return <LoadingState variant="full-page" label="Authenticating" />;
+  }
 
   // CONSOLIDATED DATA ORCHESTRATOR
   useEffect(() => {
@@ -81,7 +85,7 @@ export function DashboardOverview() {
       const companyName = appUser?.preferred_business_profile;
 
       if (!supabaseId) return;
-
+      setIsDataLoading(true);
       try {
         // Parallel fetching of profiles and service summary
         const profilePromise = apiClient(API_ROUTES.businessProfiles(supabaseId));
@@ -99,7 +103,7 @@ export function DashboardOverview() {
 
         if (summaryRes && summaryRes.ok) {
           const summaryData = await summaryRes.json();
-          const formatted = summaryData.map((item: any) => ({
+          const formatted = summaryData.map((item: ServiceSummaryItem) => ({
             label: item.label,
             value: typeof item.value === 'number' && item.label.toLowerCase().includes('value')
               ? `R${(item.value / 1000).toFixed(1)}k`
@@ -110,6 +114,7 @@ export function DashboardOverview() {
       } catch (err) {
         console.error("Dashboard Sync Error:", err);
       }
+      finally {setIsDataLoading(false);}
     };
 
     syncDashboardData();
@@ -292,6 +297,9 @@ export function DashboardOverview() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {financialServices.map((service) => (
               <div key={service.id} className="relative group">
+                {isDataLoading && !service.comingSoon && (
+                  <LoadingState variant="inset" label="Syncing..." />
+                )}
                 <Card
                   onClick={() => !service.comingSoon && router.push(service.route)}
                   className={`rounded-[2.5rem] border-none shadow-xl transition-all duration-500 p-10 flex flex-col h-full
