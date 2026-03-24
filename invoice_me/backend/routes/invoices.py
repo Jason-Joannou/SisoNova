@@ -1,13 +1,14 @@
-from fastapi import APIRouter, status, Depends, Path
+from fastapi import APIRouter, status, Depends, Path, Query
 from fastapi.exceptions import HTTPException
 from models.users import UserProfile, UserUpdate, User
 from models.invoices import InvoiceOverviewSummary, Invoice, InvoiceConfiguration, InvoiceBaseResponse
 from models.base import BaseResponseModel
-from typing import List
+from typing import List, Optional, Union, Dict
 from database.mongo_operations import (
     get_user_by_supabase_id,
     create_user,
     get_user_profile,
+    list_service_items,
     update_user_information,
     add_business_profile_operation,
     update_business_profile_operation,
@@ -15,7 +16,7 @@ from database.mongo_operations import (
     get_user_business_profile_company_names,
     get_service_overview_summary,
     add_invoice_operation,
-    get_service_analytics_overview
+    get_service_analytics_overview,
 )
 from database.mongo_client import MongoDBClient
 from database.mongo_dependencies import get_mongo_client
@@ -25,12 +26,15 @@ from utils.auth.dependencies import get_current_user
 router = APIRouter(prefix="/invoices", tags=["invoices"])
 
 
-@router.get("/{supabase_id}/{company_name}", response_model=List[Invoice], description="Get user profile", status_code=status.HTTP_200_OK)
+@router.get("/{supabase_id}/{company_name}", response_model=InvoiceBaseResponse, description="Get user profile", status_code=status.HTTP_200_OK)
 async def get_all_invoices(
     supabase_id: str = Path(..., description="The user's Supabase ID"),
+    company_name: str = Path(..., description="The name of the company"),
     user: User = Depends(get_current_user),
+    p: int = Query(0, description="The page number for pagination"),
+    page_size: int = Query(5, description="The number of items per page for pagination"),
     mongo_client: MongoDBClient = Depends(get_mongo_client),
-) -> UserProfile:
+) -> InvoiceBaseResponse:
     """
     Get the user profile for the authenticated user
     """
@@ -40,8 +44,14 @@ async def get_all_invoices(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorized",
         )
+    
+    response = await list_service_items(supabase_id=supabase_id, company_name=company_name, mongo_client=mongo_client, service="invoice", p=p, page_size=page_size)
 
-    return UserProfile
+    return InvoiceBaseResponse(
+        success=response.success,
+        message=response.message,
+        data=response.data
+    )
 
 @router.post("/{supabase_id}/{company_name}", response_model=BaseResponseModel, description="Create an invoice", status_code=status.HTTP_201_CREATED)
 async def create_invoice(

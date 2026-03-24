@@ -10,7 +10,7 @@ from models.db import DatabaseResponse
 from models.invoices import InvoiceConfiguration, InvoiceOverviewSummary, Invoice
 from config import Secrets
 from datetime import datetime
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 import traceback
 import logging
 from utils.invoices import calculate_invoice_summary_statistics
@@ -275,6 +275,26 @@ async def get_service_analytics_overview(
     except Exception as e:
         print(f"Error retrieving user information: {e}")
         return DatabaseResponse(success=False, data=None, message="Error retrieving invoice analytics overview")
+
+
+async def list_service_items(
+    mongo_client: MongoDBClient, supabase_id: str, company_name: str, service: str, p: int = 0, page_size: int = 5) -> DatabaseResponse:
+    try:
+        if service == "invoice":
+            query = {"supabase_id": supabase_id, "company_name": company_name}
+            skip = (p - 1) * page_size if p and p > 0 else 0
+            async with mongo_client.get_db(mongo_client.database_name) as db:
+                invoices_cursor = db["invoices"].find(query, {"_id": 0}).skip(skip).limit(page_size)
+                invoices = await invoices_cursor.to_list(length=page_size)
+                if not invoices or "invoices" not in invoices:
+                    return DatabaseResponse(success=True, data=[], message="No invoices found")
+                invoices_list = [Invoice.model_validate(invoice, extra="ignore") for invoice in invoices]
+                
+                return DatabaseResponse(success=True, data=invoices_list, message="Invoice summary retrieved successfully")
+    except Exception as e:
+        print(f"Error retrieving user information: {e}")
+        return DatabaseResponse(success=False, data=None, message="Error retrieving invoice analytics overview")
+    
     
 
 async def get_service_overview_summary(
