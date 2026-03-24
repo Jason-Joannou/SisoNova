@@ -69,16 +69,8 @@ export function DashboardOverview() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [businessProfiles, setBusinessProfiles] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [invoiceSummary, setInvoiceSummary] = useState<ServiceSummaryItem[]>([
-    { label: "Total Invoices", value: 0 },
-    { label: "Total Value", value: 0 },
-  ]);
+  const [invoiceSummary, setInvoiceSummary] = useState<ServiceSummaryItem[]>([]);
 
-  if (appUserLoading) {
-    return <LoadingState variant="full-page" label="Authenticating" />;
-  }
-
-  // CONSOLIDATED DATA ORCHESTRATOR
   useEffect(() => {
     const syncDashboardData = async () => {
       const supabaseId = session?.user?.id;
@@ -89,8 +81,8 @@ export function DashboardOverview() {
       try {
         // Parallel fetching of profiles and service summary
         const profilePromise = apiClient(API_ROUTES.businessProfiles(supabaseId));
-        
-        const summaryPromise = companyName 
+
+        const summaryPromise = companyName
           ? apiClient(API_ROUTES.serviceOverview(supabaseId, companyName, "invoices"))
           : Promise.resolve(null);
 
@@ -114,7 +106,7 @@ export function DashboardOverview() {
       } catch (err) {
         console.error("Dashboard Sync Error:", err);
       }
-      finally {setIsDataLoading(false);}
+      finally { setIsDataLoading(false); }
     };
 
     syncDashboardData();
@@ -218,7 +210,16 @@ export function DashboardOverview() {
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-slate-200 pb-10">
           <div className="space-y-1">
             <h1 className="text-4xl font-black text-slate-900 tracking-tighter italic leading-none">
-              Welcome <span className="text-slate-400 not-italic font-light">{appUser?.preferred_business_profile || "back"}.</span>
+              {appUserLoading ? (
+                <LoadingState variant="skeleton" className="h-10 w-64" />
+              ) : (
+                <>
+                  Welcome{" "}
+                  <span className="text-slate-400 not-italic font-light">
+                    {appUser?.preferred_business_profile}.
+                  </span>
+                </>
+              )}
             </h1>
             <div className="flex items-center gap-2 mt-3">
               <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest px-2">Your Services Overview</span>
@@ -233,9 +234,13 @@ export function DashboardOverview() {
                 </div>
                 <div className="ml-4 mr-8 space-y-0.5">
                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Business Profile</p>
-                  <p className="text-sm font-black text-slate-900 leading-none">
-                    {appUser?.preferred_business_profile || "Complete Setup"}
-                  </p>
+                  {appUserLoading ? (
+                    <LoadingState variant="skeleton" className="h-4 w-28 mt-1" />
+                  ) : (
+                    <p className="text-sm font-black text-slate-900 leading-none">
+                      {appUser?.preferred_business_profile}
+                    </p>
+                  )}
                 </div>
                 <ChevronDown className="h-3.5 w-3.5 text-slate-300 group-hover:text-slate-900 transition-colors" />
               </div>
@@ -297,9 +302,6 @@ export function DashboardOverview() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {financialServices.map((service) => (
               <div key={service.id} className="relative group">
-                {isDataLoading && !service.comingSoon && (
-                  <LoadingState variant="inset" label="Syncing..." />
-                )}
                 <Card
                   onClick={() => !service.comingSoon && router.push(service.route)}
                   className={`rounded-[2.5rem] border-none shadow-xl transition-all duration-500 p-10 flex flex-col h-full
@@ -337,19 +339,26 @@ export function DashboardOverview() {
                   </div>
 
                   <div className="mt-auto pt-8 border-t border-slate-50 space-y-4">
-                    {service.summary.map((item, idx) => (
-                      <div key={idx} className="flex items-center justify-between">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                          {item.label}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-black text-slate-900 italic">
-                            {item.value}
-                          </span>
-                          {getTrendIcon(item.trend)}
-                        </div>
+                    {isDataLoading && !service.comingSoon ? (
+                      <div className="space-y-3">
+                        <LoadingState variant="skeleton" className="h-4 w-full" />
+                        <LoadingState variant="skeleton" className="h-4 w-3/4" />
                       </div>
-                    ))}
+                    ) : (
+                      service.summary.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between">
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            {item.label}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-black text-slate-900 italic">
+                              {item.value}
+                            </span>
+                            {getTrendIcon(item.trend)}
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
 
                   {!service.comingSoon && (
