@@ -6,12 +6,14 @@ from models.business import (
     UpdateBusinessProfile,
     BusinessProfileCollection,
 )
-from models.invoices import InvoiceConfiguration, InvoiceOverviewSummary
+from models.db import DatabaseResponse
+from models.invoices import InvoiceConfiguration, InvoiceOverviewSummary, Invoice
 from config import Secrets
 from datetime import datetime
-from typing import List
+from typing import List, Tuple
 import traceback
 import logging
+from utils.invoices import calculate_invoice_summary_statistics
 
 logger = logging.getLogger(__name__)
 
@@ -252,6 +254,27 @@ async def update_business_profile_operation(
     except Exception as e:
         print(f"Error updating business profile: {e}")
         return False
+    
+
+async def get_service_analytics_overview(
+    mongo_client: MongoDBClient, supabase_id: str, company_name: str, service: str
+) -> DatabaseResponse:
+    try:
+        if service == "invoice":
+            async with mongo_client.get_db(mongo_client.database_name) as db:
+                invoices: InvoiceConfiguration = await db["invoices"].find_one(
+                    {"supabase_id": supabase_id, "company_name": company_name}, {"_id": 0}
+                )
+
+                if not invoices or "invoices" not in invoices:
+                    return DatabaseResponse(success=True, data=[], message="No invoices found")
+                
+                invoice_summary_data = calculate_invoice_summary_statistics(invoices=invoices["invoices"])
+                
+                return DatabaseResponse(success=True, data=invoice_summary_data, message="Invoice summary retrieved successfully")
+    except Exception as e:
+        print(f"Error retrieving user information: {e}")
+        return DatabaseResponse(success=False, data=None, message="Error retrieving invoice analytics overview")
     
 
 async def get_service_overview_summary(

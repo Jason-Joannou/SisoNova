@@ -1,15 +1,16 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, Annotated, Literal, Union
+from typing import Optional, List, Annotated, Literal, Union, Dict
 
 from enums.payments import AcceptedPaymentMethods, PaymentTermsType
 
 # Assuming these are in separate files as discussed
 from models.business import BusinessProfile, ClientDetails
+from models.base import BaseResponseModel
 from models.payment_information import PaymentMethodInfo
 from models.collections import CollectionSettings
 
 
-# --- Supporting Invoicing Models ---
+# --- Supporting Invoicing Models --- 
 
 class InvoiceItem(BaseModel):
     id: str
@@ -103,3 +104,8 @@ class Invoice(BaseModel):
 class InvoiceOverviewSummary(BaseModel):
     label: str
     value: Union[str, int]
+
+
+RESPONSES = Invoice | List[Invoice] | InvoiceOverviewSummary | List[InvoiceOverviewSummary] | BaseResponseModel | Dict
+class InvoiceBaseResponse(BaseResponseModel):
+    data: RESPONSES = Field(..., description="The response data, which can be an invoice, a list of invoices, an overview summary, or a list of overview summaries")
