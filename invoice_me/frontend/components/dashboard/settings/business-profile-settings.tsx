@@ -20,7 +20,7 @@ import {
   Globe,
   Fingerprint
 } from "lucide-react"
-import { useAppUser } from "@/lib/use-app-user"
+import { useAppUser } from "@/lib/contexts/app-user-context"
 import { BusinessProfile } from "@/lib/types/invoicing"
 import { Separator } from "@/components/ui/separator"
 

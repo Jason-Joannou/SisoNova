@@ -27,7 +27,7 @@ import { BusinessProfileModal } from "@/components/modals/ui/business-profile";
 import { useAuth } from "@/lib/auth-context";
 import { API_ROUTES } from "@/lib/utility/api/routes";
 import { apiClient } from "@/lib/api-client";
-import { useAppUser } from "@/lib/use-app-user";
+import { useAppUser } from "@/lib/contexts/app-user-context";
 
 // --- MOCK DATA PRESERVED ---
 const defaultBusinessProfile: BusinessProfile = {
