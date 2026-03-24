@@ -1,6 +1,15 @@
 import { PaymentTermsType, AcceptedPaymentMethods } from "../enums/invoicing";
 import { PaymentMethodInfo } from "./payment-information";
 import { CollectionSettings } from "./collections";
+
+export interface InvoiceServiceOverview {
+  number_pending_invoices: number;
+  total_ammount_due: number;
+  number_overdue_invoices: number;
+  total_overdue_amount: number;
+  collected_amount: number;
+  total_invoices: number;
+}
 export interface Invoice {
   id: string;
   invoiceNumber: string;
@@ -116,4 +125,12 @@ export interface InvoiceConfiguration {
   invoice_settings?: InvoiceConfigurationSettings
   currency: string
   notes?: string
+}
+
+type RESPONSES = Invoice | Invoice[] | InvoiceServiceOverview
+
+export interface InvoiceResponse {
+  success: boolean;
+  message: string;
+  data: RESPONSES;
 }

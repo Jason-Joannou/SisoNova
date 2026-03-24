@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -44,9 +44,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Invoice } from "@/lib/types/invoicing";
+import { Invoice, InvoiceServiceOverview, InvoiceResponse } from "@/lib/types/invoicing";
 import Link from "next/link";
 import { ViewInvoiceModal } from "./modals/view-invoice-modal";
+import { API_ROUTES } from "@/lib/utility/api/routes";
+import { apiClient } from "@/lib/api-client";
+import { useAuth } from "@/lib/auth-context";
+import { useAppUser } from "@/lib/use-app-user";
 
 // Mock data remains the same...
 const mockInvoices: Invoice[] = [
@@ -60,8 +64,34 @@ const mockInvoices: Invoice[] = [
 export function InvoiceDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const { appUser, refreshAppUser } = useAppUser();
+  const { session } = useAuth();
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [invoiceOverview, setInvoiceOverview] = useState<InvoiceServiceOverview | null>(null);
+
+  useEffect(() => {
+    async function fetchInvoiceOverview() {
+      const supabaseId = session?.user?.id;
+      const companyName = appUser?.preferred_business_profile;
+
+      if (!supabaseId) return;
+
+      try {
+        const data = await apiClient(API_ROUTES.serviceOverviewSummary(supabaseId, companyName, "invoices"));
+        const response: InvoiceResponse = await data.json();
+        if (response.success) {
+          setInvoiceOverview(response.data as InvoiceServiceOverview);
+        } else {
+          console.error("Error fetching invoice overview:", response.message);
+        }
+      } catch (error) {
+        console.error("Error fetching invoice overview:", error);
+      }
+    }
+
+    fetchInvoiceOverview();
+  }, [session, appUser]);
 
   // LOGIC: Functional Filtering restored
   const filteredInvoices = mockInvoices.filter((invoice) => {
@@ -101,7 +131,7 @@ export function InvoiceDashboard() {
             </h1>
             <p className="text-slate-500 mt-1 flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-purple-500" />
-              Viewing {filteredInvoices.length} transactions across your portfolio.
+              Viewing {invoiceOverview?.total_invoices ?? 0} transactions across your portfolio.
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -130,21 +160,21 @@ export function InvoiceDashboard() {
                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
                   <div>
                     <p className="text-slate-500 text-sm">Drafts & Pending</p>
-                    <h3 className="text-3xl font-black text-slate-900 mt-1">R 60,750</h3>
+                    <h3 className="text-3xl font-black text-slate-900 mt-1">R {invoiceOverview?.total_ammount_due ?? 0}</h3>
                     <div className="w-full h-1.5 bg-slate-100 rounded-full mt-4">
                        <div className="w-2/3 h-full bg-amber-400 rounded-full shadow-[0_0_8px_rgba(251,191,36,0.4)]" />
                     </div>
                   </div>
                   <div className="border-l border-slate-100 pl-12 hidden md:block">
                     <p className="text-slate-500 text-sm">Collected (MTD)</p>
-                    <h3 className="text-3xl font-black text-emerald-600 mt-1">R 37,400</h3>
+                    <h3 className="text-3xl font-black text-emerald-600 mt-1">R {invoiceOverview?.collected_amount ?? 0}</h3>
                     <p className="text-xs text-emerald-600 font-bold mt-2 flex items-center gap-1">
                        <ArrowUpRight className="h-3 w-3" /> +12.5%
                     </p>
                   </div>
                   <div className="border-l border-slate-100 pl-12 hidden md:block">
-                    <p className="text-slate-500 text-sm">Projected (Q4)</p>
-                    <h3 className="text-3xl font-black text-slate-900 mt-1">R 145,000</h3>
+                    <p className="text-slate-500 text-sm">Overdue</p>
+                    <h3 className="text-3xl font-black text-slate-900 mt-1">R {invoiceOverview?.total_overdue_amount ?? 0}</h3>
                     <p className="text-xs text-slate-400 mt-2 italic">Active contracts</p>
                   </div>
                </div>
